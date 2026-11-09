@@ -1,0 +1,56 @@
+# Lazarus / FPC 编译产物
+lib/
+backup/
+*.ppu
+*.o
+*.a
+*.compiled
+*.dbg
+*.or
+*.res
+*.rsj
+*.lps
+
+# 备份文件
+*.bak
+*.bak[0-9]
+*.~*
+
+# 可执行 / 库输出
+*.exe
+*.dll
+*.so
+*.dylib
+*.app/
+
+# 构建出的二进制（工具，非 Windows 平台没有扩展名；示例的在它的 lib/ 下）
+/tools/advchart-bench/advchart_bench
+/tools/advchart-probe/advchart_probe
+
+# lazbuild 从 .lpk 自动生成的包注册单元（构建时重新生成）
+/tyadvancechart.pas
+/tyadvancechart_dt.pas
+
+# Lazarus IDE 全局包链接缓存（机器相关，lazbuild --pcp 写出，不应入库）
+packagefiles.xml
+
+# FPC 智能链接 / 临时产物
+*.fpc
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# Superpowers brainstorming 可视化助手临时产物
+.superpowers/
+
+# 开发文档(superpowers 写的 plans/specs/research)不进公开仓库,在私有仓库同步
+docs/superpowers/
+
+# Test-runner output an agent left at the repo root; swept in once by a careless
+# `git add -A`. Named so, they are scratch, not deliverables.
+/m[0-9].txt
+/*.actual
+
+# the oracles' npm packages (tools/advchart-oracle/package.json; npm install there)
+tools/advchart-oracle/node_modules/
