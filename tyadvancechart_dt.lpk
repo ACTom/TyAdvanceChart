@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <Name Value="tyadvancechart_dt"/>
+    <Type Value="DesignTime"/>
+    <Author Value="ACTom"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="designtime"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)/designtime"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Description Value="TyAdvanceChart Design-Time Support Package: the palette entry, the chart&apos;s component editor and its Option property editor. Requires the TyAdvanceChart Run-Time Package and the TyControls Design-Time Support Package.
+"/>
+    <License Value="Modified LGPL (see COPYING.modifiedLGPL.txt) — same as the Lazarus LCL"/>
+    <Version Major="3" Minor="99"/>
+    <Files>
+      <Item>
+        <Filename Value="designtime/tyControls.Design.AdvanceChart.Register.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="tyControls.Design.AdvanceChart.Register"/>
+      </Item>
+      <Item>
+        <Filename Value="designtime/tyControls.Design.AdvanceChart.Descs.pas"/>
+        <UnitName Value="tyControls.Design.AdvanceChart.Descs"/>
+      </Item>
+      <Item>
+        <Filename Value="designtime/tyControls.Design.AdvanceChart.Editor.pas"/>
+        <UnitName Value="tyControls.Design.AdvanceChart.Editor"/>
+      </Item>
+      <Item>
+        <Filename Value="designtime/tyControls.Design.AdvanceChart.SeriesDialog.pas"/>
+        <UnitName Value="tyControls.Design.AdvanceChart.SeriesDialog"/>
+      </Item>
+      <Item>
+        <Filename Value="designtime/tycontrols_advchart_desc.lrs"/>
+        <Type Value="LRS"/>
+      </Item>
+      <Item>
+        <Filename Value="designtime/advchart-descs.json"/>
+        <Type Value="Text"/>
+      </Item>
+      <Item>
+        <Filename Value="designtime/tyadvancechart_icons.lrs"/>
+        <Type Value="LRS"/>
+      </Item>
+    </Files>
+    <i18n>
+      <EnableI18N Value="True"/>
+      <OutDir Value="languages"/>
+    </i18n>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="tyadvancechart"/>
+      </Item>
+      <Item>
+        <PackageName Value="tycontrols_dt"/>
+      </Item>
+      <Item>
+        <PackageName Value="IDEIntf"/>
+      </Item>
+      <Item>
+        <PackageName Value="SynEdit"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>
