@@ -23,7 +23,9 @@ backup/
 *.dylib
 *.app/
 
-# 构建出的二进制（工具，非 Windows 平台没有扩展名；示例的在它的 lib/ 下）
+# 构建出的二进制（非 Windows 平台没有扩展名）
+/tests/tyadvchart_tests
+/examples/advchart/advchart_example
 /tools/advchart-bench/advchart_bench
 /tools/advchart-probe/advchart_probe
 
