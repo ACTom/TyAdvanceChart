@@ -156,4 +156,4 @@ TranslateUnitResourceStringsEx('', LangDir, 'tycontrols_advancechart',
 
 修改版 LGPL，和 TyControls、FPC RTL、LCL、BGRABitmap 相同：可以静态链接进闭源商业软件分发；修改本项目的源码时，修改部分要以同样的许可开放。
 
-完整条款见 [COPYING.modifiedLGPL.txt](COPYING.modifiedLGPL.txt) 与 [COPYING.LGPL.txt](COPYING.LGPL.txt)。示例里的 ECharts 示例配置、地图和 d3-geo 移植代码的许可见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+完整条款见 [COPYING.modifiedLGPL.txt](COPYING.modifiedLGPL.txt) 与 [COPYING.LGPL.txt](COPYING.LGPL.txt)。图表所移植的 ECharts、ZRender 源码的许可，以及示例里的 ECharts 示例配置、地图和 d3-geo 移植代码的许可，都在 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) 里。

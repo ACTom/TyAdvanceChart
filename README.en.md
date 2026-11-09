@@ -156,4 +156,4 @@ Report problems and ideas on [GitHub](https://github.com/ACTom/TyAdvanceChart/is
 
 Modified LGPL, the same license as TyControls, the FPC RTL, LCL and BGRABitmap: you may statically link the chart into closed-source commercial applications; modifications to this project's own source must be released under the same license.
 
-Full terms: [COPYING.modifiedLGPL.txt](COPYING.modifiedLGPL.txt) and [COPYING.LGPL.txt](COPYING.LGPL.txt). The licences of the ECharts example configurations, the maps and the d3-geo port in the example are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+Full terms: [COPYING.modifiedLGPL.txt](COPYING.modifiedLGPL.txt) and [COPYING.LGPL.txt](COPYING.LGPL.txt). The licences of the ECharts and ZRender code the chart is ported from, and of the ECharts example configurations, the maps and the d3-geo port in the example, are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

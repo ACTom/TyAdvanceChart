@@ -1,7 +1,8 @@
 unit test.advchart.release;
 {$mode objfpc}{$H+}
 
-{ Three of TyControls' release guards (test.release) covered the chart, and came with it.
+{ Three of TyControls' release guards (test.release) covered the chart, and came with it; a
+  fourth follows the way TyControls guards the notices of its own ports.
 
   TheChartOptionEditorStaysAShell: the chart's Option editor only puts the layer under it in a
   box. It reads the design-time file, which is all tests/ can do about that directory.
@@ -19,7 +20,11 @@ unit test.advchart.release;
   EveryUnitOnDiskIsListedInItsPackage: TyControls walked its source/ and designtime/ and asked
   whether each unit is listed in its package -- the chart's units with them, until they moved
   here. The same walk runs here over source/ (tyadvancechart.lpk) and designtime/
-  (tyadvancechart_dt.lpk). }
+  (tyadvancechart_dt.lpk).
+
+  TheThirdPartyNoticeCoversTheEChartsPort: the chart is a port of Apache ECharts and of zrender,
+  so THIRD-PARTY-NOTICES.md carries their licence texts in a section whose heading covers the
+  ported files, as TyControls' TheThirdPartyNoticeCoversTheTerminalPort does for xterm.js. }
 
 interface
 
@@ -32,6 +37,7 @@ type
     procedure TheChartOptionEditorStaysAShell;
     procedure EveryIncludeFileAPackagedUnitNamesIsListed;
     procedure EveryUnitOnDiskIsListedInItsPackage;
+    procedure TheThirdPartyNoticeCoversTheEChartsPort;
   end;
 
 implementation
@@ -242,6 +248,91 @@ begin
   finally
     bad.Free;
   end;
+end;
+
+procedure TAdvChartReleaseTest.TheThirdPartyNoticeCoversTheEChartsPort;
+const
+  cHeading = '## Apache ECharts and ZRender';
+  cGlob = 'source/tyControls.AdvanceChart*';
+  cPrefix = 'tyControls.AdvanceChart';
+  { the units ported from the four ECharts files that embed d3.js code (ECharts' LICENSE) }
+  cD3Units: array[0..3] of string = ('tyControls.AdvanceChart.Treemap.pas',
+    'tyControls.AdvanceChart.Tree.pas', 'tyControls.AdvanceChart.Graph.pas',
+    'tyControls.AdvanceChart.Dataset.pas');
+  cExts: array[0..1] of string = ('*.pas', '*.inc');
+var
+  sl: TStringList;
+  notice, heading, section, low, bad, ext: string;
+  p, ported, i: Integer;
+  rec: TSearchRec;
+begin
+  { Hardcoded on purpose, as TyControls' guards for its own ports are: no manifest declares a
+    licence obligation, so it cannot be derived. The chart is ported from ECharts (Apache
+    License 2.0, with a NOTICE file) and from zrender (BSD 3-Clause); shipping it obliges
+    THIRD-PARTY-NOTICES.md to carry ECharts' LICENSE and NOTICE and zrender's LICENSE. The
+    pinned versions are checked too, so a notice left behind by a later re-pin shows.
+
+    What IS derived is which files the heading must cover: every unit and include file under
+    source/ that names ECharts or zrender. Today all of them start with the prefix the heading
+    names; a ported file added under another name shows here. }
+  sl := TStringList.Create;
+  try
+    sl.LoadFromFile(RepoRoot + 'THIRD-PARTY-NOTICES.md');
+    notice := sl.Text;
+  finally
+    sl.Free;
+  end;
+  p := Pos(cHeading, notice);
+  AssertTrue('the notice has an Apache ECharts and ZRender section', p > 0);
+  heading := Copy(notice, p, Pos(#10, Copy(notice, p, MaxInt)));
+  AssertTrue('its heading covers `' + cGlob + '`', Pos('`' + cGlob + '`', heading) > 0);
+  { the section runs to the next second-level heading }
+  section := Copy(notice, p + Length(heading), MaxInt);
+  p := Pos(#10'## ', section);
+  if p > 0 then
+    SetLength(section, p);
+  AssertTrue('it pins ECharts 6.1.0', Pos('ECharts 6.1.0', section) > 0);
+  AssertTrue('and zrender 6.1.0', Pos('zrender 6.1.0', section) > 0);
+  AssertTrue('it carries the Apache License 2.0, from its terms',
+    Pos('TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION', section) > 0);
+  AssertTrue('to their end', Pos('END OF TERMS AND CONDITIONS', section) > 0);
+  AssertTrue('with ECharts'' list of subcomponents', Pos('Apache ECharts Subcomponents:', section) > 0);
+  AssertTrue('ECharts'' NOTICE', Pos('This product includes software developed at', section) > 0);
+  AssertTrue('and zrender''s BSD 3-Clause licence, with its copyright line',
+    (Pos('BSD 3-Clause License', section) > 0) and (Pos('Copyright (c) 2017, Baidu Inc.', section) > 0));
+  for i := 0 to High(cD3Units) do
+  begin
+    AssertTrue('it names ' + cD3Units[i] + ', which carries d3.js code',
+      Pos(cD3Units[i], section) > 0);
+    AssertTrue(cD3Units[i] + ' is on disk', FileExists(RepoRoot + 'source' + PathDelim + cD3Units[i]));
+  end;
+  AssertTrue('and the d3 licence text is in the notice',
+    Pos('Copyright 2010-2016 Mike Bostock', notice) > 0);
+
+  bad := '';
+  ported := 0;
+  sl := TStringList.Create;
+  try
+    for ext in cExts do
+      if FindFirst(RepoRoot + 'source' + PathDelim + ext, faAnyFile, rec) = 0 then
+      begin
+        repeat
+          if (rec.Attr and faDirectory) <> 0 then Continue;
+          sl.LoadFromFile(RepoRoot + 'source' + PathDelim + rec.Name);
+          low := LowerCase(sl.Text);
+          if (Pos('echarts', low) = 0) and (Pos('zrender', low) = 0) then Continue;
+          Inc(ported);
+          if not StartsStr(cPrefix, rec.Name) then
+            bad := bad + LineEnding + '  source/' + rec.Name;
+        until FindNext(rec) <> 0;
+        FindClose(rec);
+      end;
+  finally
+    sl.Free;
+  end;
+  AssertTrue('anti-vacuity: the files that name ECharts or zrender (' + IntToStr(ported) + ')',
+    ported >= 100);
+  AssertEquals('ported files the heading''s `' + cGlob + '` does not cover:' + bad, '', bad);
 end;
 
 initialization
