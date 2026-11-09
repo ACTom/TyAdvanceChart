@@ -1,7 +1,7 @@
 unit test.advchart.release;
 {$mode objfpc}{$H+}
 
-{ Two of TyControls' release guards (test.release) were about the chart, and came with it.
+{ Three of TyControls' release guards (test.release) covered the chart, and came with it.
 
   TheChartOptionEditorStaysAShell: the chart's Option editor only puts the layer under it in a
   box. It reads the design-time file, which is all tests/ can do about that directory.
@@ -14,7 +14,12 @@ unit test.advchart.release;
   package is what Lazarus, the online package manager and a release copy go by. So each $I of
   each unit the two packages list, followed into the include files it reaches, must name a file
   that is on disk and listed in one of the packages, and there must be at least the chart's 23
-  includes plus the two .lrs files the design-time units include. }
+  includes plus the two .lrs files the design-time units include.
+
+  EveryUnitOnDiskIsListedInItsPackage: TyControls walked its source/ and designtime/ and asked
+  whether each unit is listed in its package -- the chart's units with them, until they moved
+  here. The same walk runs here over source/ (tyadvancechart.lpk) and designtime/
+  (tyadvancechart_dt.lpk). }
 
 interface
 
@@ -26,6 +31,7 @@ type
   published
     procedure TheChartOptionEditorStaysAShell;
     procedure EveryIncludeFileAPackagedUnitNamesIsListed;
+    procedure EveryUnitOnDiskIsListedInItsPackage;
   end;
 
 implementation
@@ -172,6 +178,69 @@ begin
     listed.Free;
     seen.Free;
     todo.Free;
+  end;
+end;
+
+procedure TAdvChartReleaseTest.EveryUnitOnDiskIsListedInItsPackage;
+var
+  listedTotal: Integer;
+
+  procedure CheckDir(const ADir, ALpk: string; ABad: TStrings);
+  var
+    found: TStringList;
+    listed: TStringList;
+    rec: TSearchRec;
+    i: Integer;
+    rel: string;
+  begin
+    found := TStringList.Create;
+    listed := TStringList.Create;
+    try
+      { CollectLpkFiles prepends RepoRoot itself. }
+      CollectLpkFiles(ALpk, listed);
+      Inc(listedTotal, listed.Count);
+      if FindFirst(RepoRoot + ADir + PathDelim + '*.pas', faAnyFile, rec) = 0 then
+      begin
+        repeat
+          if (rec.Attr and faDirectory) = 0 then found.Add(rec.Name);
+        until FindNext(rec) <> 0;
+        FindClose(rec);
+      end;
+      for i := 0 to found.Count - 1 do
+      begin
+        rel := Slashes(ADir) + '/' + found[i];   { the .lpk's spelling }
+        if listed.IndexOf(rel) < 0 then
+          ABad.Add(rel + '  (not listed in ' + ALpk + ')');
+      end;
+    finally
+      listed.Free;
+      found.Free;
+    end;
+  end;
+
+var
+  bad: TStringList;
+begin
+  listedTotal := 0;
+  { THE DIRECTION NOTHING CHECKED. EveryFileThePackagesNameIsShipped walks the
+    .lpk and asks whether each entry exists; this walks the DISK and asks
+    whether each unit is listed. They catch opposite mistakes, and the second
+    one is the one that actually happens: a new unit compiles perfectly through
+    the directory search path, so nothing on the author's machine notices, and
+    it is simply absent from the installed package and every release archive.
+
+    Three units were added to this layer by hand in one afternoon. That is the
+    rate at which the omission becomes likely. }
+  bad := TStringList.Create;
+  try
+    CheckDir('source', 'tyadvancechart.lpk', bad);
+    CheckDir('designtime', 'tyadvancechart_dt.lpk', bad);
+    AssertTrue('anti-vacuity: the packages list the units', listedTotal > 100);
+    AssertEquals('units on disk that no package lists -- they compile via the '
+      + 'search path and then go missing from the installed package:'
+      + LineEnding + bad.Text, '', bad.Text);
+  finally
+    bad.Free;
   end;
 end;
 

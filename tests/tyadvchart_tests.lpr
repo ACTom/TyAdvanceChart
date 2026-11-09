@@ -98,7 +98,10 @@ uses
   test.advchart.coredir, test.advchart.version, test.advchart.customclasses.mimic,
   test.advchart.customclasses, test.advchart.designeditors, test.advchart.defaults,
   test.advchart.tabstop, test.advchart.controlfont, test.advchart.release, test.advchart.themekeys,
-  test.advchart.builtinthemes;
+  test.advchart.builtinthemes, test.advchart.themelint, test.advchart.danglingrefs,
+  test.advchart.componentleaks, test.advchart.freewhileownerlives, test.advchart.wheelevents,
+  test.advchart.measurefont, test.advchart.paletteicons, test.advchart.dpicontrols,
+  test.advchart.runnerstate;
 
 type
   TTyTestRunner = class(TTestRunner)
@@ -118,8 +121,8 @@ begin
   // here, before any test, so every process starts in the same state whichever suite it
   // runs first: a suite run on its own sees what it sees in the full run. It goes before
   // the pins below because initialising reads the desktop into ScreenInfo (its PPI among
-  // them); the pins must be what is left standing. (TyControls' tests/test.runnerstate holds
-  // its runner to all of it.) (Forms. because Application below is the test runner.)
+  // them); the pins must be what is left standing. tests/test.advchart.runnerstate holds the
+  // runner to all of it. (Forms. because Application below is the test runner.)
   Forms.Application.Initialize;
   // Headless determinism: keep the empty-FontName render path so position-
   // sensitive pixel tests are unaffected by the real system font. Disable the

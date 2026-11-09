@@ -8,8 +8,11 @@ unit test.advchart.i18n;
   one and the two design-time ones) is keyed on its own unit's name. The core's catalogues are
   read from the TyControls checkout TY_CORE_DIR names (test.advchart.coredir); unset, that
   check is ignored.
-  And the chart's half of TyControls' #68 guard: no unit under source/ holds Chinese text in a
-  string literal, but for ECharts' own data in two of them. }
+  And the chart's half of three of TyControls' test.i18n guards, which walked the chart's
+  files with the core's until they moved here: no unit under source/ holds Chinese text in a
+  string literal, but for ECharts' own data in two of them (#68); no catalogue entry anywhere
+  under the repository (the example's languages/ too) is empty on both sides; every .pot names a
+  unit that still translates, and every .po a .pot. }
 interface
 uses
   Classes, SysUtils, fpcunit, testregistry, FileUtil,
@@ -24,6 +27,8 @@ type
     procedure TestEveryAdvChartResourcestringIsInItsPot;
     procedure TestTheChartCataloguesBindToTheirUnits;
     procedure TestNoUnitHoldsChineseTextInAStringLiteral;
+    procedure TestNoCatalogueEntryIsWhollyEmpty;
+    procedure TestEveryCatalogueBelongsToAUnitThatStillTranslates;
   end;
 
 implementation
@@ -128,7 +133,8 @@ end;
 { The ids the chart's pot lists are the chart's strings. None of them may survive in the
   core's pot, its Chinese or English catalogue, or in the core's string unit; and the
   three anchors keep this from passing vacuously should the pot ever be emptied. The core's
-  files are the TyControls checkout's that TY_CORE_DIR names. }
+  files are the TyControls checkout's that TY_CORE_DIR names; the chart pot's own checks run
+  before it is asked for, so they run without one. }
 procedure TAdvChartI18nTest.TestNoAdvChartStringLeftInTheCore;
 const
   CORE_PREFIX  = 'tycontrols.strconsts.';
@@ -142,13 +148,9 @@ var
   src: TStringList;
   leftover, text, core: string;
 begin
-  core := TyCoreDirFor(Self, 'that none of the chart''s strings is left in the core');
-  names[0] := core + 'languages' + PathDelim + 'tyControls.StrConsts.pot';
-  names[1] := core + 'languages' + PathDelim + 'tycontrols.strconsts.zh_CN.po';
-  names[2] := core + 'languages' + PathDelim + 'tycontrols.strconsts.en.po';
-
   chartIds := CatalogueIds(LanguagesDir + 'tyControls.AdvanceChart.StrConsts.pot');
   try
+    { the chart's own half, which needs no core }
     AssertTrue('the chart pot lists its strings', chartIds.Count > 150);
     for i := 0 to chartIds.Count - 1 do
       AssertEquals('chart pot id is keyed on the chart unit: ' + chartIds[i], 1,
@@ -156,6 +158,11 @@ begin
     for k := 0 to High(ANCHORS) do
       AssertTrue('anchor in the chart pot: ' + ANCHORS[k],
         chartIds.IndexOf(CHART_PREFIX + ANCHORS[k]) >= 0);
+
+    core := TyCoreDirFor(Self, 'that none of the chart''s strings is left in the core');
+    names[0] := core + 'languages' + PathDelim + 'tyControls.StrConsts.pot';
+    names[1] := core + 'languages' + PathDelim + 'tycontrols.strconsts.zh_CN.po';
+    names[2] := core + 'languages' + PathDelim + 'tycontrols.strconsts.en.po';
 
     leftover := '';
     for n := 0 to High(names) do
@@ -336,7 +343,8 @@ begin
 end;
 
 { The string literals of the unit at APath that hold CJK text, one 'unit:line: literal' a line.
-  Comments are left out: // to the end of the line, (* *), and { } -- which nest in FPC. }
+  Comments are left out: // to the end of the line, (* *), and brace comments, which nest
+  in FPC. }
 function ChineseLiterals(const APath: string): string;
 var
   s, lit: string;
@@ -461,7 +469,9 @@ end;
   Text a user reads is a resourcestring, so a catalogue can translate it (CONTRIBUTING); an
   error raised at a developer is English, as every other one in the library is. This reads
   every unit under source/ for a string literal holding CJK text, comments left out. Two of
-  them carry ECharts' own Chinese data and are let off literal by literal (above). }
+  them carry ECharts' own Chinese data and are let off literal by literal (above). The
+  generated theme unit is left out, as TyControls leaves out its own theme units: its literals
+  are .tycss text, and CJK there would sit in the stylesheet's own comments. }
 procedure TAdvChartI18nTest.TestNoUnitHoldsChineseTextInAStringLiteral;
 var
   files: TStringList;
@@ -475,6 +485,7 @@ begin
     for i := 0 to files.Count - 1 do
     begin
       name := ExtractFileName(files[i]);
+      if SameText(name, 'tyControls.AdvanceChart.Theme.pas') then Continue;
       Inc(scanned);
       if SameText(name, 'tyControls.AdvanceChart.Calendar.pas') then
         found := found + WithoutLiterals(ChineseLiterals(files[i]), AdvChartCalendarData)
@@ -489,6 +500,140 @@ begin
   finally
     files.Free;
   end;
+end;
+
+{ Copied from TyControls tests/test.i18n.pas at 77860b40 (lines 70-133): the walk starts at
+  this repository's root, so the example's catalogues are read too. }
+{ A .po entry that is empty on BOTH sides is a landmine, not a no-op. LazUtils'
+  TPOFile.Translate looks an item up by identifier, takes Item.Translation or falls back
+  to Item.Original, and then:
+
+      if Result='' then Raise Exception.Create('TPOFile.Translate Inconsistency');
+
+  So a wholly empty entry does not translate to nothing -- it RAISES, during form
+  streaming, before OnCreate runs. The LCL answers with a modal error box, which blocks
+  Application.CreateForm forever: the program never opens its window and never exits. That
+  is how ad81fa4 (retyping the text properties as TCaption, which made Lazarus emit
+  catalogue entries for captions whose value is the empty string) left the groupbox,
+  radiobutton and toggleswitch examples unable to start at all.
+
+  An empty msgid with a REAL msgstr does not raise, and this guard deliberately allows it.
+  It is not, however, a shape anything in this repo can USE: rsGridCheckedWord shipped
+  empty in English on exactly that theory, and the runtime half worked -- LazUtils keys
+  entries by identifier, so a hand-written entry with an empty msgid is found -- but
+  Lazarus's extractor skips empty strings, so the entry never reached the .pot and no
+  translator ever saw it. See TestEveryStrConstsResourcestringIsInThePot below. Only the
+  both-sides-empty shape is forbidden here. }
+procedure TAdvChartI18nTest.TestNoCatalogueEntryIsWhollyEmpty;
+var
+  files: TStringList;
+  lines: TStringList;
+  i, j, k: Integer;
+  bad, root: string;
+  sawHeader: Boolean;
+begin
+  root := ExtractFilePath(ParamStr(0)) + '..' + PathDelim;
+  files := FindAllFiles(root, '*.po', True);
+  try
+    AssertTrue('found catalogues to check', files.Count > 0);
+    bad := '';
+    for i := 0 to files.Count - 1 do
+    begin
+      lines := TStringList.Create;
+      try
+        lines.LoadFromFile(files[i]);
+        sawHeader := False;
+        for j := 0 to lines.Count - 1 do
+        begin
+          if Trim(lines[j]) <> 'msgid ""' then Continue;
+          { The first such block is the header (msgstr "" followed by continuation
+            lines carrying the metadata) -- skip exactly one. }
+          if not sawHeader then begin sawHeader := True; Continue; end;
+          k := j + 1;
+          while (k < lines.Count) and (Trim(lines[k]) = '') do Inc(k);
+          if (k < lines.Count) and (Trim(lines[k]) = 'msgstr ""') then
+          begin
+            { A continuation line right after means the value is non-empty. }
+            if (k + 1 >= lines.Count) or (Copy(Trim(lines[k + 1]), 1, 1) <> '"') then
+              bad := bad + LineEnding + '  ' + ExtractFileName(files[i]) + ':' + IntToStr(j + 1);
+          end;
+        end;
+      finally
+        lines.Free;
+      end;
+    end;
+    AssertEquals('catalogue entries empty on BOTH sides (these raise at form-load time):'
+      + bad, '', bad);
+  finally
+    files.Free;
+  end;
+end;
+
+{ Copied from TyControls tests/test.i18n.pas at 77860b40 (lines 424-488). }
+{ languages/ ships as-is in every release (make-release copies the folder), and the IDE only
+  ever ADDS catalogues there. When tyControls.Design was split into three units its .pot
+  stayed behind -- 36 entries under identifiers no unit declares any more, offered to
+  translators and shipped for nothing. So: each .pot names a unit under source/ or
+  designtime/ that still has a resourcestring section, and each .po names a .pot. }
+procedure TAdvChartI18nTest.TestEveryCatalogueBelongsToAUnitThatStillTranslates;
+var
+  root, base, stray: string;
+  cats, units, src: TStringList;
+  i, j, n, pots: Integer;
+  found: Boolean;
+begin
+  root := ExtractFilePath(ParamStr(0)) + '..' + PathDelim;
+  stray := '';
+  pots := 0;
+  units := FindAllFiles(root + 'source', '*.pas', True);
+  src := TStringList.Create;
+  try
+    n := units.Count;
+    cats := FindAllFiles(root + 'designtime', '*.pas', False);
+    try units.AddStrings(cats); finally cats.Free; end;
+    AssertTrue('found the units', units.Count > n);
+
+    cats := FindAllFiles(root + 'languages', '*.pot', False);
+    try
+      for i := 0 to cats.Count - 1 do
+      begin
+        Inc(pots);
+        base := LowerCase(ChangeFileExt(ExtractFileName(cats[i]), ''));
+        found := False;
+        for j := 0 to units.Count - 1 do
+          if LowerCase(ChangeFileExt(ExtractFileName(units[j]), '')) = base then
+          begin
+            src.LoadFromFile(units[j]);
+            found := Pos('resourcestring', LowerCase(src.Text)) > 0;
+            Break;
+          end;
+        if not found then stray := stray + ' ' + ExtractFileName(cats[i]);
+      end;
+    finally cats.Free; end;
+    AssertTrue('found the .pot files', pots >= 2);
+
+    cats := FindAllFiles(root + 'languages', '*.po', False);
+    try
+      for i := 0 to cats.Count - 1 do
+      begin
+        { tycontrols.strconsts.zh_CN.po -> tycontrols.strconsts }
+        base := ChangeFileExt(ChangeFileExt(ExtractFileName(cats[i]), ''), '');
+        found := False;
+        for j := 0 to units.Count - 1 do
+          if SameText(ChangeFileExt(ExtractFileName(units[j]), ''), base) then
+          begin
+            found := FileExists(root + 'languages' + PathDelim +
+              ChangeFileExt(ExtractFileName(units[j]), '.pot'));
+            Break;
+          end;
+        if not found then stray := stray + ' ' + ExtractFileName(cats[i]);
+      end;
+    finally cats.Free; end;
+  finally
+    src.Free;
+    units.Free;
+  end;
+  AssertEquals('catalogues no unit translates any more:', '', stray);
 end;
 
 initialization
