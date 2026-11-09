@@ -25,7 +25,7 @@
 | 基类 | `TTyCustomControl`（窗口化，可获得焦点） |
 | 默认尺寸 | 320 × 200（逻辑像素） |
 | 组件面板 | `TyControls Shapes & Charts` |
-| typeKey | `TyAdvChart`（图表底与外框，和 `TyPanel` 同一个规则块） |
+| typeKey | `TyAdvChart`（图表底与外框，取值和 TyControls 的 `TyPanel` 相同） |
 
 ```pascal
 uses tyControls.AdvanceChart;
@@ -33,7 +33,7 @@ uses tyControls.AdvanceChart;
 
 ### 子部件的主题键
 
-图表各部分有自己的键，都在 `themes/light.tycss` 里，其他主题继承。常用的几组：
+图表各部分有自己的键，都在本项目的 `themes/advchart.tycss` 里。程序启动时，包把它注册进 TyControls 主题的基础层，每个内置主题都继承。常用的几组：
 
 | 键 | 画什么 |
 |----|--------|
@@ -48,7 +48,7 @@ uses tyControls.AdvanceChart;
 | `TyAdvChartLoading`、`TyAdvChartLoadingSpinner` | 加载遮罩 |
 | `TyAdvChartFocusItem` | 键盘焦点框 |
 
-完整列表用 `grep TyAdvChart themes/light.tycss` 看。
+完整列表用 `grep TyAdvChart themes/advchart.tycss` 看。
 
 尺寸令牌（逻辑像素）：
 
@@ -220,7 +220,7 @@ TyChartDisconnect('sales');
 | `ExactRendering` | `Boolean` | `False` | False 时细线（不到 1 个设备像素）和标签描边用快速画法，长细线快十倍以上；True 时逐像素照浏览器 canvas 的画法 |
 | `TabStop` | `Boolean` | `False` | 设成 True 才能用键盘操作图表（第 9 节） |
 
-另发布 `StyleClass` / `StyleOverride` / `Controller`、`Align` / `Anchors` / `BorderSpacing` / `Constraints`、`Color` / `Font` / `ParentFont`、`Enabled` / `Visible` / `PopupMenu` / `TabOrder` 及 `TTyCustomControl` 的基线事件，见 [../events.md](../events.md)。
+另发布 `StyleClass` / `StyleOverride` / `Controller`、`Align` / `Anchors` / `BorderSpacing` / `Constraints`、`Color` / `Font` / `ParentFont`、`Enabled` / `Visible` / `PopupMenu` / `TabOrder` 及 `TTyCustomControl` 的基线事件，见 TyControls 的 [events.md](https://github.com/ACTom/TyControls/blob/main/docs/events.md)。
 
 ### public
 
@@ -653,4 +653,4 @@ option 编辑器：
 
 ## 13. 关联
 
-简单的折线、柱、饼图见 [TTyChart](chart.md)；单值迷你趋势线见 [TTySparkline](sparkline.md)。从 `TTyCustomAdvanceChart` 派生自己的图表控件见 [../subclassing.md](../subclassing.md)。
+简单的折线、柱、饼图见 TyControls 的 [TTyChart](https://github.com/ACTom/TyControls/blob/main/docs/controls/chart.md)；单值迷你趋势线见 [TTySparkline](https://github.com/ACTom/TyControls/blob/main/docs/controls/sparkline.md)。从 `TTyCustomAdvanceChart` 派生自己的图表控件见 TyControls 的 [subclassing.md](https://github.com/ACTom/TyControls/blob/main/docs/subclassing.md)。
