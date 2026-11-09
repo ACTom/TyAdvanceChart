@@ -361,16 +361,17 @@ function g6() {
 }
 function readJson(p) { return JSON.parse(fs.readFileSync(p, 'utf8')); }
 function box(x0, y0, x1, y1) { return [[[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]]]; }
-// geo.js' hand-made 'china'
-const CHINA = {
+// geo.js' made-up 'toyland' (no map of real borders is in this repository, not
+// even as test data)
+const TOYLAND = {
   type: 'FeatureCollection',
   features: [
-    { type: 'Feature', properties: { name: '北京' }, geometry: { type: 'Polygon', coordinates: box(115.5, 39.5, 117.3, 41) } },
-    { type: 'Feature', properties: { name: '天津' }, geometry: { type: 'Polygon', coordinates: box(116.8, 38.6, 118, 40.2) } },
-    { type: 'Feature', properties: { name: '广东' }, geometry: { type: 'Polygon', coordinates: [[[109.7, 20.2], [117.2, 23.5], [116, 25.4], [111, 25.2], [109.7, 20.2]]] } },
-    { type: 'Feature', properties: { name: '香港' }, geometry: { type: 'Polygon', coordinates: box(113.85, 22.15, 114.4, 22.55) } },
-    { type: 'Feature', properties: { name: '澳门' }, geometry: { type: 'Polygon', coordinates: box(113.52, 22.1, 113.6, 22.22) } },
-    { type: 'Feature', properties: { name: '台湾' }, geometry: { type: 'Polygon', coordinates: [[[120.1, 22.0], [121.9, 25.2], [121.5, 25.3], [120.0, 23.2], [120.1, 22.0]]] } },
+    { type: 'Feature', properties: { name: 'Region A' }, geometry: { type: 'Polygon', coordinates: box(115.5, 39.5, 117.3, 41) } },
+    { type: 'Feature', properties: { name: 'Region B' }, geometry: { type: 'Polygon', coordinates: box(116.8, 38.6, 118, 40.2) } },
+    { type: 'Feature', properties: { name: 'Region C' }, geometry: { type: 'Polygon', coordinates: [[[109.7, 20.2], [117.2, 23.5], [116, 25.4], [111, 25.2], [109.7, 20.2]]] } },
+    { type: 'Feature', properties: { name: 'Region D' }, geometry: { type: 'Polygon', coordinates: box(113.85, 22.15, 114.4, 22.55) } },
+    { type: 'Feature', properties: { name: 'Region E' }, geometry: { type: 'Polygon', coordinates: box(113.52, 22.1, 113.6, 22.22) } },
+    { type: 'Feature', properties: { name: 'Region F' }, geometry: { type: 'Polygon', coordinates: [[[120.1, 22.0], [121.9, 25.2], [121.5, 25.3], [120.0, 23.2], [120.1, 22.0]]] } },
   ],
 };
 const MAPS = [
@@ -379,7 +380,7 @@ const MAPS = [
   { name: 'USA', text: JSON.stringify(readJson(path.join(EXAMPLES, 'public/data/asset/geo/USA.json'))) },
   { name: 'iceland', text: JSON.stringify(readJson(path.join(EXAMPLES, 'public/data/asset/geo/iceland.geo.json'))) },
   { name: 'ch', text: JSON.stringify(readJson(path.join(EXAMPLES, 'public/data/asset/geo/ch.geo.json'))) },
-  { name: 'china', text: JSON.stringify(CHINA) },
+  { name: 'toyland', text: JSON.stringify(TOYLAND) },
   { name: 'g6', text: JSON.stringify(g6()) },
 ];
 const USA_SPECIAL = {
@@ -1001,8 +1002,8 @@ const CASES = [
   },
   {
     id: 'gallery-effectScatter-map',
-    note: "examples effectScatter-map on the hand-made 'china': a scatter and an effectScatter on the geo",
-    option: (() => { const o = gallery('effectScatter-map'); o.animation = false; delete o.tooltip; return o; })(),
+    note: "examples effectScatter-map on the made-up 'toyland' (the example asks for 'china'): a scatter and an effectScatter on the geo",
+    option: (() => { const o = gallery('effectScatter-map'); o.animation = false; delete o.tooltip; o.geo.map = 'toyland'; return o; })(),
   },
   // ======== [spec 242] ========
   {

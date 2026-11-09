@@ -1,8 +1,7 @@
 /*
 Upstream's own answers for roadmap batch D14 GE1 [Batch 146]: the geo
 foundation -- registerMap and the GeoJSON parse (coord/geo/geoSourceManager.ts,
-GeoJSONResource.ts, parseGeoJson.ts with the UTF8Encoding decode, Region.ts,
-the 'china' fixes in fix/nanhai.ts, fix/textCoord.ts, fix/diaoyuIsland.ts),
+GeoJSONResource.ts, parseGeoJson.ts with the UTF8Encoding decode, Region.ts),
 the geo coordinate system (Geo.ts, geoCreator.ts resizeGeo, GeoModel.ts
 optionUpdated / getFilledRegions / getRegionModel / getFormattedLabel,
 coord/View.ts with invertY) and the geo component's picture
@@ -20,6 +19,16 @@ models, the coordinate systems and the geo views' groups -- never the SVG
 text. A projection in an option is written '@name' and this script hands the
 model PROJ[name] (a function); the port registers the same arithmetic by the
 same name.
+
+The maps are made up, or the USA file the demo ships (examples/advchart/maps):
+no map of real borders is in this repository, not even as test data. Where a
+case needs what a real map gives -- hundreds of points, rings both ways round,
+holes, a sliver, a multipolygon, a compressed file -- it gets a made-up map
+built the same way: smooth blobs named after letters, nobody's outline. So the
+fixes GeoJSONResource applies to a map registered as 'china' (fix/nanhai.ts,
+fix/textCoord.ts, fix/diaoyuIsland.ts) are not run here: they need that name
+and the region names of their tables. The port's copy of the tables is held
+to upstream's by test.advchart.geo's TestTheChinaTablesAreUpstreams.
 
   node tools/advchart-oracle/geo.js
 
@@ -110,8 +119,6 @@ function readJson(p) {
   return JSON.parse(fs.readFileSync(p, 'utf8'));
 }
 const USA = readJson(path.join(EXAMPLES, 'public/data/asset/geo/USA.json'));
-const WORLD = readJson(path.join(ECHARTS_SRC, 'test/data/map/json/world.json'));
-const MACAU = readJson(path.join(ECHARTS_SRC, 'test/data/map/json/province/aomen.json'));
 const encodeGeo = require(path.join(ECHARTS_SRC, 'test/data/map/encode.js'));
 
 function subset(json, names) {
@@ -126,11 +133,95 @@ const USA_SPECIAL = {
   Hawaii: { left: -110, top: 28, width: 5 },
   'Puerto Rico': { left: -76, top: 26, width: 2 },
 };
-const WORLD_SUB = subset(WORLD, ['South Africa', 'Lesotho', 'Kyrgyzstan', 'W. Sahara', 'Morocco']);
 
+// ---------------------------------------------------------------------------
+// the made-up maps
+// ---------------------------------------------------------------------------
+// A closed ring of n points (the last one the first again) round an ellipse
+// whose radius wobbles a little, the points unevenly spaced; clockwise as
+// GeoJSON exteriors usually run, counter-clockwise for a hole. Every
+// coordinate is a multiple of 1/2048: exact in a double and in the fixture.
+function blob(cx, cy, rx, ry, n, seed, hole) {
+  const q = v => Math.round(v * 2048) / 2048;
+  const ring = [];
+  for (let k = 0; k < n - 1; k++) {
+    const t = (hole ? 1 : -1) * 2 * Math.PI * (k + 0.3 * Math.sin(k * 1.7 + seed)) / (n - 1);
+    const r = 1 + 0.06 * Math.sin(3 * t + seed) + 0.03 * Math.sin(7 * t + 2 * seed) + 0.01 * Math.sin(19 * t + seed / 2);
+    ring.push([q(cx + rx * r * Math.cos(t)), q(cy + ry * r * Math.sin(t))]);
+  }
+  ring.push(ring[0].slice());
+  return ring;
+}
+function ringArea(ring) {
+  let a = 0;
+  for (let i = 0; i + 1 < ring.length; i++) a += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1];
+  return a / 2;
+}
+function feature(name, type, coordinates, extra) {
+  // childNum as upstream's files carry it: rings of a Polygon, polygons of a MultiPolygon
+  const childNum = coordinates.length;
+  return { type: 'Feature', properties: Object.assign({ name, childNum }, extra || {}), geometry: { type, coordinates } };
+}
+
+// Five regions with the make-up of a small part of a world map: one ring of
+// 73 points; 51 points with a sliver for a hole (two of its points 4e-14
+// apart); 164 points with two holes, its centre north of 40 and its south edge
+// below it (case cut-label); a ring of 23 points, which the last region holds
+// as its hole, turned round and started elsewhere; and a multipolygon of a
+// 4-point island and 127 points. Spread over about 97 x 90 degrees, so the map
+// is wider than tall under the default aspectScale and narrower under 1.6.
+const TOY_D = blob(28.2, -29.5, 1.2, 1.0, 23, 4);
+const TOY_D_HOLE = TOY_D.slice(7, -1).concat(TOY_D.slice(0, 7)).reverse();
+TOY_D_HOLE.push(TOY_D_HOLE[0].slice());
+const TOY_SLIVER = [[-12.5, 24.3046875], [-12.5205078125, 23.9609375], [-12.5205078125, 23.960937500000036], [-12.5, 24.3046875]];
+const TOY_ISLAND = [[37.2001953125, -46.9033203125], [36.9501953125, -46.8642578125], [37.1201171875, -46.7978515625], [37.2001953125, -46.9033203125]];
+const TOY_C = blob(74.6, 41.3, 5.4, 1.9, 164, 3);
+const TOYWORLD = {
+  type: 'FeatureCollection',
+  features: [
+    feature('Region A', 'Polygon', [blob(-6.5, 31.6, 5.6, 4.0, 73, 1)]),
+    feature('Region B', 'Polygon', [blob(-13.0, 23.8, 3.8, 2.8, 51, 2), TOY_SLIVER]),
+    feature('Region C', 'Polygon', [TOY_C, blob(71.0, 40.6, 0.2, 0.2, 9, 5, true), blob(72.2, 40.45, 0.28, 0.28, 12, 6, true)]),
+    feature('Region D', 'Polygon', [TOY_D]),
+    feature('Region E', 'MultiPolygon', [[TOY_ISLAND], [blob(24.6, -28.9, 8.2, 5.2, 127, 7), TOY_D_HOLE]]),
+  ],
+};
+for (const f of TOYWORLD.features) {
+  const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+  for (const p of polys) {
+    must(ringArea(p[0]) < 0, f.properties.name + ': an exterior runs clockwise');
+    for (const h of p.slice(1)) must(ringArea(h) >= 0, f.properties.name + ': a hole runs the other way');
+  }
+}
+must(Math.min(...TOY_C.map(c => c[1])) < 40 && TOY_C.reduce((a, c) => a + c[1], 0) / TOY_C.length > 40.5,
+  'Region C straddles 40 with its middle north of it (case cut-label)');
+
+// Eight regions in a box of about 0.07 x 0.11 degrees, each with a cp, one of
+// them a multipolygon, written in the compressed form by upstream's own
+// encoder (test/data/map/encode.js) -- the make-up of a small province file.
+function toyEncoded() {
+  const r = (name, cp, cx, cy, rx, ry, n, seed) => feature(name, 'Polygon', [blob(cx, cy, rx, ry, n, seed)], { cp });
+  const json = {
+    type: 'FeatureCollection',
+    features: [
+      feature('Region A', 'MultiPolygon', [[blob(143.551, 22.2075, 0.006, 0.0055, 16, 11)], [blob(143.5595, 22.2085, 0.0035, 0.0045, 13, 12)]],
+        { cp: [143.552631, 22.207917] }),
+      r('Region B', [143.548714, 22.198822], 143.5485, 22.1985, 0.004, 0.0032, 10, 13),
+      r('Region C', [143.551377, 22.193105], 143.5512, 22.1932, 0.003, 0.0022, 7, 14),
+      r('Region D', [143.554706, 22.187563], 143.5545, 22.1878, 0.005, 0.0035, 19, 15),
+      r('Region E', [143.542251, 22.188354], 143.542, 22.188, 0.0045, 0.004, 12, 16),
+      r('Region F', [143.558219, 22.154736], 143.558, 22.1545, 0.008, 0.0095, 19, 17),
+      r('Region G', [143.568874, 22.136712], 143.569, 22.1365, 0.012, 0.009, 25, 18),
+      r('Region H', [143.560125, 22.123851], 143.56, 22.124, 0.0085, 0.0065, 17, 19),
+    ],
+  };
+  encodeGeo(json);
+  return json;
+}
+const TOYENC = toyEncoded();
 // UTF8Scale: the same encoded strings read at another scale
-const MACAU_2048 = JSON.parse(JSON.stringify(MACAU));
-MACAU_2048.UTF8Scale = 2048;
+const TOYENC_2048 = JSON.parse(JSON.stringify(TOYENC));
+TOYENC_2048.UTF8Scale = 2048;
 
 // A crafted map: every geometry kind, encoded, plus a plain geometry left in
 // an encoded file, and the features parseGeoJson filters out.
@@ -178,23 +269,24 @@ const NAMED = {
   ],
 };
 
-// A hand-made 'china': regions the fixes name, at roughly their places.
+// A made-up map of six regions, boxes and quadrilaterals of different sizes
+// (two of them small), and the same with a seventh, larger box.
 function box(x0, y0, x1, y1) {
   return [[[x0, y0], [x1, y0], [x1, y1], [x0, y1], [x0, y0]]];
 }
-const CHINA = {
+const TOYLAND = {
   type: 'FeatureCollection',
   features: [
-    { type: 'Feature', properties: { name: '北京' }, geometry: { type: 'Polygon', coordinates: box(115.5, 39.5, 117.3, 41) } },
-    { type: 'Feature', properties: { name: '天津' }, geometry: { type: 'Polygon', coordinates: box(116.8, 38.6, 118, 40.2) } },
-    { type: 'Feature', properties: { name: '广东' }, geometry: { type: 'Polygon', coordinates: [[[109.7, 20.2], [117.2, 23.5], [116, 25.4], [111, 25.2], [109.7, 20.2]]] } },
-    { type: 'Feature', properties: { name: '香港' }, geometry: { type: 'Polygon', coordinates: box(113.85, 22.15, 114.4, 22.55) } },
-    { type: 'Feature', properties: { name: '澳门' }, geometry: { type: 'Polygon', coordinates: box(113.52, 22.1, 113.6, 22.22) } },
-    { type: 'Feature', properties: { name: '台湾' }, geometry: { type: 'Polygon', coordinates: [[[120.1, 22.0], [121.9, 25.2], [121.5, 25.3], [120.0, 23.2], [120.1, 22.0]]] } },
+    { type: 'Feature', properties: { name: 'Region A' }, geometry: { type: 'Polygon', coordinates: box(115.5, 39.5, 117.3, 41) } },
+    { type: 'Feature', properties: { name: 'Region B' }, geometry: { type: 'Polygon', coordinates: box(116.8, 38.6, 118, 40.2) } },
+    { type: 'Feature', properties: { name: 'Region C' }, geometry: { type: 'Polygon', coordinates: [[[109.7, 20.2], [117.2, 23.5], [116, 25.4], [111, 25.2], [109.7, 20.2]]] } },
+    { type: 'Feature', properties: { name: 'Region D' }, geometry: { type: 'Polygon', coordinates: box(113.85, 22.15, 114.4, 22.55) } },
+    { type: 'Feature', properties: { name: 'Region E' }, geometry: { type: 'Polygon', coordinates: box(113.52, 22.1, 113.6, 22.22) } },
+    { type: 'Feature', properties: { name: 'Region F' }, geometry: { type: 'Polygon', coordinates: [[[120.1, 22.0], [121.9, 25.2], [121.5, 25.3], [120.0, 23.2], [120.1, 22.0]]] } },
   ],
 };
-const CHINA_WITH_NANHAI = JSON.parse(JSON.stringify(CHINA));
-CHINA_WITH_NANHAI.features.push({ type: 'Feature', properties: { name: '南海诸岛' }, geometry: { type: 'Polygon', coordinates: box(110, 10, 118, 20) } });
+const TOYLAND_PLUS = JSON.parse(JSON.stringify(TOYLAND));
+TOYLAND_PLUS.features.push({ type: 'Feature', properties: { name: 'Region G' }, geometry: { type: 'Polygon', coordinates: box(110, 10, 118, 20) } });
 
 // lines only: fixLineStyle takes the stroke from the fill
 const RIVERS = {
@@ -221,14 +313,14 @@ const TIES = {
 const TEXT = {
   ties: JSON.stringify(TIES),
   usa: JSON.stringify(USA_SUB),
-  world: JSON.stringify(WORLD_SUB),
-  macau: JSON.stringify(MACAU),
-  macau2048: JSON.stringify(MACAU_2048),
+  toyworld: JSON.stringify(TOYWORLD),
+  toyenc: JSON.stringify(TOYENC),
+  toyenc2048: JSON.stringify(TOYENC_2048),
   crafted: JSON.stringify(CRAFTED),
   craftedNull: JSON.stringify(CRAFTED_NULL),
   named: JSON.stringify(NAMED),
-  china: JSON.stringify(CHINA),
-  chinaNanhai: JSON.stringify(CHINA_WITH_NANHAI),
+  toyland: JSON.stringify(TOYLAND),
+  toylandPlus: JSON.stringify(TOYLAND_PLUS),
   rivers: JSON.stringify(RIVERS),
 };
 
@@ -299,39 +391,39 @@ const CASES = [
       { map: 'usaplain', left: 400, top: 50, width: 100, height: 400, preserveAspect: true, preserveAspectAlign: 'right' },
       { map: 'usaplain', left: 0, top: 0, width: 800, height: 100, preserveAspect: 'contain', preserveAspectVerticalAlign: 'top' },
     ] } },
-  { id: 'layout-center', note: 'layoutCenter + layoutSize: aspect below 1, above 1, and invalid (the box instead)', maps: [M('world', 'world')],
+  { id: 'layout-center', note: 'layoutCenter + layoutSize: aspect below 1, above 1, and invalid (the box instead)', maps: [M('toyworld', 'toyworld')],
     option: { geo: [
-      { map: 'world', layoutCenter: ['30%', '40%'], layoutSize: 200 },
-      { map: 'world', layoutCenter: [400, 300], layoutSize: '50%', aspectScale: 1.6 },
-      { map: 'world', layoutCenter: ['abc', 1], layoutSize: 100 },
-      { map: 'world', layoutCenter: ['50%', '50%'] },
+      { map: 'toyworld', layoutCenter: ['30%', '40%'], layoutSize: 200 },
+      { map: 'toyworld', layoutCenter: [400, 300], layoutSize: '50%', aspectScale: 1.6 },
+      { map: 'toyworld', layoutCenter: ['abc', 1], layoutSize: 100 },
+      { map: 'toyworld', layoutCenter: ['50%', '50%'] },
     ] } },
-  { id: 'bounding-coords', note: 'boundingCoords flipped (new BoundingRect turns a negative height round), a box, an invalid pair', maps: [M('world', 'world')],
+  { id: 'bounding-coords', note: 'boundingCoords flipped (new BoundingRect turns a negative height round), a box, an invalid pair', maps: [M('toyworld', 'toyworld')],
     option: { geo: [
-      { map: 'world', boundingCoords: [[-180, 90], [180, -90]] },
-      { map: 'world', boundingCoords: [[0, 0], [40, -40]], aspectScale: 1 },
-      { map: 'world', boundingCoords: [['x', 0], [1, 1]] },
+      { map: 'toyworld', boundingCoords: [[-180, 90], [180, -90]] },
+      { map: 'toyworld', boundingCoords: [[0, 0], [40, -40]], aspectScale: 1 },
+      { map: 'toyworld', boundingCoords: [['x', 0], [1, 1]] },
     ] } },
-  { id: 'aspect-scale', note: 'aspectScale 0.5, 0 (retrieve2 keeps the zero), null (the default)', maps: [M('world', 'world')],
+  { id: 'aspect-scale', note: 'aspectScale 0.5, 0 (retrieve2 keeps the zero), null (the default)', maps: [M('toyworld', 'toyworld')],
     option: { geo: [
-      { map: 'world', aspectScale: 0.5, left: 0, top: 0, width: 400, height: 300 },
-      { map: 'world', aspectScale: 0, left: 400, top: 0, width: 400, height: 300 },
-      { map: 'world', aspectScale: null, left: 0, top: 300, width: 400, height: 300 },
+      { map: 'toyworld', aspectScale: 0.5, left: 0, top: 0, width: 400, height: 300 },
+      { map: 'toyworld', aspectScale: 0, left: 400, top: 0, width: 400, height: 300 },
+      { map: 'toyworld', aspectScale: null, left: 0, top: 300, width: 400, height: 300 },
     ] } },
-  { id: 'projection', note: 'projections through handles: sinusoidal with boundingCoords (sampled, the left edge a diagonal), linear, one dropping points, one without unproject', maps: [M('world', 'world')],
+  { id: 'projection', note: 'projections through handles: sinusoidal with boundingCoords (sampled, the left edge a diagonal), linear, one dropping points, one without unproject', maps: [M('toyworld', 'toyworld')],
     option: { geo: [
-      { map: 'world', projection: { project: '@sinu', unproject: '@sinuInv' }, boundingCoords: [[-20, 50], [80, -40]], left: 0, top: 0, width: 400, height: 300 },
-      { map: 'world', projection: { project: '@lin', unproject: '@linInv' }, left: 400, top: 0, width: 400, height: 300 },
-      { map: 'world', projection: { project: '@cut', unproject: '@cutInv' }, left: 0, top: 300, width: 400, height: 300 },
-      { map: 'world', projection: { project: '@sinu' }, left: 400, top: 300, width: 400, height: 300 },
+      { map: 'toyworld', projection: { project: '@sinu', unproject: '@sinuInv' }, boundingCoords: [[-20, 50], [80, -40]], left: 0, top: 0, width: 400, height: 300 },
+      { map: 'toyworld', projection: { project: '@lin', unproject: '@linInv' }, left: 400, top: 0, width: 400, height: 300 },
+      { map: 'toyworld', projection: { project: '@cut', unproject: '@cutInv' }, left: 0, top: 300, width: 400, height: 300 },
+      { map: 'toyworld', projection: { project: '@sinu' }, left: 400, top: 300, width: 400, height: 300 },
     ] } },
   { id: 'albers-usa', note: '[R2-J2] d3-geo geoAlbersUsa through the handles (map-usa-projection): the lower 48, Alaska and Hawaii in their insets, Puerto Rico in none (null: its points dropped)', maps: [M('usaplain', 'usa')],
     option: { geo: { map: 'usaplain', projection: { project: '@albersUsa', unproject: '@albersUsaInv' } } } },
   { id: 'albers-usa-label', note: '[R2-J3] the same with the labels shown: Puerto Rico has no centre, so its label stays at textConfig.position inside -- the middle of its (empty) path box through the group transform', maps: [M('usaplain', 'usa')],
     option: { geo: { map: 'usaplain', label: { show: true }, left: 100, top: 50, width: 400, height: 250, zoom: 1.5,
       projection: { project: '@albersUsa', unproject: '@albersUsaInv' } } } },
-  { id: 'cut-label', note: '[r2v] labels under a projection that drops every point north of 40 (the centre of Kyrgyzstan is at 41.5, its south edge at 39.2): a region whose centre is north of it and part of whose outline is south has no centre but a drawn box -- its inside label the middle of that box, both ways', maps: [M('world', 'world')],
-    option: { geo: { map: 'world', label: { show: true }, left: 0, top: 0, width: 600, height: 400,
+  { id: 'cut-label', note: '[r2v] labels under a projection that drops every point north of 40 (the centre of Region C is north of 41, its south edge below 39.5): a region whose centre is north of it and part of whose outline is south has no centre but a drawn box -- its inside label the middle of that box, both ways', maps: [M('toyworld', 'toyworld')],
+    option: { geo: { map: 'toyworld', label: { show: true }, left: 0, top: 0, width: 600, height: 400,
       projection: { project: '@cut40', unproject: '@cutInv' } } } },
   { id: 'center-zoom', note: 'center and zoom from the option; percentages of the data rect; scaleLimit clamping the zoom', maps: [M('usa', 'usa', USA_SPECIAL)],
     option: { geo: [
@@ -340,20 +432,20 @@ const CASES = [
       { map: 'usa', zoom: 3, scaleLimit: { min: 1, max: 1.5 }, left: 0, top: 300, width: 400, height: 300 },
       { map: 'usa', zoom: 0, center: ['center', 'top'], left: 400, top: 300, width: 400, height: 300, label: { show: true } },
     ] } },
-  { id: 'encoded', note: 'the compressed format: Macau as shipped, and read at UTF8Scale 2048', maps: [M('macau', 'macau'), M('macau2048', 'macau2048')],
+  { id: 'encoded', note: 'the compressed format: eight small regions written by upstream\'s encoder, and read at UTF8Scale 2048', maps: [M('toyenc', 'toyenc'), M('toyenc2048', 'toyenc2048')],
     option: { geo: [
-      { map: 'macau', left: 0, top: 0, width: 400, height: 600, label: { show: true } },
-      { map: 'macau2048', left: 400, top: 0, width: 400, height: 600 },
+      { map: 'toyenc', left: 0, top: 0, width: 400, height: 600, label: { show: true } },
+      { map: 'toyenc2048', left: 400, top: 0, width: 400, height: 600 },
     ] } },
   { id: 'crafted', note: 'every geometry kind encoded, a plain geometry in an encoded file, the features parseGeoJson drops', maps: [M('crafted', 'crafted')],
     option: { geo: { map: 'crafted', label: { show: true }, itemStyle: { color: '#88aa00', borderColor: null } } } },
-  { id: 'china-fix', note: 'a map named china: the South China Sea islands added, Taiwan given the island, label centres moved; the same data under another name', maps: [M('china', 'china'), M('china2', 'china')],
+  { id: 'two-names', note: 'one made-up map registered under two names, labels shown: the name changes nothing in the regions', maps: [M('toyland', 'toyland'), M('toyland2', 'toyland')],
     option: { geo: [
-      { map: 'china', left: 0, top: 0, width: 400, height: 600, label: { show: true } },
-      { map: 'china2', left: 400, top: 0, width: 400, height: 600, label: { show: true } },
+      { map: 'toyland', left: 0, top: 0, width: 400, height: 600, label: { show: true } },
+      { map: 'toyland2', left: 400, top: 0, width: 400, height: 600, label: { show: true } },
     ] } },
-  { id: 'china-has-nanhai', note: 'a china map that already has the islands region: none added, its label centre still moved', maps: [M('china', 'chinaNanhai')],
-    option: { geo: { map: 'china', label: { show: true } } } },
+  { id: 'seven-regions', note: 'the same map with a seventh, larger region: kept as it comes, nothing added', maps: [M('toyland', 'toylandPlus')],
+    option: { geo: { map: 'toyland', label: { show: true } } } },
   { id: 'name-map', note: 'nameProperty code, nameMap renaming, duplicated names sharing one group, cp, echartsStyle', maps: [M('named', 'named')],
     option: { geo: [
       { map: 'named', left: 0, top: 0, width: 400, height: 300, nameMap: { North: 'Nord', South: 'Sud', Nope: 'X' }, label: { show: true } },
@@ -631,10 +723,8 @@ function guards(cases) {
   add('crafted-filter', G('crafted').regions.map(r => r.name).join() === 'Poly,Multi,Line,Lines,Plain', 'no properties and empty coordinates are dropped');
   add('null-geometry-throws', /Invalid geoJson/.test(C('encoded-null-geometry').throws || ''), 'a null geometry in a compressed file throws');
   add('crafted-plain', fromHex(R(G('crafted'), 'Plain').geoms[0].ext[0][0]) === 2, 'a geometry with no encodeOffsets is left as it is');
-  add('china-nanhai', R(G('china-fix', 0), '南海诸岛') && !R(G('china-fix', 1), '南海诸岛'), 'the islands are added to a map named china only');
-  add('china-diaoyu', R(G('china-fix', 0), '台湾').geoms.length === 2 && R(G('china-fix', 1), '台湾').geoms.length === 1, 'Taiwan gets a second polygon on china only');
-  add('china-has-nanhai', G('china-has-nanhai').regions.filter(r => r.name === '南海诸岛').length === 1, 'an existing islands region is not added again');
-  add('china-text', R(G('china-fix', 0), '广东').center.join() !== R(G('china-fix', 1), '广东').center.join(), 'the label centre of Guangdong moves on china only');
+  add('two-names', JSON.stringify(G('two-names', 0).regions) === JSON.stringify(G('two-names', 1).regions) && G('two-names', 0).regions.length === 6, 'the same regions, centres and polygons under either name');
+  add('seven-regions', G('seven-regions').regions.map(r => r.name).join() === 'Region A,Region B,Region C,Region D,Region E,Region F,Region G' && G('seven-regions').regions.every(r => r.geoms.length === 1), 'seven regions in the features\' order, one polygon each');
   add('name-map', G('name-map', 0).regions.map(r => r.name).join() === 'Nord,Sud,Sud,Isle', 'nameMap renames; duplicates stay two regions');
   add('dup-group', G('name-map', 0).draw.groups.length === 3 && grp(G('name-map', 0), 'Sud').paths.length === 2, 'duplicated names share one group');
   add('name-property', G('name-map', 1).regions.map(r => r.name).join() === 'N,S,S2,I', 'nameProperty picks the name');
