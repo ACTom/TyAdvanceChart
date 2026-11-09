@@ -22,10 +22,11 @@
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>
-    <RequiredPackages Count="3">
+    <RequiredPackages Count="4">
       <Item1><PackageName Value="LCL"/></Item1>
       <Item2><PackageName Value="tycontrols"/></Item2>
-      <Item3><PackageName Value="SynEdit"/></Item3>
+      <Item3><PackageName Value="tyadvancechart"/></Item3>
+      <Item4><PackageName Value="SynEdit"/></Item4>
     </RequiredPackages>
     <Units Count="8">
       <Unit0>
@@ -69,7 +70,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <SearchPaths>
-      <OtherUnitFiles Value=".;../../source"/>
+      <OtherUnitFiles Value="."/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <SyntaxOptions>
