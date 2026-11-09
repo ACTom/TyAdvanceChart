@@ -3,12 +3,13 @@ unit test.advchart.theme;
 
 { The chart's tokens and rules live in its own themes/advchart.tycss, which the generated unit
   tyControls.AdvanceChart.Theme compiles in and registers as an add-on, instead of in the core's
-  light.tycss. Three things hold:
+  light.tycss. Two things hold:
     - the generated unit carries that file as it is, and it is the text registered;
     - every built-in theme, in both modes, resolves the chart's tokens and typeKeys exactly as
       it did before they moved: tests/fixtures/advchart-theme-baseline.json is the dump
-      (test.advchart.themedump) taken before anything moved;
-    - light.tycss holds nothing of the chart's.
+      (test.advchart.themedump) taken before anything moved.
+  That light.tycss holds nothing of the chart's is a fact about a TyControls file, and is
+  TyControls' to check; this repository has no light.tycss.
 
   The 'system' theme seeds its accent and its mode from the OS, so its part of the baseline is
   this machine's: SetUp pins both hooks to what the baseline was taken with, and the comparison
@@ -30,7 +31,6 @@ type
   published
     procedure TestTheUnitIsTheTycssFile;
     procedure TestTheThemesResolveAsBefore;
-    procedure TestLightHoldsNoAdvChart;
   end;
 
 implementation
@@ -283,16 +283,6 @@ begin
     eVals.Free;
     eKeys.Free;
   end;
-end;
-
-procedure TAdvChartThemeTest.TestLightHoldsNoAdvChart;
-var
-  light: string;
-begin
-  light := FileTextLF(RepoPath('themes' + PathDelim + 'light.tycss'));
-  AssertTrue('light.tycss was read', Length(light) > 10000);
-  AssertEquals('light.tycss holds no --advchart- token', 0, Pos('--advchart-', light));
-  AssertEquals('light.tycss holds no TyAdvChart rule', 0, Pos('TyAdvChart', light));
 end;
 
 initialization

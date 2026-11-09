@@ -5,12 +5,17 @@ unit test.advchart.i18n;
   languages/tyControls.AdvanceChart.StrConsts.pot). These tests pin the three halves of
   that move: the strings reach the chart's own catalogue and are translated through it,
   the core's catalogue no longer carries them, and every catalogue of the chart (the new
-  one and the two design-time ones) is keyed on its own unit's name. }
+  one and the two design-time ones) is keyed on its own unit's name. The core's catalogues are
+  read from the TyControls checkout TY_CORE_DIR names (test.advchart.coredir); unset, that
+  check is ignored.
+  And the chart's half of TyControls' #68 guard: no unit under source/ holds Chinese text in a
+  string literal, but for ECharts' own data in two of them. }
 interface
 uses
   Classes, SysUtils, fpcunit, testregistry, FileUtil,
   Translations,                      // TPOFile, TranslateUnitResourceStrings (LazUtils)
-  tyControls.AdvanceChart.StrConsts; // the unit that DECLARES the chart's resourcestrings
+  tyControls.AdvanceChart.StrConsts, // the unit that DECLARES the chart's resourcestrings
+  test.advchart.coredir;             // TY_CORE_DIR, the checkout the core's catalogues are in
 type
   TAdvChartI18nTest = class(TTestCase)
   published
@@ -18,6 +23,7 @@ type
     procedure TestNoAdvChartStringLeftInTheCore;
     procedure TestEveryAdvChartResourcestringIsInItsPot;
     procedure TestTheChartCataloguesBindToTheirUnits;
+    procedure TestNoUnitHoldsChineseTextInAStringLiteral;
   end;
 
 implementation
@@ -121,7 +127,8 @@ end;
 
 { The ids the chart's pot lists are the chart's strings. None of them may survive in the
   core's pot, its Chinese or English catalogue, or in the core's string unit; and the
-  three anchors keep this from passing vacuously should the pot ever be emptied. }
+  three anchors keep this from passing vacuously should the pot ever be emptied. The core's
+  files are the TyControls checkout's that TY_CORE_DIR names. }
 procedure TAdvChartI18nTest.TestNoAdvChartStringLeftInTheCore;
 const
   CORE_PREFIX  = 'tycontrols.strconsts.';
@@ -133,11 +140,12 @@ var
   i, k, n: Integer;
   names: array[0..2] of string;
   src: TStringList;
-  leftover, text: string;
+  leftover, text, core: string;
 begin
-  names[0] := LanguagesDir + 'tyControls.StrConsts.pot';
-  names[1] := LanguagesDir + 'tycontrols.strconsts.zh_CN.po';
-  names[2] := LanguagesDir + 'tycontrols.strconsts.en.po';
+  core := TyCoreDirFor(Self, 'that none of the chart''s strings is left in the core');
+  names[0] := core + 'languages' + PathDelim + 'tyControls.StrConsts.pot';
+  names[1] := core + 'languages' + PathDelim + 'tycontrols.strconsts.zh_CN.po';
+  names[2] := core + 'languages' + PathDelim + 'tycontrols.strconsts.en.po';
 
   chartIds := CatalogueIds(LanguagesDir + 'tyControls.AdvanceChart.StrConsts.pot');
   try
@@ -168,7 +176,7 @@ begin
     { the core's own string unit must not declare any of them either }
     src := TStringList.Create;
     try
-      src.LoadFromFile(RepoRoot + 'source' + PathDelim + 'tyControls.StrConsts.pas');
+      src.LoadFromFile(core + 'source' + PathDelim + 'tyControls.StrConsts.pas');
       text := LowerCase(src.Text);
       for i := 0 to chartIds.Count - 1 do
         if Pos(LineEnding + '  ' + Copy(chartIds[i], Length(CHART_PREFIX) + 1, MaxInt) + ' ', text) > 0 then
@@ -310,6 +318,177 @@ begin
     end;
   end;
   AssertEquals('chart catalogue entries that do not bind:', '', bad);
+end;
+
+{ True when the UTF-8 bytes of S hold a CJK character: U+3000..U+9FFF (lead bytes E3..E9) or
+  a fullwidth form, U+FF00..U+FFEF (EF BC..EF BF). '…' (E2 80 A6) and '»' are not. }
+function HoldsCJK(const S: string): Boolean;
+var
+  i: Integer;
+begin
+  for i := 1 to Length(S) do
+  begin
+    if Ord(S[i]) in [$E3..$E9] then Exit(True);
+    if (Ord(S[i]) = $EF) and (i < Length(S)) and (Ord(S[i + 1]) in [$BC..$BF]) then
+      Exit(True);
+  end;
+  Result := False;
+end;
+
+{ The string literals of the unit at APath that hold CJK text, one 'unit:line: literal' a line.
+  Comments are left out: // to the end of the line, (* *), and { } -- which nest in FPC. }
+function ChineseLiterals(const APath: string): string;
+var
+  s, lit: string;
+  i, j, n, line, depth: Integer;
+  inParen: Boolean;
+begin
+  Result := '';
+  s := ReadFileToString(APath);
+  n := Length(s);
+  i := 1;
+  line := 1;
+  depth := 0;
+  inParen := False;
+  while i <= n do
+  begin
+    if s[i] = #10 then Inc(line);
+    if inParen then
+    begin
+      if (s[i] = '*') and (i < n) and (s[i + 1] = ')') then
+      begin
+        inParen := False;
+        Inc(i, 2);
+      end
+      else
+        Inc(i);
+      Continue;
+    end;
+    if depth > 0 then
+    begin
+      if s[i] = '{' then Inc(depth)
+      else if s[i] = '}' then Dec(depth);
+      Inc(i);
+      Continue;
+    end;
+    if s[i] = '{' then
+    begin
+      depth := 1;
+      Inc(i);
+      Continue;
+    end;
+    if (s[i] = '(') and (i < n) and (s[i + 1] = '*') then
+    begin
+      inParen := True;
+      Inc(i, 2);
+      Continue;
+    end;
+    if (s[i] = '/') and (i < n) and (s[i + 1] = '/') then
+    begin
+      while (i <= n) and (s[i] <> #10) do Inc(i);   { the #10 is counted on the next pass }
+      Continue;
+    end;
+    if s[i] = '''' then
+    begin
+      j := i + 1;
+      while (j <= n) and (s[j] <> #10) do
+      begin
+        if s[j] = '''' then
+        begin
+          if (j < n) and (s[j + 1] = '''') then
+          begin
+            Inc(j, 2);
+            Continue;
+          end;
+          Break;
+        end;
+        Inc(j);
+      end;
+      lit := Copy(s, i, j - i + 1);
+      if HoldsCJK(lit) then
+        Result := Result + ExtractFileName(APath) + ':' + IntToStr(line) + ': ' + lit
+          + LineEnding;
+      i := j + 1;
+      Continue;
+    end;
+    Inc(i);
+  end;
+end;
+
+{ AdvChart's calendar carries ECharts' own name tables -- nameMap 'ZH' is these month and day
+  names, picked by the chart's option as upstream picks them -- and recognises the system's
+  Chinese day names by their prefix to shorten them. Data, not text written for a user. }
+const
+  AdvChartCalendarData: array[0..20] of string = (
+    '''1月''', '''2月''', '''3月''', '''4月''', '''5月''', '''6月''', '''7月''', '''8月''',
+    '''9月''', '''10月''', '''11月''', '''12月''',
+    '''日''', '''一''', '''二''', '''三''', '''四''', '''五''', '''六''',
+    '''周''', '''星期''');
+
+  { AdvChart's geo carries ECharts' fixes for a map registered as 'china' (src/coord/geo/fix/
+    nanhai.ts, textCoord.ts, diaoyuIsland.ts): region names matched against the map's own
+    feature names, so they must be the names the map data uses. Data, not text for a user. }
+  AdvChartGeoFixData: array[0..6] of string = (
+    '''北京''', '''南海诸岛''', '''台湾''', '''天津''', '''广东''', '''澳门''', '''香港''');
+
+{ AFound (ChineseLiterals' lines) without the lines whose literal is one of AExempt. }
+function WithoutLiterals(const AFound: string; const AExempt: array of string): string;
+var
+  lines: TStringList;
+  i, j, p: Integer;
+  lit: string;
+  keep: Boolean;
+begin
+  Result := '';
+  lines := TStringList.Create;
+  try
+    lines.Text := AFound;
+    for i := 0 to lines.Count - 1 do
+    begin
+      p := Pos(': ', lines[i]);
+      lit := Copy(lines[i], p + 2, MaxInt);
+      keep := True;
+      for j := Low(AExempt) to High(AExempt) do
+        if lit = AExempt[j] then keep := False;
+      if keep then Result := Result + lines[i] + LineEnding;
+    end;
+  finally
+    lines.Free;
+  end;
+end;
+
+{ #68, the chart's half: TyControls' test.i18n scans the core's units, this scans the chart's.
+  Text a user reads is a resourcestring, so a catalogue can translate it (CONTRIBUTING); an
+  error raised at a developer is English, as every other one in the library is. This reads
+  every unit under source/ for a string literal holding CJK text, comments left out. Two of
+  them carry ECharts' own Chinese data and are let off literal by literal (above). }
+procedure TAdvChartI18nTest.TestNoUnitHoldsChineseTextInAStringLiteral;
+var
+  files: TStringList;
+  i, scanned: Integer;
+  name, found: string;
+begin
+  files := FindAllFiles(RepoRoot + 'source', '*.pas;*.inc', True);
+  try
+    found := '';
+    scanned := 0;
+    for i := 0 to files.Count - 1 do
+    begin
+      name := ExtractFileName(files[i]);
+      Inc(scanned);
+      if SameText(name, 'tyControls.AdvanceChart.Calendar.pas') then
+        found := found + WithoutLiterals(ChineseLiterals(files[i]), AdvChartCalendarData)
+      else if SameText(name, 'tyControls.AdvanceChart.GeoFix.pas') then
+        found := found + WithoutLiterals(ChineseLiterals(files[i]), AdvChartGeoFixData)
+      else
+        found := found + ChineseLiterals(files[i]);
+    end;
+    AssertTrue('the scan read the library (' + IntToStr(scanned) + ' units)', scanned > 100);
+    AssertEquals('Chinese text in a string literal -- a resourcestring if a user reads it, '
+      + 'English if it is an error for a developer:' + LineEnding + found, '', found);
+  finally
+    files.Free;
+  end;
 end;
 
 initialization

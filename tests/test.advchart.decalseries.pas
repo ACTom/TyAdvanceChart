@@ -15,7 +15,7 @@ unit test.advchart.decalseries;
 interface
 uses Classes, SysUtils, Math, fpcunit, testregistry, fpjson, jsonparser,
      Controls, Graphics, Forms, BGRABitmap, BGRABitmapTypes,
-     tyControls.Controller, tyControls.Types, tyControls.StyleModel,
+     tyControls.Controller, tyControls.Types, tyControls.StyleModel, tyControls.BuiltinThemes,
      tyControls.AdvanceChart.Types, tyControls.AdvanceChart.Paint, tyControls.AdvanceChart.Shape,
      tyControls.AdvanceChart.Color, tyControls.AdvanceChart.Render, tyControls.AdvanceChart.Custom,
      tyControls.AdvanceChart.Legend, tyControls.AdvanceChart.Decal,
@@ -602,8 +602,8 @@ begin
     takes white ink }
   m := TTyStyleModel.Create;
   try
-    m.LoadFromFile(ExtractFilePath(ParamStr(0)) + '..' + PathDelim + 'themes'
-      + PathDelim + 'auto.tycss');
+    { TyControls' themes/auto.tycss, as its compiled-in pack carries it ('default') }
+    m.LoadFromCss(TyBuiltinThemeCss('default'));
     m.SetMode('light');
     skin := TTyChartColor(m.ResolveStyle(TyDecalSkin, '', []).TextColor);
     AssertEquals('auto light: upstream''s colour', Int64(ColourOf(cUpstreamDefault)), Int64(skin));
@@ -743,8 +743,8 @@ begin
   AssertTrue('a decal', k > 0);
   m := TTyStyleModel.Create;
   try
-    m.LoadFromFile(ExtractFilePath(ParamStr(0)) + '..' + PathDelim + 'themes'
-      + PathDelim + 'auto.tycss');
+    { TyControls' themes/auto.tycss, as its compiled-in pack carries it ('default') }
+    m.LoadFromCss(TyBuiltinThemeCss('default'));
     m.SetMode('dark');
     ink := TTyChartColor(m.ResolveStyle(TyDecalSkin, '', []).TextColor);
     ground := TTyChartColor(m.ResolveStyle(TyDecalSkin, '', []).Background.Color);
