@@ -5,11 +5,20 @@ unit test.advchart.theme;
   tyControls.AdvanceChart.Theme compiles in and registers as an add-on, instead of in the core's
   light.tycss. Three things hold:
     - the generated unit carries that file as it is, and it is the text registered;
-    - every built-in theme, in both modes, resolves the chart's tokens and typeKeys exactly as
-      it did before they moved: tests/fixtures/advchart-theme-baseline.json is the dump
-      (test.advchart.themedump) taken before anything moved;
+    - every built-in theme, in both modes, resolves the chart's tokens and typeKeys as recorded
+      in tests/fixtures/advchart-theme-baseline.json, the dump of test.advchart.themedump. It
+      was first taken before anything moved, so the move changed nothing a theme draws;
     - light.tycss holds nothing of the chart's. That file is TyControls', so it is read from
       the checkout TY_CORE_DIR names (test.advchart.coredir); unset, the check is ignored.
+
+  The dump's lists are the vocabulary of advchart.tycss, and the item count follows from them and
+  from TyBuiltinThemeNames, so a token, typeKey or built-in theme added on either side shows as
+  an item the baseline does not record. The chart follows TyControls' main, whose themes may
+  change what it resolves. When a change is the point (in TyControls or in advchart.tycss),
+  re-record the baseline and read its diff:
+    TY_WRITE_BASELINE=1 tyadvchart_tests.exe --suite=TAdvChartThemeTest.TestTheThemesResolveAsBefore
+  with the exe in tests/ (the fixture is found from the exe's own location). The test then
+  writes the dump to the fixture and passes.
 
   The 'system' theme seeds its accent and its mode from the OS, so its part of the baseline is
   this machine's: SetUp pins both hooks to what the baseline was taken with, and the comparison
@@ -37,8 +46,8 @@ type
 implementation
 
 uses
-  tyControls.Css.AddOns, tyControls.AdvanceChart.Theme, test.advchart.themedump,
-  test.advchart.coredir;
+  tyControls.Css.AddOns, tyControls.BuiltinThemes, tyControls.AdvanceChart.Theme,
+  test.advchart.themedump, test.advchart.coredir;
 
 const
   { What the baseline machine's OS answered when the baseline was taken. }
@@ -59,6 +68,26 @@ end;
 function RepoPath(const ARel: string): string;
 begin
   Result := ExtractFilePath(ParamStr(0)) + '..' + PathDelim + ARel;
+end;
+
+function BaselinePath: string;
+begin
+  Result := ExtractFilePath(ParamStr(0)) + 'fixtures' + PathDelim + 'advchart-theme-baseline.json';
+end;
+
+{ The dump's bytes as they are, LF line ends: what a re-record commits. }
+procedure WriteBaseline(const AText: string);
+var
+  fs: TFileStream;
+begin
+  ForceDirectories(ExtractFilePath(BaselinePath));
+  fs := TFileStream.Create(BaselinePath, fmCreate);
+  try
+    if AText <> '' then
+      fs.WriteBuffer(AText[1], Length(AText));
+  finally
+    fs.Free;
+  end;
 end;
 
 { The file's bytes, line endings made LF. }
@@ -238,8 +267,9 @@ end;
 procedure TAdvChartThemeTest.TestTheThemesResolveAsBefore;
 var
   eKeys, eVals, aKeys, aVals: TStringList;
-  i, k, diffs: Integer;
-  ev, av, report: string;
+  i, k, diffs, expected: Integer;
+  ev, av, report, dump: string;
+  v: TTyCssVocabulary;
 
   procedure Note(const AText: string);
   begin
@@ -249,16 +279,28 @@ var
   end;
 
 begin
+  dump := TyAdvChartThemeDump;
+  if GetEnvironmentVariable('TY_WRITE_BASELINE') = '1' then
+  begin
+    WriteBaseline(dump);
+    Exit;
+  end;
+  v := TyAdvChartThemeVocabulary;
+  AssertTrue('anti-vacuity: advchart.tycss defines tokens', Length(v.Tokens) > 0);
+  AssertTrue('anti-vacuity: and names typeKeys', Length(v.TypeKeys) > 0);
+  AssertTrue('anti-vacuity: there are built-in themes', Length(TyBuiltinThemeNames) > 0);
+  { every built-in theme x 2 modes x (each token + each typeKey) }
+  expected := Length(TyBuiltinThemeNames) * 2 * (Length(v.Tokens) + Length(v.TypeKeys));
   eKeys := NewKeyList;
   eVals := TStringList.Create;
   aKeys := NewKeyList;
   aVals := TStringList.Create;
   try
-    ParseDump(FileTextLF(ExtractFilePath(ParamStr(0)) + 'fixtures' + PathDelim +
-      'advchart-theme-baseline.json'), eKeys, eVals);
-    ParseDump(TyAdvChartThemeDump, aKeys, aVals);
-    { 17 themes x 2 modes x (10 tokens + 87 typeKeys) }
-    AssertEquals('items in the baseline', 34 * 97, eKeys.Count);
+    AssertTrue('the baseline exists: ' + BaselinePath + ' (written with TY_WRITE_BASELINE=1)',
+      FileExists(BaselinePath));
+    ParseDump(FileTextLF(BaselinePath), eKeys, eVals);
+    ParseDump(dump, aKeys, aVals);
+    AssertEquals('items in the dump', expected, aKeys.Count);
     diffs := 0;
     report := '';
     for i := 0 to eKeys.Count - 1 do
@@ -277,8 +319,10 @@ begin
     for i := 0 to aKeys.Count - 1 do
       if eKeys.IndexOf(aKeys[i]) < 0 then
         Note(aKeys[i] + ': not in the baseline');
-    AssertEquals(IntToStr(diffs) + ' item(s) resolve differently from the baseline' + report,
-      0, diffs);
+    AssertEquals(IntToStr(diffs) + ' item(s) resolve differently from the baseline (re-record '
+      + 'with TY_WRITE_BASELINE=1 when that is the point of the change)' + report, 0, diffs);
+    AssertEquals('items in the baseline: the themes and the vocabulary give these', expected,
+      eKeys.Count);
   finally
     aVals.Free;
     aKeys.Free;

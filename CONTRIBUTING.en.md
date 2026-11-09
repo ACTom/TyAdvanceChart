@@ -74,7 +74,9 @@ Bug fixes should come with a test that fails without the fix.
 **Ground rules**:
 
 - Expected values come from the real ECharts: `tests/fixtures/advchart-*.json` are written by the node scripts in `tools/advchart-oracle/`, run against the ECharts 6.1 dist. Never edit them by hand; change the script and run it again.
-- Visual values (colors, sizes) come from theme tokens, never hard-coded. The chart's tokens and rules are in `themes/advchart.tycss`; after changing it, run `powershell -File scripts/gen-advchart-theme.ps1` to regenerate `tyControls.AdvanceChart.Theme.pas`.
+- Visual values (colors, sizes) come from theme tokens, never hard-coded. The chart's tokens and rules are in `themes/advchart.tycss`; after changing it, run `powershell -File scripts/gen-advchart-theme.ps1` to regenerate `tyControls.AdvanceChart.Theme.pas`. Two fixtures record what TyControls makes of it; re-record one only when changing that is the point, and read its diff:
+  - `tests/fixtures/advchart-theme-baseline.json` holds what every built-in theme, in both modes, resolves for each of the chart's tokens and theme keys. It changes when `advchart.tycss` does, or when TyControls' themes do. From `tests/`, run `TY_WRITE_BASELINE=1 ./tyadvchart_tests --suite=TAdvChartThemeTest.TestTheThemesResolveAsBefore` (in PowerShell, set `$env:TY_WRITE_BASELINE='1'` first).
+  - `tests/fixtures/advchart-theme-lint.txt` holds what TyControls' theme linter says about `advchart.tycss`. From `tests/`, run `TY_WRITE_GOLDEN=1 ./tyadvchart_tests --suite=TAdvChartThemeLintGoldenTest` (in PowerShell, `$env:TY_WRITE_GOLDEN='1'`).
 - No native LCL controls (`TEdit`, `TButton`, …) inside owner-drawn UI.
 - Add new units to `tyadvancechart.lpk` (design-time ones to `tyadvancechart_dt.lpk`); add new test units to `tests/tyadvchart_tests.lpr`.
 - `TTyCustomAdvanceChart` holds the implementation and `TTyAdvanceChart` is just a `published` section (see TyControls' [subclassing.en.md](https://github.com/ACTom/TyControls/blob/main/docs/subclassing.en.md)). After changing `TTyAdvanceChart`'s `published` section, do two more steps and read each diff:

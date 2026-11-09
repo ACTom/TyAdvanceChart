@@ -3,13 +3,14 @@ unit test.advchart.themedump;
 
 { Test support, not a suite: a deterministic JSON dump of what every built-in theme, in both
   modes, resolves for the chart. Two things go in:
-    - each of the chart's --advchart-* tokens (TyAdvChartThemeTokens), read with ResolveToken;
-    - each of the chart's TyAdvChart* typeKeys (TyAdvChartThemeTypeKeys), resolved with no
-      style class under no state and under each pseudo-state, every field of the result
-      written as text.
-  The two lists are the ones themes/light.tycss carried when the chart was split out of the
-  core (the same regexes as scripts/gen-tycss-catalog.ps1 pull). They are constants here
-  because after the split light.tycss no longer holds them.
+    - each token the chart's own tycss defines (its --advchart-* tokens), read with
+      ResolveToken;
+    - each typeKey it names (its TyAdvChart* keys), resolved with no style class under no state
+      and under each pseudo-state, every field of the result written as text.
+  The two lists are TyAdvChartThemeVocabulary: TyCssVocabularyOf over TyAdvChartCss, the text
+  tyControls.AdvanceChart.Theme registers, by the rules scripts/gen-tycss-catalog.ps1 uses
+  (ascending by byte value). When the chart was split out of the core they gave exactly the
+  lists themes/light.tycss carried for it: 10 tokens and 87 typeKeys.
 
   The text is the same on every run and on every machine: names and keys are sorted ordinally,
   floats use a fixed format, and a path under the checkout is written relative to it. A
@@ -17,120 +18,23 @@ unit test.advchart.themedump;
 
 interface
 
+uses
+  tyControls.Css.AddOns;
+
 // The dump as JSON. One object keyed '<theme>|<light|dark>', each holding 'tokens' (token name to
 // value) and 'typeKeys' (typeKey to one text line per state).
 function TyAdvChartThemeDump: string;
+
+// The tokens and typeKeys the dump covers: the vocabulary of the chart's own tycss.
+function TyAdvChartThemeVocabulary: TTyCssVocabulary;
 
 implementation
 
 uses
   Classes, SysUtils, tyControls.Types, tyControls.StyleModel, tyControls.Controller,
-  tyControls.ThemeRegistry, tyControls.BuiltinThemes;
+  tyControls.ThemeRegistry, tyControls.BuiltinThemes, tyControls.AdvanceChart.Theme;
 
 const
-  cTokens: array[0..9] of string = (
-    '--advchart-axispointer-margin',
-    '--advchart-label-margin',
-    '--advchart-minor-tick-length',
-    '--advchart-name-gap',
-    '--advchart-single-tick-length',
-    '--advchart-tick-length',
-    '--advchart-tooltip-gap',
-    '--advchart-tooltip-gutter',
-    '--advchart-tooltip-marker',
-    '--advchart-tooltip-marker-gap'
-  );
-
-  cTypeKeys: array[0..86] of string = (
-    'TyAdvChart',
-    'TyAdvChartAxisLabel',
-    'TyAdvChartAxisLabelPrimary',
-    'TyAdvChartAxisLine',
-    'TyAdvChartAxisName',
-    'TyAdvChartAxisPointer',
-    'TyAdvChartAxisPointerLabel',
-    'TyAdvChartAxisPointerShadow',
-    'TyAdvChartAxisTick',
-    'TyAdvChartBarBackground',
-    'TyAdvChartBreadcrumb',
-    'TyAdvChartBreakArea',
-    'TyAdvChartBrush',
-    'TyAdvChartBrushOut',
-    'TyAdvChartCandleDown',
-    'TyAdvChartCandleUp',
-    'TyAdvChartDataZoom',
-    'TyAdvChartDataZoomBackground',
-    'TyAdvChartDataZoomBorder',
-    'TyAdvChartDataZoomBrush',
-    'TyAdvChartDataZoomFiller',
-    'TyAdvChartDataZoomHandle',
-    'TyAdvChartDataZoomMoveHandle',
-    'TyAdvChartDataZoomShadow',
-    'TyAdvChartDataZoomShadowSelected',
-    'TyAdvChartDecal',
-    'TyAdvChartEmptyCircle',
-    'TyAdvChartFocusItem',
-    'TyAdvChartGaugeDetail',
-    'TyAdvChartGeoArea',
-    'TyAdvChartGeoLabel',
-    'TyAdvChartGridBorder',
-    'TyAdvChartLabel',
-    'TyAdvChartLabelOnDark',
-    'TyAdvChartLabelOnLight',
-    'TyAdvChartLabelOnMid',
-    'TyAdvChartLegend',
-    'TyAdvChartLegendBackground',
-    'TyAdvChartLegendBorder',
-    'TyAdvChartLegendInactive',
-    'TyAdvChartLegendPageIcon',
-    'TyAdvChartLegendPageIconInactive',
-    'TyAdvChartLegendPageText',
-    'TyAdvChartLegendSelector',
-    'TyAdvChartLoading',
-    'TyAdvChartLoadingSpinner',
-    'TyAdvChartMapArea',
-    'TyAdvChartMinorSplitLine',
-    'TyAdvChartMinorTick',
-    'TyAdvChartParallelSelect',
-    'TyAdvChartSankeyLink',
-    'TyAdvChartSeries1',
-    'TyAdvChartSeries2',
-    'TyAdvChartSeries3',
-    'TyAdvChartSeries4',
-    'TyAdvChartSeries5',
-    'TyAdvChartSeries6',
-    'TyAdvChartSeries7',
-    'TyAdvChartSeries8',
-    'TyAdvChartSeries9',
-    'TyAdvChartShadow',
-    'TyAdvChartSplitArea',
-    'TyAdvChartSplitLine',
-    'TyAdvChartSubtitle',
-    'TyAdvChartThumbnail',
-    'TyAdvChartThumbnailWindow',
-    'TyAdvChartTimeline',
-    'TyAdvChartTimelineCheckpoint',
-    'TyAdvChartTimelineControl',
-    'TyAdvChartTimelineItem',
-    'TyAdvChartTimelineLabel',
-    'TyAdvChartTimelineProgress',
-    'TyAdvChartTitle',
-    'TyAdvChartToolbox',
-    'TyAdvChartToolboxBackground',
-    'TyAdvChartToolboxBorder',
-    'TyAdvChartToolboxBrush',
-    'TyAdvChartTooltip',
-    'TyAdvChartTooltipValue',
-    'TyAdvChartTreeEdge',
-    'TyAdvChartTreeNode',
-    'TyAdvChartTreemapLabel',
-    'TyAdvChartVisualMap',
-    'TyAdvChartVisualMapBackground',
-    'TyAdvChartVisualMapBorder',
-    'TyAdvChartVisualMapHandle',
-    'TyAdvChartVisualMapInactive'
-  );
-
   cStateNames: array[0..5] of string =
     ('normal', 'hover', 'active', 'focused', 'disabled', 'selected');
 
@@ -257,6 +161,11 @@ begin
       end;
 end;
 
+function TyAdvChartThemeVocabulary: TTyCssVocabulary;
+begin
+  Result := TyCssVocabularyOf(TyAdvChartCss);
+end;
+
 function TyAdvChartThemeDump: string;
 var
   c: TTyStyleController;
@@ -265,7 +174,9 @@ var
   i, m, k, s: Integer;
   mode, line: string;
   firstEntry: Boolean;
+  v: TTyCssVocabulary;
 begin
+  v := TyAdvChartThemeVocabulary;
   TyRegisterBuiltinThemes;
   GFS := DefaultFormatSettings;
   GFS.DecimalSeparator := '.';
@@ -285,26 +196,26 @@ begin
         firstEntry := False;
         sb.Append(JsonStr(names[i] + '|' + mode)).Append(': {').Append(#10);
         sb.Append('  "tokens": {').Append(#10);
-        for k := 0 to High(cTokens) do
+        for k := 0 to High(v.Tokens) do
         begin
-          sb.Append('    ').Append(JsonStr(cTokens[k])).Append(': ')
-            .Append(JsonStr(c.Model.ResolveToken(cTokens[k])));
-          if k < High(cTokens) then sb.Append(',');
+          sb.Append('    ').Append(JsonStr(v.Tokens[k])).Append(': ')
+            .Append(JsonStr(c.Model.ResolveToken(v.Tokens[k])));
+          if k < High(v.Tokens) then sb.Append(',');
           sb.Append(#10);
         end;
         sb.Append('  },').Append(#10);
         sb.Append('  "typeKeys": {').Append(#10);
-        for k := 0 to High(cTypeKeys) do
+        for k := 0 to High(v.TypeKeys) do
         begin
           line := '';
           for s := 0 to High(cStateNames) do
           begin
             if s > 0 then line := line + #10;
             line := line + cStateNames[s] + ': ' +
-              StyleText(c.Model.ResolveStyle(cTypeKeys[k], '', StatesOf(s)));
+              StyleText(c.Model.ResolveStyle(v.TypeKeys[k], '', StatesOf(s)));
           end;
-          sb.Append('    ').Append(JsonStr(cTypeKeys[k])).Append(': ').Append(JsonStr(line));
-          if k < High(cTypeKeys) then sb.Append(',');
+          sb.Append('    ').Append(JsonStr(v.TypeKeys[k])).Append(': ').Append(JsonStr(line));
+          if k < High(v.TypeKeys) then sb.Append(',');
           sb.Append(#10);
         end;
         sb.Append('  }').Append(#10).Append('}');

@@ -74,7 +74,9 @@ tests/tyadvchart_tests --all --format=plain
 **几条硬规矩**：
 
 - 期望值来自真的 ECharts：`tests/fixtures/advchart-*.json` 由 `tools/advchart-oracle/` 下的 node 脚本对 ECharts 6.1 的 dist 跑出来，不要手改；要改就改脚本，再重跑它。
-- 颜色、尺寸等视觉值走主题 token，不写死在代码里。图表的 token 和规则写在 `themes/advchart.tycss`，改完跑 `powershell -File scripts/gen-advchart-theme.ps1` 重新生成 `tyControls.AdvanceChart.Theme.pas`。
+- 颜色、尺寸等视觉值走主题 token，不写死在代码里。图表的 token 和规则写在 `themes/advchart.tycss`，改完跑 `powershell -File scripts/gen-advchart-theme.ps1` 重新生成 `tyControls.AdvanceChart.Theme.pas`。下面两份 fixture 记着 TyControls 读它得出的结果；只有本来就要改变结果时才重新记录，记完看一遍 diff：
+  - `tests/fixtures/advchart-theme-baseline.json` 记着每个内置主题在亮、暗两种模式下，对图表每个 token 和主题键解析出的值。`advchart.tycss` 改了，或者 TyControls 的主题改了，它都可能跟着变。在 `tests/` 下跑 `TY_WRITE_BASELINE=1 ./tyadvchart_tests --suite=TAdvChartThemeTest.TestTheThemesResolveAsBefore`（PowerShell 里先 `$env:TY_WRITE_BASELINE='1'`）。
+  - `tests/fixtures/advchart-theme-lint.txt` 记着 TyControls 的主题检查器对 `advchart.tycss` 的输出。在 `tests/` 下跑 `TY_WRITE_GOLDEN=1 ./tyadvchart_tests --suite=TAdvChartThemeLintGoldenTest`（PowerShell 里先 `$env:TY_WRITE_GOLDEN='1'`）。
 - 自绘界面里不用原生 LCL 控件（`TEdit`、`TButton` 等）。
 - 新单元要加进 `tyadvancechart.lpk`（设计期的加进 `tyadvancechart_dt.lpk`）；新测试单元加进 `tests/tyadvchart_tests.lpr`。
 - `TTyCustomAdvanceChart` 放全部实现，`TTyAdvanceChart` 只有一段 `published`（做法见 TyControls 的 [subclassing.md](https://github.com/ACTom/TyControls/blob/main/docs/subclassing.md)）。改了 `TTyAdvanceChart` 的 `published` 段，再做两步，各看一遍 diff：
