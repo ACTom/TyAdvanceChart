@@ -54,3 +54,6 @@ docs/superpowers/
 
 # the oracles' npm packages (tools/advchart-oracle/package.json; npm install there)
 tools/advchart-oracle/node_modules/
+
+# scripts/make-gallery.ps1's build copy of the example
+/.gallery-build/

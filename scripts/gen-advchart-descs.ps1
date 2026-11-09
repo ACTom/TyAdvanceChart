@@ -6,9 +6,9 @@
 # the runtime package would put a fifth of a megabyte of documentation into every
 # application that draws a chart.
 #
-# WHY NOT READ tools/advchart/catalog.json AT DESIGN TIME. scripts/make-release.ps1
-# excludes tools/ from the archive, so an installed copy of the package would find
-# no file there and the editor would silently show no descriptions. A resource
+# WHY NOT READ tools/advchart/catalog.json AT DESIGN TIME. An installed copy of the
+# package need not carry tools/ (TyControls' release archive leaves it out), so the
+# editor could find no file there and would silently show no descriptions. A resource
 # compiled into the design-time package travels with it.
 #
 # Regenerate after tools/advchart/catalog.json changes:

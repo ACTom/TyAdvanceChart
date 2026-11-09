@@ -148,7 +148,7 @@ const ONLY = onlyArg.split(',').map((x) => x.trim()).filter(Boolean);
 
 const SRC = positional[0] || 'D:/Projects/echarts-examples';
 const OUT = positional[1] ||
-  'D:/Projects/ty-advchart/examples/advchart/gallery';
+  path.join(__dirname, '..', '..', 'examples', 'advchart', 'gallery');
 const TS_DIR = path.join(SRC, 'public/examples/ts');
 const MAX_BYTES = Number(process.env.TY_GALLERY_MAX || 1048576);
 const DATA_DIR = path.join(SRC, 'public/data');

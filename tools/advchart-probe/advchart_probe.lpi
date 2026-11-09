@@ -12,11 +12,12 @@
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>
-    <RequiredPackages Count="4">
+    <RequiredPackages Count="5">
       <Item1><PackageName Value="SynEdit"/></Item1>
       <Item2><PackageName Value="LCL"/></Item2>
       <Item3><PackageName Value="tycontrols"/></Item3>
-      <Item4><PackageName Value="IDEIntf"/></Item4>
+      <Item4><PackageName Value="tyadvancechart"/></Item4>
+      <Item5><PackageName Value="IDEIntf"/></Item5>
     </RequiredPackages>
     <Units Count="1">
       <Unit0>
