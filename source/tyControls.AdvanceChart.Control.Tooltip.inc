@@ -5962,6 +5962,7 @@ begin
   P := NewPainter;
   try
     P.BeginPaintOn(nil, R, FLastPPI, bmp);
+    TyCanvasBlend(P);
     { ([R7-AC] a paint of the box alone: the overlay's run from the ground,
       not a paint's left over) }
     FOvOn := False;
@@ -8201,6 +8202,7 @@ begin
   mask := TBGRABitmap.Create(mw * s, mh * s, BGRAPixelTransparent);
   try
     AMp.BeginPaintOnScaled(nil, Rect(0, 0, mw, mh), P.PPI, mask, sc);
+    TyCanvasBlend(AMp);
     AMp.DrawText(Rect(m, m, m + ARect.Right - ARect.Left, m + ARect.Bottom - ARect.Top),
       AText, AFont, ASize, AWeight, AInk or TTyColor($FF000000), taLeftJustify, tlCenter, False);
     AMp.EndPaint;

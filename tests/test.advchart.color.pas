@@ -668,7 +668,10 @@ begin
     RASTERISER rather than about the option being read. Three opacities and
     the order between them says the option is read and that more of it means
     more colour, which is the whole claim; ignoring the key, or pinning it
-    to any one value, collapses all three together. }
+    to any one value, collapses all three together.
+    [The chart's painter blends as the canvas does now (TyCanvasBlend,
+    TAdvChartCanvasBlendTest holds the midpoint); the order is still all
+    this test claims.] }
   opaque := GreenAt('1');
   half := GreenAt('0.5');
   faint := GreenAt('0.15');

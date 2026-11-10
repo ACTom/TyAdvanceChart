@@ -408,7 +408,10 @@ const
     for i := 0 to ABmp.NbPixels - 1 do
     begin
       if ARed and (p^.red > 200) and (p^.green < 60) and (p^.blue < 60) and (p^.alpha > 200) then Inc(Result);
-      if (not ARed) and (p^.blue > 200) and (p^.green < 60) and (p^.red < 60) and (p^.alpha > 200) then Inc(Result);
+      { the symbol's own ink only: its antialiased rim is a blend with
+        whatever lies under it, the region in one picture and the ground in
+        the other }
+      if (not ARed) and (p^.blue > 250) and (p^.green < 5) and (p^.red < 5) and (p^.alpha > 250) then Inc(Result);
       Inc(p);
     end;
   end;

@@ -86,8 +86,8 @@ type
     function CountIn(const ARect: TRect; R, G, B, ATol: Integer): Integer;
     { pixels whose channel AStrong is at least 200 and the other two in
       [ALo, AHi]: a pure colour (ALo 0), or the same colour faded (ALo
-      above 0) -- the renderer blends in linear light, so half of #0000ff
-      over white is not 128 but about 170 }
+      above 0) -- the renderer blends as the canvas does, so half of
+      #0000ff over white is about 128 [was: in linear light, about 170] }
     function CountTint(const ARect: TRect; AStrong, ALo, AHi: Integer): Integer;
   protected
     procedure SetUp; override;

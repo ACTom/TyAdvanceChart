@@ -1872,7 +1872,8 @@ begin
   AssertTrue('the line is in the frame', hasLine);
   plain := RedOnTheLine('0');
   trail := RedOnTheLine('0.5');
-  { (BGRA blends in linear light: half a blue over white reads about 170) }
+  { (half a blue over white reads about 128, as the canvas blends it
+    [was: in linear light, about 170]) }
   AssertTrue(Format('a line at 0.5 lets the white through without a trail (red %d)',
     [plain]), (plain > 100) and (plain < 200));
   AssertTrue(Format('with one it saturates (red %d against %d)', [trail, plain]),

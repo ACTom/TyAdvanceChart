@@ -28,6 +28,7 @@ uses Classes, SysUtils, Math, fpcunit, testregistry, fpjson, jsonparser,
      tyControls.AdvanceChart.Types, tyControls.AdvanceChart.Shape,
      tyControls.AdvanceChart.Paint, tyControls.AdvanceChart.Measure,
      tyControls.AdvanceChart.Color,
+     tyControls.AdvanceChart.Render,
      tyControls.AdvanceChart.Export, tyControls.AdvanceChart.Loading,
      tyControls.AdvanceChart,
      test.advchart.gridbounds, test.advchart.categoryminmax;
@@ -171,6 +172,8 @@ begin
   P := TTyPainter.Create;
   try
     P.BeginPaintOn(nil, Rect(0, 0, 4, 4), 96, bmp);
+    { as the chart's own painters blend }
+    TyCanvasBlend(P);
     P.BeginPath;
     P.RectPath(0, 0, 4, 4);
     P.FillPath(AColour);

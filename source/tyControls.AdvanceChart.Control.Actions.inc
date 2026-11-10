@@ -1793,6 +1793,7 @@ begin
         P := NewPainter;
         try
           P.BeginPaintOn(nil, Rect(0, 0, w, h), 96, Result);
+          TyCanvasBlend(P);
           case bg.Kind of
             ebkSolid, ebkBlack:
               begin
@@ -1823,7 +1824,7 @@ begin
     for i := 0 to n - 1 do
       if bmps[i] <> nil then
         Result.PutImage(Floor(lay.X[i] + 0.5), Floor(lay.Y[i] + 0.5), bmps[i],
-          dmDrawWithTransparency);
+          dmLinearBlend);
   finally
     for i := 0 to n - 1 do bmps[i].Free;
   end;

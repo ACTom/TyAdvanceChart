@@ -314,11 +314,13 @@ procedure TAdvChartLabelHaloTest.TestATranslucentHaloDoesNotDarken;
 var n, darkest: Integer;
 begin
   { half-transparent red over white is (255, 128, 128) wherever it is laid
-    once; laid twice it is (255, 64, 64) }
+    once; laid twice it is (255, 64, 64). Under the black glyph's
+    antialiased edge it is darker, and counts as red down to a green of
+    100 (RedPixels: a red over 200) }
   Show(Format(cHaloBar, ['"textBorderColor": "rgba(255,0,0,0.5)", "textBorderWidth": 8']));
   n := RedPixels(0, darkest);
   AssertTrue(Format('the halo is drawn (%d px)', [n]), n > 100);
-  AssertTrue(Format('and laid once: its darkest green is %d', [darkest]), darkest >= 118);
+  AssertTrue(Format('and laid once: its darkest green is %d', [darkest]), darkest >= 96);
 end;
 
 procedure TAdvChartLabelHaloTest.TestADashedHaloLeavesGaps;

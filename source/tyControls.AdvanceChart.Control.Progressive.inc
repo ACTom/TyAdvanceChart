@@ -459,6 +459,7 @@ begin
       try
         P.BeginPaintOnScaled(nil, Rect(0, 0, AW div FProgLayerScale, AH div FProgLayerScale), APPI,
           FProgLayers[k].Bmp, sc);
+        TyCanvasBlend(P);
         for i := 0 to FPaintList.Count - 1 do
         begin
           idx := FPaintList.PaintOrder(i);
@@ -534,6 +535,7 @@ begin
         sc.DeviceUnits := False;
         P[k].BeginPaintOnScaled(nil, Rect(0, 0, FProgLayerW div FProgLayerScale,
           FProgLayerH div FProgLayerScale), FProgLayerPPI, FProgLayers[k].Bmp, sc);
+        TyCanvasBlend(P[k]);
       end;
       { [R2-L] still what a whole drawing gives: each element drawn after
         every one before it in paint order, and whole }
@@ -690,7 +692,7 @@ begin
               FProgLogOn := True;
               LogList(i + 1, pe^.ZLevel);
             end;
-            bmp.PutImage(0, 0, FProgLayers[k].Bmp, dmDrawWithTransparency);
+            bmp.PutImage(0, 0, FProgLayers[k].Bmp, dmLinearBlend);
           end;
         end;
       end;
@@ -828,6 +830,7 @@ begin
         sc.DeviceUnits := False;
         P.BeginPaintOnScaled(nil, Rect(0, 0, FProgLayerW div s, FProgLayerH div s),
           FProgLayerPPI, lay, sc);
+        TyCanvasBlend(P);
         for i := 0 to FPaintList.Count - 1 do
         begin
           idx := FPaintList.PaintOrder(i);
@@ -1000,7 +1003,7 @@ begin
       nb.PutImage(0, 0, FProgWork, dmSet);
       nb.ClipRect := box;
       nb.PutImage(0, 0, FProgUnder, dmSet);
-      nb.PutImage(0, 0, FProgLayers[first].Bmp, dmDrawWithTransparency);
+      nb.PutImage(0, 0, FProgLayers[first].Bmp, dmLinearBlend);
       { NOT CLIPPED to the box: BGRA's antialiased fill is not the same
         inside a clip as without one -- a slanted edge's coverage is summed
         from where the clip cuts it, and rounds differently. What meets the
@@ -1021,6 +1024,7 @@ begin
         sc.Scale := s;
         sc.DeviceUnits := False;
         P.BeginPaintOnScaled(nil, Rect(0, 0, w, h), APPI, nb, sc);
+        TyCanvasBlend(P);
         clip := nb.ClipRect;
         { [R7-AJ] WHAT THE FULL PAINT DREW AFTER ITS FIRST BLIT, in its order
           [was: the two zlevel passes of a paint whose levels are not apart,
@@ -1057,7 +1061,7 @@ begin
                   k := ProgLayerAt(pe^.ZLevel);
                   if k < 0 then Continue;
                   nb.ClipRect := box;
-                  nb.PutImage(0, 0, FProgLayers[k].Bmp, dmDrawWithTransparency);
+                  nb.PutImage(0, 0, FProgLayers[k].Bmp, dmLinearBlend);
                   nb.ClipRect := clip;
                   Continue;
                 end;
@@ -1117,6 +1121,7 @@ begin
   P := NewPainter;
   try
     P.BeginPaintOn(FStatic.Canvas, R, APPI, FProgWork);
+    TyCanvasBlend(P);
     P.EndPaint;
   finally
     P.Free;

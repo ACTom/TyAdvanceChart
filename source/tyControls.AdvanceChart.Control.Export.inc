@@ -80,6 +80,7 @@ begin
   try
     StApplyChanged;
     P.BeginPaintOn(nil, R, ppi, Result);
+    TyCanvasBlend(P);
     { Layer.clear: the whole image, before anything is drawn }
     case bg.Kind of
       ebkSolid, ebkBlack:
@@ -118,6 +119,7 @@ begin
         try
           measurer := NewTextMeasurer(ppi0);
           P.BeginPaintOn(nil, Rect(0, 0, Width, Height), ppi0, scratch);
+          TyCanvasBlend(P);
           PaintStatic(P, Rect(0, 0, Width, Height), ppi0, measurer);
           P.EndPaint;
         finally
@@ -184,7 +186,7 @@ begin
   jpg := TBGRABitmap.Create(ABmp.Width, ABmp.Height, BGRABlack);
   writer := TFPWriterJPEG.Create;
   try
-    jpg.PutImage(0, 0, ABmp, dmDrawWithTransparency);
+    jpg.PutImage(0, 0, ABmp, dmLinearBlend);
     writer.CompressionQuality := 92;
     TFPCustomImage(jpg).SaveToStream(AStream, writer);
   finally

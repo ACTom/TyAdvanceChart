@@ -214,8 +214,9 @@ begin
     and (Abs(AWant.blue - AGot.blue) <= 2));
 end;
 
-{ One colour laid ONCE over another at an opacity -- by BGRABitmap's own
-  blend, which is the painter's, gamma and all. }
+{ One colour laid ONCE over another at an opacity -- source-over on the
+  values as they stand, as an HTML canvas blends and the chart's painter
+  with it (TyCanvasBlend) [was: BGRABitmap's own blend, gamma and all]. }
 function Over(AGround: TBGRAPixel; AColour: TTyChartColor;
   AAlpha: Double): TBGRAPixel;
 var tmp: TBGRABitmap;
@@ -223,7 +224,7 @@ begin
   tmp := TBGRABitmap.Create(1, 1, AGround);
   try
     tmp.DrawPixel(0, 0, BGRA((AColour shr 16) and $FF, (AColour shr 8) and $FF,
-      AColour and $FF, Round(AAlpha * 255)));
+      AColour and $FF, Round(AAlpha * 255)), dmLinearBlend);
     Result := tmp.GetPixel(0, 0);
   finally
     tmp.Free;

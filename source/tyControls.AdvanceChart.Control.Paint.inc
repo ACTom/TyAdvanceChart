@@ -199,7 +199,7 @@ var
   areaFill: TTyFill;
   view: TTyChartView;
   { [F3b] the proxied areas, minor ticks and name }
-  areaR: TRect;
+  areaR, bandR: TRect;
   majors: Integer;
   nx, ny, nrot: Double;
   { the author's pens over the skin [R5-B] }
@@ -761,15 +761,26 @@ begin
       end;
       { where its groupTransition has it now [F3b] }
       if ProxArea('area_' + TyJsNumberToString(spec^.SplitAreaMarks[i].Value), areaR) then
-        APainter.FillBackground(areaR, areaFill, 0)
+        bandR := areaR
       else if horiz then
-        APainter.FillBackground(
-          Rect(Round(bandLo), Round(APlot.Top),
-               Round(bandHi), Round(APlot.Bottom)), areaFill, 0)
+        bandR := Rect(Round(bandLo), Round(APlot.Top), Round(bandHi), Round(APlot.Bottom))
       else
-        APainter.FillBackground(
-          Rect(Round(APlot.Left), Round(bandLo),
-               Round(APlot.Right), Round(bandHi)), areaFill, 0);
+        bandR := Rect(Round(APlot.Left), Round(bandLo), Round(APlot.Right), Round(bandHi));
+      { A COLOUR THROUGH THE CANVAS STATE, as every path of the chart is
+        filled: a half-clear band then blends as upstream's canvas blends it
+        (TyCanvasBlend) [was: FillBackground, which fills past that state] }
+      if areaFill.Kind = tfkSolid then
+      begin
+        APainter.BeginPath;
+        APainter.MoveTo(bandR.Left, bandR.Top);
+        APainter.LineTo(bandR.Right, bandR.Top);
+        APainter.LineTo(bandR.Right, bandR.Bottom);
+        APainter.LineTo(bandR.Left, bandR.Bottom);
+        APainter.ClosePath;
+        APainter.FillPath(areaFill.Color);
+      end
+      else
+        APainter.FillBackground(bandR, areaFill, 0);
     end;
   end;
 
@@ -1263,6 +1274,7 @@ begin
       patched where only they changed [P2] }
     if StApplyChanged then FProgReuse := StPatchList;
     P.BeginPaint(ACanvas, ARect, APPI);
+    TyCanvasBlend(P);
     PaintStatic(P, R, APPI, measurer);
     PaintDynamic(P, R, APPI, measurer);
     P.EndPaint;
@@ -4972,6 +4984,7 @@ begin
     P := NewPainter;
     try
       P.BeginPaint(FStatic.Canvas, R, APPI);
+      TyCanvasBlend(P);
       { [R2-L] the bitmap kept for the progress frames to come, where a run
         is blitted in it and the paint blends it as it stands }
       FProgCapOk := False;
@@ -5017,6 +5030,7 @@ begin
     P := NewPainter;
     try
       P.BeginPaint(ACanvas, ARect, APPI);
+      TyCanvasBlend(P);
       PaintDynamic(P, R, APPI, measurer);
       P.EndPaint;
     finally
@@ -5290,6 +5304,7 @@ begin
   P := NewPainter;
   try
     P.BeginPaintOn(FStatic.Canvas, R, APPI, FDrWork);
+    TyCanvasBlend(P);
     FDrCapture := True;
     try
       PaintStatic(P, R, APPI, measurer);
@@ -5382,6 +5397,7 @@ begin
     sc.Scale := FDrScale;
     sc.DeviceUnits := False;
     P.BeginPaintOnScaled(nil, R, APPI, FDrWork, sc);
+    TyCanvasBlend(P);
     { ONE PASS UNDER THE RECTS' BOUNDS: the bitmap's clip is the box round
       every rect, and an element is drawn once when it meets any of them.
       zrender clips and draws rect by rect; drawn that way here an element
@@ -5583,6 +5599,7 @@ begin
       sc.Scale := FDrScale;
       sc.DeviceUnits := False;
       P.BeginPaintOnScaled(nil, R, APPI, FDrDyn, sc);
+      TyCanvasBlend(P);
       PaintDynamic(P, R, APPI, measurer);
       P.EndPaint;
     finally
@@ -5696,6 +5713,7 @@ begin
       sc.Scale := FDrScale;
       sc.DeviceUnits := False;
       P.BeginPaintOnScaled(nil, R, APPI, FDrDyn, sc);
+      TyCanvasBlend(P);
       for blk := 0 to n - 1 do
       begin
         FDrDyn.ClipRect := DrRaster(px[blk]);

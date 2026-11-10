@@ -70,7 +70,7 @@ uses
   test.advchart.pathicons, test.advchart.penmap, test.advchart.gaugereads,
   test.advchart.sankeyroamtween, test.advchart.galleryrenderitem, test.advchart.callbacks,
   test.advchart.titlelist, test.advchart.render, test.advchart.proglayers,
-  test.advchart.traillayer, test.advchart.stringidentity, test.advchart.p2perf,
+  test.advchart.traillayer, test.advchart.canvasblend, test.advchart.stringidentity, test.advchart.p2perf,
   test.advchart.tooltipkeep, test.advchart.axisownpointer, test.advchart.tiphtml,
   test.advchart.tooltipparams, test.advchart.actionsbatch, test.advchart.rootinherit,
   test.advchart.dataedge, test.advchart.axistooltip, test.advchart.visualmaptext,

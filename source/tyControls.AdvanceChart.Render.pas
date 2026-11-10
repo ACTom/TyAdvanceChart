@@ -50,6 +50,15 @@ procedure TyResumeZBand(const AState: TTyZBandState);
 { the highest ZLevel of AList's elements that draw (-MaxInt for none) }
 function TyMaxZLevelOf(AList: TTyPaintList): Integer;
 
+{ THE SURFACE A CHART PAINTS ON BLENDS AS AN HTML CANVAS DOES: source-over on
+  the sRGB values as they stand, where BGRABitmap's own default expands them
+  by its gamma first -- a green of opacity 0.5 on white (127, 255, 127) as
+  upstream's, not (169, 255, 169). Called after every BeginPaint of the
+  chart's: the layer at rest, the layer in motion (a clear bitmap the
+  window composites the canvas' way already), an export and every layer
+  kept between frames are then one ink. }
+procedure TyCanvasBlend(P: TTyPainter);
+
 { [R5-C] the pen an element's style strokes with: its cap, its join, its
   miter limit (zrender's 10 where the style says nothing) }
 function TyStyleLineCap(const AStyle: TTyChartElementStyle): TTyLineCap;
@@ -802,6 +811,7 @@ begin
     try
       { no canvas: EndPaint leaves the bitmap where it is }
       P.BeginPaintOn(nil, Rect(0, 0, w, h), 96, bmp);
+      TyCanvasBlend(P);
       for i := 0 to High(marks) do
       begin
         if marks[i].IsImage then
@@ -823,7 +833,7 @@ begin
           end;
           if (r.Right - r.Left >= 1) and (r.Bottom - r.Top >= 1) then
             bmp.StretchPutImage(Rect(Round(r.Left), Round(r.Top), Round(r.Right),
-              Round(r.Bottom)), img, dmDrawWithTransparency);
+              Round(r.Bottom)), img, dmLinearBlend);
           Continue;
         end;
         if not marks[i].Draws then Continue;
@@ -2092,6 +2102,7 @@ begin
   end;
   Result := TTyPainter.Create;
   Result.BeginPaintOnScaled(nil, Rect(0, 0, AW, AH), P.PPI, AMask, sc);
+  TyCanvasBlend(Result);
 end;
 
 { the stroke along the mask's contours, under the glyphs: one path, so
@@ -2420,6 +2431,7 @@ begin
     try
       mp.FastStrokes := P.FastStrokes;
       mp.BeginPaintOnScaled(nil, Rect(0, 0, mw, mh), P.PPI, mask, sc);
+      TyCanvasBlend(mp);
       if AHasHalo then
         HaloRotated(mp, AText, AFont, ASize, AWeight, mx, my, ARotationRad, AH, AV,
           AHalo, AHaloWidth, ADash, ADashOffset);
@@ -2458,6 +2470,7 @@ begin
   try
     mp.FastStrokes := P.FastStrokes;
     mp.BeginPaintOnScaled(nil, Rect(0, 0, r.Right - r.Left, r.Bottom - r.Top), P.PPI, mask, sc);
+    TyCanvasBlend(mp);
     mp.BeginPath;
     mp.RoundRectPath(0, 0, r.Right - r.Left, r.Bottom - r.Top, ARadius);
     mp.FillPath(AFill);
@@ -2830,6 +2843,7 @@ begin
   try
     mp.FastStrokes := P.FastStrokes;
     mp.BeginPaintOn(nil, Rect(0, 0, bw, bh), ppi, bmp);
+    TyCanvasBlend(mp);
     e := AElement;
     e.ClipPaths := nil;
     e.Caption.X := e.Caption.X - ox;
@@ -2928,6 +2942,7 @@ begin
       try
         mp.FastStrokes := P.FastStrokes;
         mp.BeginPaintOn(nil, Rect(0, 0, bw, bh), ppi, bmp);
+        TyCanvasBlend(mp);
         e := AElement;
         e.Caption.HasAffine := False;
         e.Caption.RotationRad := 0;
@@ -3000,6 +3015,7 @@ begin
     try
       mp.FastStrokes := P.FastStrokes;
       mp.BeginPaintOn(nil, Rect(0, 0, bw, bh), ppi, bmp);
+      TyCanvasBlend(mp);
       e := AElement;
       e.Caption.HasAffine := False;
       e.Caption.BaselineKind := 0;
@@ -3188,6 +3204,11 @@ begin
   GZBandOn := AState.IsOn;
   GZBandLo := AState.Lo;
   GZBandHi := AState.Hi;
+end;
+
+procedure TyCanvasBlend(P: TTyPainter);
+begin
+  if (P <> nil) and (P.Bitmap <> nil) then P.Bitmap.Canvas2D.linearBlend := True;
 end;
 
 function TyMaxZLevelOf(AList: TTyPaintList): Integer;
@@ -3712,7 +3733,7 @@ var
           end;
         end;
       end;
-      bmp.PutImage(area.Left, area.Top, layer, dmDrawWithTransparency, op);
+      bmp.PutImage(area.Left, area.Top, layer, dmLinearBlend, op);
     finally
       memo.Free;
       layer.Free;

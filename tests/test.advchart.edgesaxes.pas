@@ -975,8 +975,8 @@ begin
     px := bmp.GetPixel(x, 61);
     AssertTrue(Format('blue inside: %d %d %d', [px.red, px.green, px.blue]),
       (px.blue > 240) and (px.red < 16));
-    { the row the clip's edge halves: half blue over the white ground (the
-      painter mixes in linear light, so half is 170, not 128 -- spec 1) }
+    { the row the clip's edge halves: half blue over the white ground,
+      about 128 as the canvas blends it [was: in linear light, 170] }
     px := bmp.GetPixel(x, 59);
     AssertTrue(Format('half covered at y 59: %d %d %d', [px.red, px.green, px.blue]),
       (px.red > 90) and (px.red < 200) and (px.blue > 240));

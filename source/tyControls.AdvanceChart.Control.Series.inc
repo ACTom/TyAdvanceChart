@@ -3610,6 +3610,7 @@ begin
     sc.DeviceUnits := False;
     P.BeginPaintOnScaled(nil, Rect(0, 0, bmp.Width div sc.Scale, bmp.Height div sc.Scale),
       FPaintListPPI, FTrailLayer, sc);
+    TyCanvasBlend(P);
     if not blocks then
     begin
       for i := 0 to trail.Count - 1 do
@@ -3640,7 +3641,7 @@ begin
       end;
     end;
     P.EndPaint;
-    bmp.PutImage(0, 0, FTrailLayer, dmDrawWithTransparency);
+    bmp.PutImage(0, 0, FTrailLayer, dmLinearBlend);
     for i := 0 to AList.Count - 1 do
     begin
       el := AList.Element(i);
@@ -3717,6 +3718,7 @@ begin
     sc.DeviceUnits := False;
     P.BeginPaintOnScaled(nil, Rect(0, 0, bmp.Width div sc.Scale, bmp.Height div sc.Scale),
       FPaintListPPI, layer, sc);
+    TyCanvasBlend(P);
     { the level's elements, in paint order (the zlevel band passes them) }
     for i := 0 to AList.Count - 1 do
     begin
@@ -3727,7 +3729,7 @@ begin
   finally
     P.Free;
   end;
-  bmp.PutImage(0, 0, layer, dmDrawWithTransparency);
+  bmp.PutImage(0, 0, layer, dmLinearBlend);
 end;
 
 procedure TTyCustomAdvanceChart.SolveRadars(APPI: Integer);
