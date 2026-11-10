@@ -317,6 +317,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
+## echarts-stat — `source/tyControls.AdvanceChart.StatTransform.pas`
+
+Upstream: <https://github.com/ecomfe/echarts-stat> · echarts-stat 1.2.0, by Deqing Li.
+
+`tyControls.AdvanceChart.StatTransform.pas` ports the three dataset transforms echarts-stat
+ships (`ecStat:regression`, `ecStat:histogram` and `ecStat:clustering`), from the build of it
+ECharts keeps in its test folder (`test/lib/ecStat.min.js`).
+
+echarts-stat declares its licence as "BSD" in its `package.json`. Its repository ships no
+licence file and names no variant of the BSD licence, so there is no licence text to
+reproduce here. This section records the attribution and the declared licence; it will
+carry the full text once upstream publishes one.
+
 ## Apache ECharts example gallery
 
 `examples/advchart/gallery/*.json` are the option trees of the official Apache ECharts
