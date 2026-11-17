@@ -141,12 +141,12 @@ function TyGfxIdText(const AId: string): string;
 
 { ---- shared with the custom series [Batch 123, C14] ---- }
 
-{ applyPropsDirectly and applyMiscProps (customGraphicTransition.ts): the
+(* applyPropsDirectly and applyMiscProps (customGraphicTransition.ts): the
   final props set at once -- the style (with AClearStyle, the custom
   series' clearStyle, the element's style replaced: useStyle({}) before
   setStyle), the legacy position / scale / origin arrays, every transform
   prop the option gives a value, the shape (setShape); silent, ignore and
-  (not on a group) invisible where the option has the key. No animation. }
+  (not on a group) invisible where the option has the key. No animation. *)
 procedure TyGfxApplyDirect(AEl: TTyGfxEl; AOpt: TJSONObject; AClearStyle: Boolean);
 
 { isEC4CompatibleStyle (util/styleCompat.ts): `legacy: true`, or -- legacy
@@ -1172,8 +1172,8 @@ begin
     ef := ObjOf(sub, 'enterFrom');
     if ef = nil then Continue;
     case k of
-      { the root's may name a nested object: enterFrom: {style: {opacity:
-        0}} [F3b] }
+      (* the root's may name a nested object: enterFrom: {style: {opacity:
+        0}} [F3b] *)
       0: RootPropsOf(ef, AEnter);
       1: TyGfxPropsOf(ef, 'style', AEnter);
       2: TyGfxPropsOf(ef, 'shape', AEnter);

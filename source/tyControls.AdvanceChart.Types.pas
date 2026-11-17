@@ -173,7 +173,7 @@ function TyRectFContains(const AR: TTyRectF; const AP: TTyPointF): Boolean;
   first. -1 is not a column anywhere. }
 function TyNoStack: TTySeriesStack;
 
-{ A number out of an option tree, narrowed to an Integer WITHOUT raising.
+(* A number out of an option tree, narrowed to an Integer WITHOUT raising.
 
   JAVASCRIPT'S `Math.round` HAS NO DOMAIN. It answers a finite Double for any
   finite input, and every option ECharts reads this way is typed `number` with
@@ -191,7 +191,7 @@ function TyNoStack: TTySeriesStack;
 
   Use this for every option number that becomes an Integer. It is not a
   defensive flourish -- twenty-seven such reads were audited against the
-  ECharts source and sixteen killed the render on a value upstream accepts. }
+  ECharts source and sixteen killed the render on a value upstream accepts. *)
 function TyRoundOpt(AValue: Double; ADefault: Integer = 0;
   ALo: Integer = Low(Integer); AHi: Integer = High(Integer)): Integer;
 

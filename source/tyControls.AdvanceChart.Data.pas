@@ -67,12 +67,12 @@ type
   end;
   TTyDataValueArray = array of TTyDataValue;
 
-  { WHAT A DATA ITEM WAS, as written -- upstream's getRawValue, for the text a
+  (* WHAT A DATA ITEM WAS, as written -- upstream's getRawValue, for the text a
     label or a tooltip prints. rshNone is "nothing kept", and every reader
     then falls back to the parsed Double. An item written as null, or as an
     object with no `value`, is ABSENT (`undefined`); `{value: null}` is NULL.
     A scalar answers every dimension; an array or a row answers by position,
-    and an objectRows row by its source dimension's position. }
+    and an objectRows row by its source dimension's position. *)
   TTyRawShape = (rshNone, rshAbsent, rshNull, rshScalar, rshArray, rshObject);
   TTyRawItem = record
     Shape: TTyRawShape;
@@ -582,9 +582,9 @@ type
       width, or the table's; a cell past it belongs to no dimension. }
     property RawWidth: Integer read FRawWidth write FRawWidth;
     function RawDimName(APos: Integer): string;
-    { `{@key}` to a position (getDimensionIndex): `[n]` as a number, a
+    (* `{@key}` to a position (getDimensionIndex): `[n]` as a number, a
       declared name, a numeric-looking key as a number; not-a-number when
-      none of them. }
+      none of them. *)
     function RawPosOf(const AKey: string): Double;
     { The cell at APos of an item: a scalar answers any position; an array or
       object by an in-range whole position; anything else is no cell. }
@@ -1495,10 +1495,10 @@ begin
   s := AText;
   if s = '' then Exit;
 
-  { ---- TIME_REG, token for token ----
+  (* ---- TIME_REG, token for token ----
     ^(\d{4})([-/](\d{1,2})([-/](\d{1,2})([T ](\d{1,2})(:(\d{1,2})(:(\d{1,2})
     ([.,](\d+))?)?)?(Z|[+-]\d\d:?\d\d)?)?)?)?$ -- every group after the year
-    optional, and a zone only after an hour. }
+    optional, and a zone only after an hour. *)
   p := 1;
   haveMo := False; haveD := False; haveH := False; haveMi := False;
   haveS := False; haveMs := False; haveZone := False; zoneZ := False;

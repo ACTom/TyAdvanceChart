@@ -66,10 +66,10 @@ type
 { [R2-J2] a node's `name` as upstream's getName answers it: a string, a
   number's text, or nothing (moved here from the tooltip's) }
 function TyHierItemName(AItem: TJSONData): string;
-{ [R2-J2] wrapTreePathInfo as JSON text -- a sunburst's or a treemap's
+(* [R2-J2] wrapTreePathInfo as JSON text -- a sunburst's or a treemap's
   params.treePathInfo: every node from the virtual root (named ARootName)
   down to ARow, {name, dataIndex, value}, the value AValues[row] (a number
-  that is none is null, as JSON.stringify writes it) }
+  that is none is null, as JSON.stringify writes it) *)
 function TyHierTreePathJson(const AHier: TTyHierarchy;
   const AValues: TTyDoubleArray; ARow: Integer; const ARootName: string): string;
 
@@ -554,8 +554,8 @@ begin
   if AStore = nil then Exit;
   hier := TyHierarchyOf(AOption, ASeriesIndex);
   done := nil;
-  { the completed values as JavaScript left them -- a concatenated string
-    stays one, for the store to parse and a label's {c} to print [R2-G] }
+  (* the completed values as JavaScript left them -- a concatenated string
+    stays one, for the store to parse and a label's {c} to print [R2-G] *)
   if ACompleteValues then done := TyTreeCompletedRaw(hier);
   AStore.AddDimension('value', ddtFloat);
   SetLength(dims, 1);

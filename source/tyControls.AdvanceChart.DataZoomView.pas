@@ -1350,9 +1350,9 @@ begin
       Result.Labels[k].Rect := XYWH(0, 0, 0, 0)
     else if AInk.HasRt and (AMeasurer <> nil) then
     begin
-      { [R7-M] THE BLOCK: createTextStyle(textStyleModel, {x, y, align,
+      (* [R7-M] THE BLOCK: createTextStyle(textStyleModel, {x, y, align,
         verticalAlign, fill: getTextColor()}) -- laid out at the style's
-        place, its rect the union of its children }
+        place, its rect the union of its children *)
       b := AInk.Rt;
       TyRtFinish(b, AInk.FontName, AInk.FontSizeLogical, AInk.FontWeight,
         AInk.RtGlobal, False, 0);

@@ -212,7 +212,7 @@ begin
     if (not FBindings[i].HasAxes) and (FBindings[i].Polar = nil)
       and (FBindings[i].Single = nil) and not CustomOnNone(i) then
     begin
-      { A SERIES OFF EVERY COORDINATE SYSTEM HAS DATA TOO, and until now
+      (* A SERIES OFF EVERY COORDINATE SYSTEM HAS DATA TOO, and until now
         only a pie got any: the columns below are the coordinate system's
         dimensions, and a series without a coordinate system has none, so
         the store stayed empty and the `data` array was never read. One
@@ -226,7 +226,7 @@ begin
         day it was written -- so both of them reached here, matched nothing,
         and left with a store of zero columns and zero rows. Nothing raised;
         their layout simply found no value dimension and drew nothing, which
-        is indistinguishable from a type with no renderer. }
+        is indistinguishable from a type with no renderer. *)
       { A RADAR SERIES IS NOT ON NO COORDINATE SYSTEM -- it is on one whose
         axes are spokes, and HasAxes says only that the cartesian pair is
         absent. One float column per indicator, named the way the coordinate
@@ -589,8 +589,8 @@ begin
       { [spec 242] past the table: the first free column }
       TyEncodeDropPast(enc, FSources[i].DimCount);
     end;
-    { A GIVEN ENCODE FILLS WHAT IT LEAVES OUT from the next free columns --
-      `encode: {tooltip: [2]}` still draws x from 0 and y from 1. }
+    (* A GIVEN ENCODE FILLS WHAT IT LEAVES OUT from the next free columns --
+      `encode: {tooltip: [2]}` still draws x from 0 and y from 1. *)
     { (up to the dimensions upstream counts: a table's written `dimensions`,
       at least the coordinates' [spec 255]) }
     if enc.Given then
@@ -1232,12 +1232,12 @@ begin
     [Batch 98] }
   FLegendSelHoverLegend := -1;
   FLegendSelHoverIdx := -1;
-  { A NEW LAYOUT SNAPS: a resize, a theme -- upstream sets those directly
+  (* A NEW LAYOUT SNAPS: a resize, a theme -- upstream sets those directly
     ({duration: 0}) -- and a new option is armed again after the build
     [Batch 89]. A NEW OPTION UPDATES: the render before it is kept -- its
     list, its keys, its build -- for the render that arms it, and the
     proxies run on [Batch 90]. So does a full update of the same option, a
-    legend toggle or a dataZoom (AnimFullBegin) [Batch 96]. }
+    legend toggle or a dataZoom (AnimFullBegin) [Batch 96]. *)
   if FAnimPending and (FAnimMode <> camOff) and not (csDesigning in ComponentState) then
   begin
     if not FAnimPrev.Valid then AnimSnapshot;
@@ -1582,7 +1582,7 @@ begin
   if (ax = nil) or (ax.Scale.BreakMapper = nil) then Exit;
   brks := ax.Scale.BreakMapper.BreakList;
   if (ABreakIndex < 0) or (ABreakIndex > High(brks)) then Exit;
-  { {type, breaks: [{start, end}]}, then `${dim}AxisIndex` }
+  (* {type, breaks: [{start, end}]}, then `${dim}AxisIndex` *)
   DispatchAction('{"type":"expandAxisBreak","breaks":[{"start":' + brks[ABreakIndex].StartJson
     + ',"end":' + brks[ABreakIndex].EndJson + '}],"' + ax.Dim + 'AxisIndex":'
     + IntToStr(ax.ComponentIndex) + '}');
@@ -1991,11 +1991,11 @@ begin
       key := style.Color;
       other := style.BorderColor;
     end;
-    { `auto` ON EITHER HALF OF THE PAIR sends this series to the palette,
+    (* `auto` ON EITHER HALF OF THE PAIR sends this series to the palette,
       even when the other half names a colour -- upstream tests `fill` AND
       `stroke` for the word and consults the palette if either carries it.
       So `{ color: '#fff', borderColor: 'auto' }` is a white bar with a
-      border in the palette colour, and it costs a slot. }
+      border in the palette colour, and it costs a slot. *)
     hasAuto := key.IsAuto or other.IsAuto;
     { [R2-J3] A COLOUR CALLBACK AT THE KEY is the style task's third reason
       to ask the palette, whatever the type's defaults name: the series takes
@@ -2037,10 +2037,10 @@ begin
 
     if key.Written and not hasAuto then
     begin
-      { AN AUTHORED COLOUR CONSUMES NO SLOT, and upstream says why in a comment:
+      (* AN AUTHORED COLOUR CONSUMES NO SLOT, and upstream says why in a comment:
         an author who paints one series transparent, or as a backdrop, did not
         mean to shift every other series' colour. `series: [{}, {color}, {}]` is
-        palette[0], the authored one, palette[1]. }
+        palette[0], the authored one, palette[1]. *)
       if not key.IsNone then
       begin
         FSeriesColors[i] := key.Color;
@@ -3056,10 +3056,10 @@ begin
     AVisual.StrokeClear := line.Color.Written and not line.Color.IsNone
       and not line.Color.IsAuto and ((line.Color.Color shr 24) = 0)
       and (line.Color.Gradient.Kind = cgkNone) and not line.Color.Pattern.Present;
-    { AND IT REPLACES the itemStyle one rather than adding to it: for a shape
+    (* AND IT REPLACES the itemStyle one rather than adding to it: for a shape
       drawn with a stroke, lineStyle IS the pen. `lineStyle: {}` with no type
       leaves todNone, which answers solid -- so a line series that writes only
-      a width does not inherit a dash from its itemStyle. }
+      a width does not inherit a dash from its itemStyle. *)
     AVisual.Dash := line.Dash;
     AVisual.DashExplicit := line.DashLogical;
     AVisual.DashOffset := line.DashOffset;
@@ -3800,10 +3800,10 @@ begin
   end;
 end;
 
-{ `encode` ON A SERIES' OWN DATA: `encode: {x: 1, y: 0}` has x read element
+(* `encode` ON A SERIES' OWN DATA: `encode: {x: 1, y: 0}` has x read element
   1 of each item and y element 0, exactly as it would pick table columns.
   Only the plain coordinate columns -- a multi-value series places its own,
-  and a row-index column reads no element at all. }
+  and a row-index column reads no element at all. *)
 procedure TTyCustomAdvanceChart.BoxTipDims(const AEnc: TTySeriesEncode;
   const ASource: TTyChartSource; AStore: TTyDataStore);
 var
@@ -5110,9 +5110,9 @@ begin
           SetLength(itemSpecs, FBindings[i].SeriesIndex + 1);
         itemSpecs[FBindings[i].SeriesIndex] := v.ItemLabels;
       end;
-      { `{c}` and the default text read the VALUE column -- whichever axis is
+      (* `{c}` and the default text read the VALUE column -- whichever axis is
         not the base one. A label that read x on a bar chart would show the
-        category ordinal, which is a number and looks like an answer. }
+        category ordinal, which is a number and looks like an answer. *)
       v.LabelValueDim := -1;
       if (FBindings[i].ValueAxis <> nil) and (FStores[i] <> nil) then
         v.LabelValueDim := FStores[i].DimIndexOf(FBindings[i].ValueAxis.Dim)

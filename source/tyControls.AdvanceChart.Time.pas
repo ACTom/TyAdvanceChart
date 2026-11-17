@@ -75,13 +75,13 @@ type
     Falsy: array of Boolean;
   end;
 
-  { UPSTREAM'S GENERATED DICTIONARY (parseTimeAxisLabelFormatterDictionary):
+  (* UPSTREAM'S GENERATED DICTIONARY (parseTimeAxisLabelFormatterDictionary):
     Lists[lowest, upper] for every upper unit at or above the lowest one.
     A tick that is not on an axis break only ever reads Lists[u, u] with u
     its own unit -- the rest is what a break tick would read, and is built
     because the cascade that fills a unit nobody wrote runs through it.
     Highlight: no unit was written at all, so the default templates carry a
-    second, `{primary|...}` entry for the coarser levels. [Batch 104] }
+    second, `{primary|...}` entry for the coarser levels. [Batch 104] *)
   TTyTimeTemplateDict = record
     Highlight: Boolean;
     Lists: array[TTyTimeUnit, TTyTimeUnit] of TTyTimeTemplates;
@@ -108,7 +108,7 @@ function TyTimeUnitName(AUnit: TTyTimeUnit): string;
   label a tick in that unit carries when nobody wrote one. }
 function TyTimeSeed(AUnit: TTyTimeUnit): string;
 
-{ THE DICTIONARY FROM THE OPTION. AOption is axisLabel.formatter when it is
+(* THE DICTIONARY FROM THE OPTION. AOption is axisLabel.formatter when it is
   neither a string nor a function, or nil for none. Upstream's rules, entry by
   entry:
     - a unit's entry that is an object is looked into by the upper unit's
@@ -120,7 +120,7 @@ function TyTimeSeed(AUnit: TTyTimeUnit): string;
       template so far does not contain, that unit's own first template, a
       space, and the template so far -- `{yyyy} {MMM} {d}` for a day under a
       year; and only these get the `{primary|...}` second entry, and only
-      while no unit at all was written. }
+      while no unit at all was written. *)
 function TyTimeTemplateDict(AOption: TJSONData): TTyTimeTemplateDict;
 
 { parseTimeAxisLabelFormatter: AFormatter is axisLabel.formatter as written,
@@ -1233,8 +1233,8 @@ begin
     else Result.Kind := tfkString;
     Exit;
   end;
-  { `dictOption || {}`: nothing, null, a number, an array -- all the
-    defaults }
+  (* `dictOption || {}`: nothing, null, a number, an array -- all the
+    defaults *)
   Result.Kind := tfkDict;
   Result.Dict := TyTimeTemplateDict(AFormatter);
 end;

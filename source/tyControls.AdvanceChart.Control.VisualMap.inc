@@ -199,8 +199,8 @@ begin
   FVisualLines[ASlot] := TyVisualLineFillOf(metas[k], axis, origin, len,
     APPI / 96);
   AVisual.VisualLine := FVisualLines[ASlot];
-  { the pen keeps an authored lineStyle.color, the area an authored
-    areaStyle.color -- `defaults(style, {stroke: visualColor})` }
+  (* the pen keeps an authored lineStyle.color, the area an authored
+    areaStyle.color -- `defaults(style, {stroke: visualColor})` *)
   AVisual.VisualLineStroke := True;
   AVisual.VisualLineArea := True;
   d := FOption.ComponentAt('series', FBindings[ASlot].SeriesIndex);
@@ -1496,10 +1496,10 @@ begin
         else FVmLive[k].Labels[h] := FVmLive[k].LabelsSaved[h];
         FVmLive[k].LabelBlurOn[h] := want;
         anyChange := True;
-        { [R5-I] the label's stateTransition ({duration: 200}, no easing):
+        (* [R5-I] the label's stateTransition ({duration: 200}, no easing):
           its opacity to the blur's 0.1, or back to its own, from where it
           is [was: switched at once]; [R7-N] its own is the normal state's,
-          textStyle's opacity [was: 1] }
+          textStyle's opacity [was: 1] *)
         if (k <= High(FVmBlurBag)) and (FVmBlurBag[k] <> nil) then
         begin
           if want then o := 0.1 else o := VmLabelOwnOpacity(k);

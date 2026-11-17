@@ -636,10 +636,10 @@ type
       shifting any timestamp. Data kept in UTC on a server is still meant to
       be read on the reader's own clock. }
     property UTC: Boolean read FUTC write FUTC;
-    { scale.getLabel({value}): the FULL date to the precision of the finest
+    (* scale.getLabel({value}): the FULL date to the precision of the finest
       unit the ticks were chosen at -- a day for years and months, the
       millisecond for milliseconds, the second otherwise. What a slider
-      dataZoom writes beside its handles. }
+      dataZoom writes beside its handles. *)
     function GetLabel(AValue: Double): string;
   end;
 

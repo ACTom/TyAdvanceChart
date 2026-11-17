@@ -216,11 +216,11 @@ function TyPieResolve(const AValue: TTyBoxValue; ABase: Double): Double;
 function TyPiePercentSeats(const AValues: array of Double;
   APrecision: Integer): TTyDoubleArray;
 
-{ Each sector's percentage, index-parallel to ALayout.Sectors -- the `{d}` a
+(* Each sector's percentage, index-parallel to ALayout.Sectors -- the `{d}` a
   label or a tooltip template shows. Over the sectors that exist: the legend's
   filtered rows, the negatives already gone, a missing value counted as 0. A
   total of nothing is 0 for every slice, as upstream's `seats[i] || 0` -- and
-  so is every slice of a precision too large to count in. }
+  so is every slice of a precision too large to count in. *)
 function TyPieSectorPercents(const ALayout: TTyPieLayout;
   APrecision: Integer): TTyDoubleArray;
 

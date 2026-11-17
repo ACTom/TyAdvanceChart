@@ -103,13 +103,13 @@ type
 
 { ---- reading ---- }
 
-{ The series' `labelLayout` node as seriesModel.get reads it: a string
+(* The series' `labelLayout` node as seriesModel.get reads it: a string
   '@Name' is a handler; an object with at least one key, a non-empty
   string or array is a layout (keys(...).length -- a string that names no
   handler or an array lays out with every field absent); null, a boolean,
   a number or {} is none. APieDefault merges a pie's default
   `{hideOverlap: true}` under the node (and stands alone where the series
-  wrote no `labelLayout` at all: AHasKey False). }
+  wrote no `labelLayout` at all: AHasKey False). *)
 function TyLabelLayoutSpecOf(ANode: TJSONData; AHasKey, APieDefault: Boolean): TTyLabelLayoutSpec;
 
 { One layout object read: x / y (numbers and strings, a boolean as +b),
@@ -218,7 +218,7 @@ begin
     jtString: Result := TyChartPosText(D.AsString);
     jtBoolean: if D.AsBoolean then Result := TyChartPosNum(1) else Result := TyChartPosNum(0);
   else
-    { +[] and +{} are not numbers a chart can use }
+    (* +[] and +{} are not numbers a chart can use *)
     Result := TyChartPosNum(NaN);
   end;
 end;

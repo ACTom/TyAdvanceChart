@@ -11,7 +11,7 @@ uses
 
 const
   // The expected counts. Edit these, nothing else, to ratchet.
-  ExpNestedBraceComments = 219;
+  ExpNestedBraceComments = 0;
   ExpObjFpcMode = 114;
   ExpFpcTypeNames = 506;
   ExpStringCaseLabels = 22;

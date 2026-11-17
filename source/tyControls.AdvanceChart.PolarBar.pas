@@ -410,7 +410,7 @@ var
     onIt := AIndex.SeriesOnAxisOfKey(AAxis, key);
     if Length(onIt) = 0 then Exit;
     other := APolar.OtherAxis(AAxis);
-    { calcBandWidth(axis, {fromStat, min: 1}).w }
+    (* calcBandWidth(axis, {fromStat, min: 1}).w *)
     APolar.AxisExtent(AAxis, e0, e1);
     pxSpan := Abs(e1 - e0);
     lin := AAxis.Scale.LinearExtent2(sekMapping);

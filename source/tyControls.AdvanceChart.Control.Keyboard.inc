@@ -484,7 +484,7 @@ begin
   Result := -1;
 end;
 
-{ ==================== the component keyboard [F5] ====================
+(* ==================== the component keyboard [F5] ====================
 
   ECHARTS HAS NO KEYBOARD FOR ITS COMPONENTS EITHER, so this is the port's
   design again, made as D11 made the data items' (Batch 144): every key
@@ -515,7 +515,7 @@ end;
     (axisAreaSelect, then brush with no areas); a thumb's drag as
     selectDataRange (while it moves when realtime, at the release when
     not); a piece's click as selectDataRange; a region's click as
-    geoToggleSelect. }
+    geoToggleSelect. *)
 
 const
   { a visualMap handle's arrow: a fiftieth of the bar; its page key: a

@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.Marker;
 {$mode objfpc}{$H+}
-{ SERIES MARKERS -- markPoint, markLine and markArea -- as numbers: which
+(* SERIES MARKERS -- markPoint, markLine and markArea -- as numbers: which
   items survive, where their ends and corners land, and what each one reads
   from the option chain. Nothing here paints.
 
@@ -28,7 +28,7 @@ unit tyControls.AdvanceChart.Marker;
   AN ELEMENT UPSTREAM CANNOT HANDLE -- a 1D markLine item with no type and no
   xAxis / yAxis, a markArea element that is not a pair, anything that is not
   an object -- throws out of upstream's render. The port cannot mimic a crash;
-  such an element is skipped: not survived, no data index. }
+  such an element is skipped: not survived, no data index. *)
 interface
 
 uses SysUtils, Math, fpjson,
@@ -86,8 +86,8 @@ type
 
   { One end of a marker: a markPoint item, or either end of a markLine. }
   TTyMkEnd = record
-    { the element's own option object; nil for the far end of a 1D line,
-      which upstream builds as a bare {coord} }
+    (* the element's own option object; nil for the far end of a 1D line,
+      which upstream builds as a bare {coord} *)
     Src: TJSONObject;
     { item.coord after the transform, and the values the layout reads from
       them (parseDataValue by the coordinate's type: a category keeps what
@@ -107,8 +107,8 @@ type
     Index, DataIndex: Integer;
     Survived: Boolean;
     From, To_: TTyMkEnd;
-    { the merged line item: {type, valueIndex, value} for a 1D line, then the
-      start item's keys, then the end item's, none overwriting }
+    (* the merged line item: {type, valueIndex, value} for a 1D line, then the
+      start item's keys, then the end item's, none overwriting *)
     LineType, LineValue, LineName: TTyMkVal;
   end;
 
@@ -1335,7 +1335,7 @@ begin
     ok := False;
     if el.JSONType = jtArray then
     begin
-      { a pair: its ends as written. The line item starts as {type: null}. }
+      (* a pair: its ends as written. The line item starts as {type: null}. *)
       if (el.Count >= 2) and (el.Items[0].JSONType = jtObject)
         and (el.Items[1].JSONType = jtObject) then
       begin
@@ -1394,7 +1394,7 @@ begin
           if prec > 20 then p := 20 else p := Trunc(prec);
           value := TyMkNum(TyJsToFixed(value.Num, p));
         end;
-        { from = clone(item) with type null and a fresh coord; to = {coord} }
+        (* from = clone(item) with type null and a fresh coord; to = {coord} *)
         n0.TypeStr := '';
         n0.CoordGiven := True;
         n0.CoordArr := True;
@@ -1407,7 +1407,7 @@ begin
         n1.Coord[valueIndex] := value;
         DataTransform(n0);
         DataTransform(n1);
-        { {type, valueIndex, value} first; then the start item's keys }
+        (* {type, valueIndex, value} first; then the start item's keys *)
         if t <> '' then
         begin
           r.LineType.Kind := mvkStr;

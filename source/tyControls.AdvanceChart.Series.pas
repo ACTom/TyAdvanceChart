@@ -620,9 +620,9 @@ begin
   Result := ADefault;
   if ANode = nil then Exit;
   d := ANode.Find(AKey);
-  { Non-scalar where a string was expected RAISES out of AsString. See the note
+  (* Non-scalar where a string was expected RAISES out of AsString. See the note
     on Builder's StrIn: `series: [{ type: {} }]` is legal JSON and a normal
-    mid-edit state. }
+    mid-edit state. *)
   if (d = nil) or (d.JSONType in [jtNull, jtArray, jtObject]) then Exit;
   Result := d.AsString;
 end;
@@ -1817,9 +1817,9 @@ begin
   nCat := 0;
   if ordinal and (AAxis.Scale is TTyOrdinalScale) then
     nCat := TTyOrdinalScale(AAxis.Scale).CategoryCount;
-  { `xxxAxis: {data: []}` -- upstream's backward-compatibility path: the
+  (* `xxxAxis: {data: []}` -- upstream's backward-compatibility path: the
     axis is a category one whose free ends are the SERIES data's, and it is
-    blank (the axis line only) while the series still stand on it [R2-G] }
+    blank (the axis line only) while the series still stand on it [R2-G] *)
   emptyCats := ordinal and (ANode <> nil) and CategoryDataIsEmpty(ANode.Find('data'));
   { Not-a-number is a legal value all the way through, as in JavaScript, and
     comparing one with the traps on raises. }
@@ -2285,7 +2285,7 @@ begin
     d := ANode.Find('maxInterval');
     if (d <> nil) and (d.JSONType = jtNumber) then maxIvl := d.AsFloat;
 
-    { THE SPLIT NUMBER IS NOT `minorTick.show`. Upstream's
+    (* THE SPLIT NUMBER IS NOT `minorTick.show`. Upstream's
       getMinorTicksCoords reads `minorTick.splitNumber` and nothing else --
       the two SHOW questions, one for the marks and one for the grid, are
       asked later and separately, by the axis furniture.
@@ -2300,7 +2300,7 @@ begin
 
       Still not computed unless SOMEBODY asked, though: upstream builds the
       subdivisions of every value axis on every frame and this does not
-      need to. Either of the two options counts as asking. }
+      need to. Either of the two options counts as asking. *)
     minorSplit := 5;
     wantMinor := False;
     d := ANode.Find('minorTick');

@@ -1040,9 +1040,9 @@ begin
   end;
 end;
 
-{ formatValueText: a number to its precision, the ends of the data bound
+(* formatValueText: a number to its precision, the ends of the data bound
   as 'min' and 'max', an interval with its edge symbols, a string
-  formatter's {value} and {value2} }
+  formatter's {value} and {value2} *)
 function FormatPieceText(AIsInterval: Boolean; A0, A1: Double;
   const ACategory: string; AIsCategory: Boolean; APrecision: Integer;
   const AFormatter: string; const AEdge0, AEdge1: string): string;
@@ -1928,7 +1928,7 @@ var
   end;
 
 
-  { the model's own object under AKey, made where it is none (`x || (x = {})`) }
+  (* the model's own object under AKey, made where it is none (`x || (x = {})`) *)
   function OwnObj(const AKey: string): TJSONObject;
   begin
     Result := ObjOf(AModel.Find(AKey));

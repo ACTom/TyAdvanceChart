@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.GfxEl;
 {$mode objfpc}{$H+}
-{ TTyAdvanceChart -- ZRENDER'S ELEMENTS AS AN OPTION WRITES THEM: the element
+(* TTyAdvanceChart -- ZRENDER'S ELEMENTS AS AN OPTION WRITES THEM: the element
   model the graphic component builds its scene from, and the one the custom
   series' renderItem will hand back. [Batch 122, C13]
 
@@ -41,7 +41,7 @@ unit tyControls.AdvanceChart.GfxEl;
   object {type, x, y, colorStops [{offset, color 'rgba(..)'}], global, x2,
   y2 | r}, a raw one as the object it was.
 
-  PURE: SysUtils, Classes, Math, fpjson (jsonparser) and the AdvanceChart units. }
+  PURE: SysUtils, Classes, Math, fpjson (jsonparser) and the AdvanceChart units. *)
 interface
 uses
   SysUtils, Classes, Math, fpjson,
@@ -2155,7 +2155,7 @@ begin
     R.HasBackground := True;
     R.Background := c;
   end
-  { [R2-F] {image: src}: a picture over the box }
+  (* [R2-F] {image: src}: a picture over the box *)
   else if (d is TJSONObject) and (TJSONObject(d).Find('image') <> nil)
     and (TJSONObject(d).Find('image').JSONType = jtString) then
     R.BgImage := TJSONObject(d).Find('image').AsString;

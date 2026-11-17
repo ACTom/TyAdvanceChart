@@ -1118,10 +1118,10 @@ begin
       if places[i].Text = '' then Continue;
       { [R7-AD] the labels of the z2 drawn now }
       if not (Min(31, TyAxisLabelZ2(AAxis, spec, i)) in AZ2) then Continue;
-      { THE STYLE THE LAYOUT MEASURED IT IN. A time axis' heavier `Mar` in a
+      (* THE STYLE THE LAYOUT MEASURED IT IN. A time axis' heavier `Mar` in a
         run of day numbers is a `{primary|Mar}` tag, drawn from its pieces
         below in the weight the block was measured in. [Revised in batch
-        104: a whole label marked emphasised and drawn in a second style.] }
+        104: a whole label marked emphasised and drawn in a second style.] *)
       lblStyle := labelS;
       { [R7-AB] a font the canvas refused: the one the paint order settled }
       CompFont(AAxis, cpkLabel, lblStyle);
@@ -1161,7 +1161,7 @@ begin
         maxW := Round(APainter.ScaleF(spec^.LabelWidthLogical));
         if maxW < lblW then lblW := maxW;
       end;
-      { TURNED, WHEN THE AUTHOR ASKED FOR IT. The layout has measured the
+      (* TURNED, WHEN THE AUTHOR ASKED FOR IT. The layout has measured the
         turned extent since item 12 and nothing ever drew the turn, so an
         `axisLabel: { rotate: 45 }` bought a deeper gutter and put flat text in
         it. Counter-clockwise positive on both sides -- upstream's and the
@@ -1169,7 +1169,7 @@ begin
 
         DrawTextRotated takes the anchor as a POINT plus the alignments that
         say where in the text box it sits, which is what the placement already
-        carries; AnchorBox exists only because the flat path needs a rect. }
+        carries; AnchorBox exists only because the flat path needs a rect. *)
       if spec^.RotationRad <> 0 then
       begin
         { every line of a label of several, the block as the layout
@@ -3276,8 +3276,8 @@ end;
 
 procedure TTyCustomAdvanceChart.ViewsPrepare(AFresh: Boolean);
 const
-  { a marker's master model (checkMarkerInSeries' `option.markPoint = {}`):
-    one view of every series' markers of that kind }
+  (* a marker's master model (checkMarkerInSeries' `option.markPoint = {}`):
+    one view of every series' markers of that kind *)
   cMarks: array[0..2] of string = ('markArea', 'markLine', 'markPoint');
   cMaster = #0'master';
 var
@@ -4610,13 +4610,13 @@ begin
   if has then AColour := TTyChartColor(col);
 end;
 
-{ [R5-G] GridView.render: when the grid model's `show` is truthy, one silent
+(* [R5-G] GridView.render: when the grid model's `show` is truthy, one silent
   Rect over coordinateSystem.getRect() at z2 -1, its style
   defaults({fill: backgroundColor}, getItemStyle()) -- so the fill is the
   backgroundColor (default transparent), the stroke borderColor (default
   tokens.color.neutral30: the skin's TyAdvChartGridBorder), the lineWidth
   borderWidth (default 1), the dash, the opacity and the shadow the grid's
-  own item-style keys. [Was: not drawn -- an option without effect.] }
+  own item-style keys. [Was: not drawn -- an option without effect.] *)
 procedure TTyCustomAdvanceChart.AddGridBackgrounds(AList: TTyPaintList);
 var
   g: Integer;

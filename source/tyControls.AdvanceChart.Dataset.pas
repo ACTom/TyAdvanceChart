@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.Dataset;
 {$mode objfpc}{$H+}
-{ `dataset` and `encode` -- the other way data reaches a chart.
+(* `dataset` and `encode` -- the other way data reaches a chart.
 
   A series' `data` says WHAT the values are and, by position, which coordinate
   each one is. A `dataset` says only what the values are, in a table shared by
@@ -48,7 +48,7 @@ unit tyControls.AdvanceChart.Dataset;
     detect correctly and then answer no rows, which is what a chart with an
     unreadable source should draw.
 
-  PURE: SysUtils, Math, fpjson and the AdvanceChart units. }
+  PURE: SysUtils, Math, fpjson and the AdvanceChart units. *)
 interface
 uses
   SysUtils, Classes, Math, fpjson,
@@ -71,7 +71,7 @@ type
     for it if it declared one. }
   TTySourceDim = record
     Name: string;
-    { `dimensions: [{ name: 'x', type: 'time' }]`. '' when nobody said. }
+    (* `dimensions: [{ name: 'x', type: 'time' }]`. '' when nobody said. *)
     DimType: string;
     { `displayName`, or failing that the name: what a tooltip sub-row calls
       the dimension. '' only for a dimension with no name at all. }
@@ -103,11 +103,11 @@ type
     DimsWritten: Boolean;
   end;
 
-  { Which source dimensions feed one series' coordinates.
+  (* Which source dimensions feed one series' coordinates.
 
     Columns[i] is the source dimension feeding coordinate dimension i, or -1
     for `there is none` -- which is what `encode: { x: -1 }` asks for and what
-    an unclaimed coordinate gets. }
+    an unclaimed coordinate gets. *)
   TTySeriesEncode = record
     Given: Boolean;
     Columns: array of Integer;
@@ -333,7 +333,7 @@ function TyDatasetTruthy(AData: TJSONData): Boolean;
   `undefined` arithmetic does. [Batch 108] }
 function TyQuantile(const AAsc: array of Double; AP: Double): Double;
 
-{ prepareBoxplotData: for every row of ARaw (a list of samples) the box
+(* prepareBoxplotData: for every row of ARaw (a list of samples) the box
   [name, low, Q1, Q2, Q3, high] and, for every sample outside [low, high],
   an outlier [name, sample].
 
@@ -345,7 +345,7 @@ function TyQuantile(const AAsc: array of Double; AP: Double): Double;
   `{value: i}` (params.Values [i]); anything else, the index. A sample is a number as JavaScript's subtraction reads it.
 
   False, with nothing made, when a row is not an array -- upstream's
-  `.slice()` throws there. The two arrays are the caller's. [Batch 108] }
+  `.slice()` throws there. The two arrays are the caller's. [Batch 108] *)
 function TyPrepareBoxplotData(ARaw: TJSONArray; AConfig: TJSONObject;
   out ABoxes, AOutliers: TJSONArray): Boolean;
 
@@ -417,10 +417,10 @@ function TyEncodeOf(AOption: TTyChartOption; ASeriesIndex: Integer;
   from the entries resolved, -1 for each that reaches nothing. }
 function TyEncodeFirstSlot(const AEntries: array of Integer): Integer;
 
-{ upstream's createDimensions for a GIVEN encode: every coordinate not
+(* upstream's createDimensions for a GIVEN encode: every coordinate not
   written in it takes, in coordinate order, the first dimension below
   ADimCount that no coordinate holds yet. `encode: {y: 2}` on a table reads
-  x from 0; `encode: {tooltip: [2]}` leaves x on 0 and y on 1. }
+  x from 0; `encode: {tooltip: [2]}` leaves x on 0 and y on 1. *)
 procedure TyEncodeFillUnclaimed(var AEnc: TTySeriesEncode; ADimCount: Integer);
 { [spec 242] createDimensions over a default encode: an index past the
   table's dimensions is no dimension, and a coordinate left with none takes
@@ -814,8 +814,8 @@ begin
       lo := JsMax2(mn, q1 - bound);
       hi := JsMin2(mx, q3 + bound);
     end;
-    { [R2-J2] isFunction(itemNameFormatter): itemNameFormatter({value: i}) --
-      boxplot-light-velocity2 names its boxes 'expr 0' ... that way }
+    (* [R2-J2] isFunction(itemNameFormatter): itemNameFormatter({value: i}) --
+      boxplot-light-velocity2 names its boxes 'expr 0' ... that way *)
     if (fmt <> nil) and (fmt.JSONType = jtString) and TyChartIsHandlerRef(fmt.AsString) then
     begin
       prm := TyChartBlankParams;
@@ -2074,10 +2074,10 @@ begin
   enc := ObjOf(node.Find('encode'));
   if enc = nil then Exit;
 
-  { GIVEN AT ALL, which is the thing that matters: a partial encode does not
+  (* GIVEN AT ALL, which is the thing that matters: a partial encode does not
     merge with the defaulter, it REPLACES it. `encode: { x: 0 }` on the third
     series of a dataset leaves y to fall back positionally rather than to the
-    column the first two series' counter would have handed it. }
+    column the first two series' counter would have handed it. *)
   Result.Given := True;
   dimCount := Max(Max(TySourceEncodeDimCount(ASource), ADimCount), Max(Length(ACoordDims), 1));
   SetLength(owner, dimCount);

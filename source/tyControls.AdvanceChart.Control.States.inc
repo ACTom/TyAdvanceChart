@@ -3801,8 +3801,8 @@ begin
   if AObj.RawJson[AKey] = '' then Exit(TyAnimNum(AObj.Num[AKey]));
   d := GetJSON(AObj.RawJson[AKey]);
   try
-    { an object is no number, no colour, no gradient: its track is
-      discrete as well (String({}) is no number) }
+    (* an object is no number, no colour, no gradient: its track is
+      discrete as well (String({}) is no number) *)
     if d.JSONType = jtObject then Result := TyAnimStr('[object Object]')
     else Result := TyGfxAnimOf(d);
   finally

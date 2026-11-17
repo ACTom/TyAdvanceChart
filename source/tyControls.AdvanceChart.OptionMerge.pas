@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.OptionMerge;
 {$mode objfpc}{$H+}
-{ TTyAdvanceChart -- upstream's MERGE setOption, on the option tree.
+(* TTyAdvanceChart -- upstream's MERGE setOption, on the option tree.
   [Batch 95, A10 / MG1]
 
   A second setOption without notMerge does not replace the option: it maps
@@ -79,7 +79,7 @@ unit tyControls.AdvanceChart.OptionMerge;
   tyControls.AdvanceChart.Media's [Batch 107]); upstream's preprocessors
   otherwise.
 
-  LCL-free: SysUtils, Math, fcl-json and the scale's number printer. }
+  LCL-free: SysUtils, Math, fcl-json and the scale's number printer. *)
 interface
 uses SysUtils, Math, fpjson;
 
@@ -848,7 +848,7 @@ begin
     mergeLayoutParam, their defaultOption's box keys }
   else if AMainType = 'toolbox' then
   begin
-    { ToolboxModel: {type: 'box', ignoreSize: true} }
+    (* ToolboxModel: {type: 'box', ignoreSize: true} *)
     AIgnoreW := True;
     AIgnoreH := True;
     Def(1, TJSONString.Create('right'));
@@ -1142,9 +1142,9 @@ begin
   AKeys[i].Items := AItems;
 end;
 
-{ A PREPROCESSOR'S `{}` for AMainType: mapped by index, it takes slot 0 --
+(* A PREPROCESSOR'S `{}` for AMainType: mapped by index, it takes slot 0 --
   merged into the model there (nothing changes) or, in a hole or an empty
-  list, a new model with an id of its own. }
+  list, a new model with an id of its own. *)
 procedure EnsureFirstSlot(var AKeys: TTyOptionKeys; const AMainType: string);
 var
   i, n: Integer;
@@ -1185,11 +1185,11 @@ begin
   AKeys[i].Items := items;
 end;
 
-{ the preprocessors' models an option makes: `axisPointer: {}` unless it has
+(* the preprocessors' models an option makes: `axisPointer: {}` unless it has
   one (an empty array is none), `grid: {}` with an xAxis and a yAxis and no
   grid; [spec 244] `markPoint: {}` (markLine, markArea) when the option has
   none and a series of it writes a truthy one (checkMarkerInSeries: the
-  series a list or a single object) }
+  series a list or a single object) *)
 procedure PreprocessorModels(AOption: TJSONObject; var AKeys: TTyOptionKeys);
 const
   cMarkers: array[0..2] of string = ('markPoint', 'markLine', 'markArea');
@@ -1208,8 +1208,8 @@ begin
   s := AOption.Find('series');
   for k := 0 to High(cMarkers) do
   begin
-    { `opt.markPoint = opt.markPoint || {}`: a truthy one the option wrote
-      stands (an empty list too, and it makes no model) }
+    (* `opt.markPoint = opt.markPoint || {}`: a truthy one the option wrote
+      stands (an empty list too, and it makes no model) *)
     if Truthy(AOption.Find(cMarkers[k])) then Continue;
     found := False;
     if s is TJSONArray then
@@ -1688,8 +1688,8 @@ begin
     k := ANew.Names[i];
     if TyOptionIsComponentType(k) and Given(ANew.Items[i]) then AddTo(written, k);
   end;
-  { A REPLACEMERGE TYPE THE OPTION LEAVES OUT is merged as `{xxx: []}`:
-    every model of it goes }
+  (* A REPLACEMERGE TYPE THE OPTION LEAVES OUT is merged as `{xxx: []}`:
+    every model of it goes *)
   for k in replace do AddTo(written, k);
   { THE ASSERT FIRST, so a refused merge changes nothing }
   for k in written do

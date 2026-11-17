@@ -320,7 +320,7 @@ begin
   if s = 'pin' then Exit(tsyPin);
   if s = 'arrow' then Exit(tsyArrow);
   if s = 'line' then Exit(tsyLine);
-  { symbol.ts:296-301 -- `if (!proxySymbol) { symbolType = 'rect'; ... }`. }
+  (* symbol.ts:296-301 -- `if (!proxySymbol) { symbolType = 'rect'; ... }`. *)
   Result := tsyRect;
 end;
 

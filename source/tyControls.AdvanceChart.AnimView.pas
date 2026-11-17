@@ -2104,9 +2104,9 @@ begin
   else TyInitProps(AP, props, AModel, opts);
 end;
 
-{ EffectSymbol.startEffectAnimation for one ripple: two looping animators,
+(* EffectSymbol.startEffectAnimation for one ripple: two looping animators,
   `animate('', true).when(period, scale)` and `animateStyle(true)
-  .when(period, {opacity: 0})`, both delayed -i / n * period + idx / count }
+  .when(period, {opacity: 0})`, both delayed -i / n * period + idx / count *)
 procedure StartRipple(AP: TTyChartAnimProxy; const AEl: TTyChartElement);
 var period, half, delay: Double;
 begin
@@ -2119,11 +2119,11 @@ begin
     [TyAnimNum(0)]).Delay(delay).Start('');
 end;
 
-{ EffectLine._updateEffectAnimation / _animateSymbol for one symbol: the
+(* EffectLine._updateEffectAnimation / _animateSymbol for one symbol: the
   path, then -- the period above 0 -- `animate('', loop).when(period (twice
   for a round trip), {__t: 1 or 2}).delay(delay).during(...)`, removed when
   a clip that does not loop is done. AResume: the __t an update's restart
-  goes on from (delay -period * __t), below 0 for none. [Batch 121] }
+  goes on from (delay -period * __t), below 0 for none. [Batch 121] *)
 procedure StartLinesEffect(AP: TTyChartAnimProxy; const AEl: TTyChartElement;
   AResume: Double);
 var
@@ -2587,9 +2587,9 @@ begin
           before it makes the clip }
         if AC.On_ and (FLsdSeries <> AEl.Anim.Series) then
           LineSymbolInit(AList, AEl.Anim.Series, AC);
-        { createPolarClipPath: the sweep from its start (an angle base) or
+        (* createPolarClipPath: the sweep from its start (an angle base) or
           r from r0, initProps({endAngle, r}) on the series, no row
-          [Batch 113] }
+          [Batch 113] *)
         p := Make(AEl.Anim.Series, -1, 'lineClip');
         props := PolarClipProps(AEl);
         p.Attr(props);
@@ -3926,8 +3926,8 @@ var
         or (AOldEl.Anim.G[6] = AEl.Anim.G[6]));
   end;
 
-  { [R2-I7] the delay's {} of an element of a pictorial bar that is no
-    repeated path (the bundle, the bar rect, the clip, a single glyph) }
+  (* [R2-I7] the delay's {} of an element of a pictorial bar that is no
+    repeated path (the bundle, the bar rect, the clip, a single glyph) *)
   function PictNoPlace(ARow: Integer): TTyAnimCallOpts;
   begin
     Result := TyAnimCallAt(ARow);
@@ -4080,7 +4080,7 @@ var
             Num1('scaleX', AEl.Anim.G[2]), Num1('scaleY', AEl.Anim.G[3]),
             Num1('rotation', AEl.Anim.G[5])]);
           popts := PictNoPlace(r);
-          { a repeated path hands {index, count} -- the count the new one }
+          (* a repeated path hands {index, count} -- the count the new one *)
           if AEl.Anim.G[6] <> 0 then
           begin
             popts.HasDelayIndex := True;
@@ -4116,12 +4116,12 @@ var
         end;
       carPictorialClip:
         begin
-          { [R2-I7] a kept clipped bar's path: updateAttr(isUpdate) is an
+          (* [R2-I7] a kept clipped bar's path: updateAttr(isUpdate) is an
             updateProps of its place, scale and turn, {index, count} for a
             repeated one, {} for the single one -- [R2-I8] tweened on a
             proxy of its own, 'pcpath<n>', from the old path of its place in
             the column (one that had none grows from nought at its place)
-            [Revised in R2-I8: only the timing was asked.] }
+            [Revised in R2-I8: only the timing was asked.] *)
           if (AEl.Anim.G[8] = 0) and AC.Enabled and PictOldBar(AOld, AOldRow, AEl, oe) then
           begin
             popts := PictNoPlace(r);
@@ -4821,10 +4821,10 @@ var
         and (APrev.Elements[j].Anim.Key = AKey) then Exit(APrev.Elements[j].Anim.Index);
   end;
 
-  { [R2-I7] createOrUpdateRepeatSymbols on a kept column: a path past the
+  (* [R2-I7] createOrUpdateRepeatSymbols on a kept column: a path past the
     new count updateProps to no scale (update timing, the item's model, its
     {index, count} -- the new count) and goes when it ends; it stays at its
-    place in the bundle }
+    place in the bundle *)
   procedure PictorialShrink(ASer, AOld: Integer; const AC: TTyChartAnimSeries;
     const ARowMap: TTyIntegerArray);
   var
@@ -5334,8 +5334,8 @@ var
     poly.FFollow := nil;
     if stepCode <> 0 then
     begin
-      { shape.__points = diff.current; shape.points = current; the target
-        {points: next, __points: diff.next} }
+      (* shape.__points = diff.current; shape.points = current; the target
+        {points: next, __points: diff.next} *)
       poly.SetAnimProp('shape.__points', TyAnimArr(sCur, 0, True));
       poly.SetAnimProp('shape.points', TyAnimArr(tCur, 0, False));
       poly.StopAnimation;

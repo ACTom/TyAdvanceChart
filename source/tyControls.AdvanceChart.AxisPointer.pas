@@ -779,12 +779,12 @@ function TyTooltipAxisPointerType(AOption: TTyChartOption;
 var
   d: TJSONData;
 begin
-  { THE TOOLTIP'S OWN DEFAULT IS 'line' AND IT WINS AT RUNTIME. Both upstream
+  (* THE TOOLTIP'S OWN DEFAULT IS 'line' AND IT WINS AT RUNTIME. Both upstream
     declarations say 'line', and the tooltip's materialises into the volatile
     layer, which shadows the root -- so `axisPointer: {type:'shadow'}` written
     at the ROOT has no effect on a tooltip axis pointer at all. There is no
     per-axis-kind default table anywhere in 6.1: every shadow in an ECharts
-    bar demo was written by its author. }
+    bar demo was written by its author. *)
   Result := aptLine;
   d := TipPointerKey(AOption, ACoordTip, 'type');
   if (d <> nil) and (d.JSONType = jtString) then
@@ -855,11 +855,11 @@ begin
   if AFromTooltip then
   begin
     tip := TooltipNode(AOption);
-    { THE PEN COMES FROM crossStyle on the NON-TRIGGERING ARM of a cross, and
+    (* THE PEN COMES FROM crossStyle on the NON-TRIGGERING ARM of a cross, and
       from lineStyle everywhere else. The gate is `not triggerTooltip`, so for
       the common `tooltip: {axisPointer: {type:'cross'}}` written WITHOUT
       `trigger: 'axis'` both arms take crossStyle -- a default cross is one
-      arm at the border shade and the other at a darker one, both dashed. }
+      arm at the border shade and the other at a darker one, both dashed. *)
     if ACross and not ATriggerTooltip then penKey := 'crossStyle'
     else penKey := 'lineStyle';
     { [R5-D] the coordinate system's tooltip first: each field the first
@@ -892,10 +892,10 @@ begin
 
   { ---- the three overwrites ---- }
 
-  { CROSS IS NEVER A SHAPE. It is rewritten to a line PER AXIS, and the drawing
+  (* CROSS IS NEVER A SHAPE. It is rewritten to a line PER AXIS, and the drawing
     layer upstream has only two builders -- `line` and `shadow`. A root
     `axisPointer: {type:'cross'}` on a non-tooltip axis reaches that table
-    unrewritten and throws; a port must coerce it here or reject it. }
+    unrewritten and throws; a port must coerce it here or reject it. *)
   if Result.PointerType = aptCross then Result.PointerType := aptLine;
 
   { SNAP IS RECOMPUTED FROM THE AXIS KIND, unconditionally -- which is what

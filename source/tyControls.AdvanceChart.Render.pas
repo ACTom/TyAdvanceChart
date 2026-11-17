@@ -2369,9 +2369,9 @@ begin
   end;
 end;
 
-{ [R2-F] a rich box's picture (backgroundColor: {image}): a ZRImage of the
+(* [R2-F] a rich box's picture (backgroundColor: {image}): a ZRImage of the
   box -- its corners through the text's anchor and turn -- drawn like any
-  picture element (PaintImageInto), at AAlpha }
+  picture element (PaintImageInto), at AAlpha *)
 procedure RtPicture(P: TTyPainter; const APiece: TTyRtPiece; AX, AY, ARotationRad,
   AScale, AAlpha: Double);
 var

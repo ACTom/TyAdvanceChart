@@ -76,7 +76,7 @@ function TyLabelEmphWantsBlock(AEmph: TJSONObject): Boolean;
 procedure TyLabelReadBlock(ALabel: TJSONObject; ARoot: TJSONData;
   var ASpec: TTyLabelSpec);
 
-{ The words for one datum: upstream's getFormattedLabel.
+(* The words for one datum: upstream's getFormattedLabel.
 
   THE LETTER TOKENS go through formatTpl -- the first bare `{a}` becomes
   `{a0}`, then the first `{a0}` is replaced, and a second `{c}` is emitted as
@@ -85,7 +85,7 @@ procedure TyLabelReadBlock(ALabel: TJSONObject; ARoot: TJSONData;
   Two rules in one function because upstream has two.
 
   No formatter (AHasFormatter False) answers the default text for the series
-  type; an empty one is an empty label. }
+  type; an empty one is an empty label. *)
 function TyLabelText(const AFormatter: string; AHasFormatter: Boolean;
   ADefault: TTyLabelDefaultText; AStore: TTyDataStore; ARow: Integer;
   const ASeriesName: string; AValueDim: Integer; APercent: Double;
@@ -1036,18 +1036,18 @@ begin
     Exit(valueText);
   end;
 
-  { formatTpl over the one series: a = series name, b = datum name,
+  (* formatTpl over the one series: a = series name, b = datum name,
     c = value, and d = percent where there is one. The indexed forms work
     too -- `{a0}|{b0}|{c0}` is upstream's own spelling of the same three --
-    and a '$' in a name is read as String.replace reads it. }
+    and a '$' in a name is read as String.replace reads it. *)
   if AHasPercent then n := 4 else n := 3;
   vars := nil;
   SetLength(vars, 1);
   SetLength(vars[0], n);
   vars[0][0] := ASeriesName;
   vars[0][1] := nameText;
-  { `{c}` IS THE WHOLE RAW VALUE, String()-ed: an array joined by commas,
-    `null`, `undefined`, `[object Object]` -- not the label dimension. }
+  (* `{c}` IS THE WHOLE RAW VALUE, String()-ed: an array joined by commas,
+    `null`, `undefined`, `[object Object]` -- not the label dimension. *)
   if hasRaw then vars[0][2] := TyRawItemText(it)
   else vars[0][2] := valueText;
   { params.value is the interpolated one [Batch 92] }
@@ -1057,9 +1057,9 @@ begin
   if n = 4 then vars[0][3] := TyJsNumberToString(APercent);
   Result := TyJsFormatTpl(AFormatter, n, vars);
 
-  { `{@dim}` IS GLOBAL, because upstream's pattern for it is a regex with the
+  (* `{@dim}` IS GLOBAL, because upstream's pattern for it is a regex with the
     g flag while the letters above are plain strings. Two rules, and they are
-    upstream's two rules rather than an inconsistency introduced here. }
+    upstream's two rules rather than an inconsistency introduced here. *)
   if AStore = nil then Exit;
   i := 1;
   while i <= Length(Result) - 2 do

@@ -1676,11 +1676,11 @@ begin
       lastCX := ALayout.Sectors[i].CX;
       lastCY := ALayout.Sectors[i].CY;
 
-      { A PIE SAYS ITS NAME, not its value -- getFormattedLabel falls back to
+      (* A PIE SAYS ITS NAME, not its value -- getFormattedLabel falls back to
         the datum's name where a bar falls back to its number. The row asked
         is the VIEW row, the one the store's accessors answer for: with a slice
         deselected in the legend the raw index named the next slice along. `{a}`
-        is the series' NAME, `{c}` its value, `{d}` its share. }
+        is the series' NAME, `{c}` its value, `{d}` its share. *)
       words := TyLabelText(sp.Formatter, sp.HasFormatter, tldName, AStore,
         ALayout.Sectors[i].Index, ASeriesName, AValueDim, percents[i], True,
         ABinding.SeriesIndex, ABinding.SeriesType);

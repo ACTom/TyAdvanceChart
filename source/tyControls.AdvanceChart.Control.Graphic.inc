@@ -255,12 +255,12 @@ end;
 
 { ==================== a graphic element as a tooltip target [spec 242] ==================== }
 
-{ GraphicView gives every element a tooltip config (setTooltipConfig: the
+(* GraphicView gives every element a tooltip config (setTooltipConfig: the
   content its name, the formatter params {componentType 'graphic', name,
   graphicIndex}, $vars ['name']); TooltipView shows it through
   _showComponentItemTooltip -- the element's tooltip (a string a
   formatter), the graphic component's, a level whose formatter is the
-  content, the global component. A label is its host's. }
+  content, the global component. A label is its host's. *)
 { [R7-AF] a graphic element of the tree by its id (nil none) }
 function GfxElOfId(AEl: TTyGfxEl; const AId: string): TTyGfxEl;
 var j: Integer;
@@ -1422,12 +1422,12 @@ begin
   end;
 end;
 
-{ [R2-J2] DataFormatMixin.getFormattedLabel(dataIndexInside, status): the
+(* [R2-J2] DataFormatMixin.getFormattedLabel(dataIndexInside, status): the
   item model's `label.formatter` (`emphasis.label.formatter` for the
   emphasis status -- no fall back inside, the caller's retrieve3 does that),
   a function handed the item's getDataParams with params.status set, a
   string through formatTpl and the `{@dim}` pass; anything else, and no
-  formatter at all, is undefined. A '@Name' is the registered handler. }
+  formatter at all, is undefined. A '@Name' is the registered handler. *)
 function TTyChartCustomApi.FormattedLabel(ARow: Integer; AEmphasis: Boolean;
   out AText: string): Boolean;
 var
@@ -1960,8 +1960,8 @@ begin
   Result := Scale;
 end;
 
-{ [spec 242] visualEncoding's visualMeta list of a series as JSON:
-  {stops: [{value, color}], outerColors, dimension} each }
+(* [spec 242] visualEncoding's visualMeta list of a series as JSON:
+  {stops: [{value, color}], outerColors, dimension} each *)
 function TTyCustomAdvanceChart.CustomVisualMetaJson(ASlot: Integer): TJSONArray;
 var
   k, s: Integer;

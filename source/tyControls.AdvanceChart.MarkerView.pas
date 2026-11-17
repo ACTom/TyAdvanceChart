@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.MarkerView;
 {$mode objfpc}{$H+}
-{ WHAT A MARKER DRAWS. The Marker unit decides which items survive and where
+(* WHAT A MARKER DRAWS. The Marker unit decides which items survive and where
   their ends land; this one turns a surviving markLine into upstream's
   picture -- the segment (chart/helper/Line.ts createLine, zrender's Line
   with its sub-pixel step), the two end symbols (createSymbol at full size,
@@ -16,7 +16,7 @@ unit tyControls.AdvanceChart.MarkerView;
   option merged over the defaults the same way. A view here is that list of
   objects, first one holding a key winning.
 
-  PURE: option and layout in, numbers and elements out. [Batch 65] }
+  PURE: option and layout in, numbers and elements out. [Batch 65] *)
 interface
 
 uses SysUtils, Math, fpjson,
@@ -135,7 +135,7 @@ type
       SeriesColorData when the author's is not a string (a gradient) }
     SeriesColor: string;
     SeriesColorData: TJSONData;
-    { {a}; undefined when the series has no name }
+    (* {a}; undefined when the series has no name *)
     SeriesName: TTyMkVal;
     { the host series, for what a named label handler is given }
     SeriesIndex: Integer;
@@ -996,7 +996,7 @@ begin
     and (Result <> 'middle') then Result := 'top';
 end;
 
-{ formatTpl: {a} {b} {c}, each replaced at its FIRST occurrence only }
+(* formatTpl: {a} {b} {c}, each replaced at its FIRST occurrence only *)
 { what a named marker label handler is given: the marker's own params }
 function MkHandlerText(const AHandler: string; const AIn: TTyMkPicInput;
   const AKind, AName, AValueText: string; ADataIndex: Integer;
@@ -3098,7 +3098,7 @@ var
     lp.Present := True;
     lp.Hidden := not Truthy(Chain(LB, 'show'));
     fmt := Chain(LB, 'formatter');
-    { the value as {c} prints it: an array joins }
+    (* the value as {c} prints it: an array joins *)
     v := nil;
     if E.Src <> nil then v := E.Src.Find('value');
     if (v <> nil) and (v.JSONType = jtArray) and (E.Value.Kind = mvkOther) then

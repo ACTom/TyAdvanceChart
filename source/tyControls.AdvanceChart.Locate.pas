@@ -150,10 +150,10 @@ var
     if depth > 1 then Dec(depth);   { never pop the synthetic root }
   end;
 
-  { A token that MIGHT be a key. Held, not emitted: what makes a name a key is
+  (* A token that MIGHT be a key. Held, not emitted: what makes a name a key is
     the colon after it, and until one arrives `a` in `{ a b: 1 }` is not a key
     at all. Emitting on the token instead produced a phantom entry for every
-    such stray word, with a path nothing could ever look up. }
+    such stray word, with a path nothing could ever look up. *)
   procedure Hold(const AName: string; ALine, ACol, ALen: Integer);
   begin
     if depth = 0 then Exit;
@@ -374,7 +374,7 @@ begin
     if APath[i] = '.' then Exit(Copy(APath, 1, i - 1));
 end;
 
-{ Drop every '[0]' from a path.
+(* Drop every '[0]' from a path.
 
   TWO PRODUCERS NORMALISE THE SAME TEXT DIFFERENTLY, and this is that seam.
   `xAxis: { type: 'wat' }` is a bare object; the builder loops over
@@ -384,7 +384,7 @@ end;
 
   Without this the walk degrades two whole steps -- straight past the key that
   IS in the text -- and lands on the container. Only '[0]' is dropped: a path
-  naming element 3 is talking about a real array. }
+  naming element 3 is talking about a real array. *)
 function DropZeroIndexes(const APath: string): string;
 var i: Integer;
 begin

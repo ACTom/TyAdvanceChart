@@ -579,13 +579,13 @@ var
   i, n: Integer;
   bw, dir: Double;
 begin
-  { MAJORS ONLY. GetTicks hands majors and minors back in ONE array with Level
+  (* MAJORS ONLY. GetTicks hands majors and minors back in ONE array with Level
     saying which is which, and everything that reads this function -- the tick
     marks, the split lines, the split-area band edges -- is asking about
     majors. Taking the array whole meant `minorTick: { show: true }` drew the
     minor grid a second time in the MAJOR style, and put a full-length tick
     mark at every subdivision. The minor painters ask FScale.GetTicks
-    themselves and test Level the other way round. }
+    themselves and test Level the other way round. *)
   ticks := TyMajorTicks(TyDrawnTicks(FScale));
   n := Length(ticks);
   if n = 0 then Exit(nil);

@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.Color;
 {$mode objfpc}{$H+}
-{ A colour the AUTHOR wrote, and the palette a series gets when it wrote none.
+(* A colour the AUTHOR wrote, and the palette a series gets when it wrote none.
 
   Until this unit every colour in the chart came from the .tycss theme, and an
   option naming one was read by nobody. That is right for the CHROME -- axis
@@ -10,7 +10,7 @@ unit tyControls.AdvanceChart.Color;
   write still comes from the theme.
 
   PURE. No LCL, no painter, no theme -- it is handed JSON and hands back
-  numbers, so the palette arithmetic can be tested exactly. }
+  numbers, so the palette arithmetic can be tested exactly. *)
 interface
 uses SysUtils, Math, Classes, fpjson,
      tyControls.AdvanceChart.Types, tyControls.AdvanceChart.Option,
@@ -416,13 +416,13 @@ function TyOptMiterLimit(AData: TJSONData): Double;
 function TyLineCapOf(AData: TJSONData): Byte;
 function TyLineJoinOf(AData: TJSONData): Byte;
 
-{ The style block a series' PALETTE colour lands in, and whether it lands on
+(* The style block a series' PALETTE colour lands in, and whether it lands on
   the fill or the stroke.
 
   A LINE SERIES IS THE TRAP: its access path is `itemStyle`, not `lineStyle`.
   So `lineStyle: { color: ... }` does not stop a line from taking a palette
   slot, and the palette colour it took still reaches its symbols and its area;
-  the authored lineStyle colour wins only the polyline's own pixels. }
+  the authored lineStyle colour wins only the polyline's own pixels. *)
 function TyStyleAccessPath(const ASeriesType: string): string;
 function TyStyleDrawsWithStroke(const ASeriesType: string): Boolean;
 

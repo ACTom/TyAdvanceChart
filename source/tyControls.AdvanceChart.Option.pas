@@ -1939,11 +1939,11 @@ begin
   else Result := 1;
 end;
 
-{ parallelPreprocessor [Batch 128, C19]: createParallelIfNeeded -- with no
+(* parallelPreprocessor [Batch 128, C19]: createParallelIfNeeded -- with no
   truthy `parallel` and a series of type 'parallel' the option gets
   `parallel: [{}]` -- then mergeAxisOptionFromParallel: every parallelAxis
   object takes the parallelAxisDefault of the parallel its `parallelIndex
-  || 0` names (in this option), under its own keys }
+  || 0` names (in this option), under its own keys *)
 procedure TyParallelPreprocess(AOption: TJSONObject);
 var
   ser, axes, pars, it, pd, def: TJSONData;

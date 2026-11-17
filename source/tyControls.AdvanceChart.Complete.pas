@@ -1281,12 +1281,12 @@ begin
   end;
 end;
 
-{ A TOP-LEVEL markPoint / markLine / markArea. The schema documents them
+(* A TOP-LEVEL markPoint / markLine / markArea. The schema documents them
   only under a series, but upstream's preprocessor makes the top-level one
   the master every series' marker falls back to -- so it takes the series'
   own marker node (every series type shares it; a line's is used). -1 for
   any other key. [Batch 64: pictorialBar-body-fill's `markLine: {z: -100}`
-  was reported as an option ECharts does not know.] }
+  was reported as an option ECharts does not know.] *)
 function RootMarkerNode(const AKey: string): Integer;
 var s, v: Integer;
 begin
@@ -1757,7 +1757,7 @@ begin
       if TyOptNodes[ANode].ChildCount = 0 then
         Exit
       else
-      { A COMPONENT SLOT ACCEPTS EITHER SHAPE, and the two used to be validated
+      (* A COMPONENT SLOT ACCEPTS EITHER SHAPE, and the two used to be validated
         very differently. `series: { type: 'bar', ... }` -- the bare-object form
         ECharts documents everywhere -- resolves no variant here, so every key
         under it, `type` included, came back as "not an option ECharts knows".
@@ -1766,7 +1766,7 @@ begin
         TTyChartOption.ComponentAt already treats a bare object as element 0.
         This is the same normalisation, and it keeps the array branch's silence
         rule: an unresolvable variant reports nothing rather than reporting
-        everything. }
+        everything. *)
       if TyOptIsVariantContainer(ANode) then
       begin
         tag := TJSONObject(AData).Get('type', '');
@@ -1834,7 +1834,7 @@ begin
               are never checked against the string form's list. }
             if (item < 0) and not (arr.Items[i].JSONType in [jtObject, jtArray]) then
               Continue;
-            { NO '[]' EDGE IS NOT THE SAME AS NOTHING TO CHECK. The multi-
+            (* NO '[]' EDGE IS NOT THE SAME AS NOTHING TO CHECK. The multi-
               component options -- xAxis, yAxis, grid -- carry their properties
               directly and have no element node, because the schema describes
               one axis and lets you write a list of them. Skipping the array
@@ -1842,7 +1842,7 @@ begin
               produced no issue at all and the editor said all clear.
 
               An element of such a slot is validated against the slot itself,
-              which is exactly what ComponentAt means by component i. }
+              which is exactly what ComponentAt means by component i. *)
             if item >= 0 then
               WalkValidate(arr.Items[i], item, sub, C)
             else

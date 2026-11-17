@@ -297,11 +297,11 @@ type
   end;
   TTyOverlayShapeArray = array of TTyOverlayShape;
 
-  { [R7-N] AN AXIS POINTER LABEL'S TEXT STYLE as buildLabelElOption makes
+  (* [R7-N] AN AXIS POINTER LABEL'S TEXT STYLE as buildLabelElOption makes
     it: createTextStyle(labelModel, {text, font, fill, padding,
     backgroundColor}), finished in the label's font (getFont: its own parts,
     the root textStyle's, the skin's), the element's opacity (its own, else
-    the root textStyle's) apart; Scale device px to a CSS px. }
+    the root textStyle's) apart; Scale device px to a CSS px. *)
   TTyPtrLabel = record
     Block: TTyRtBlockStyle;
     Global: TTyRtGlobal;
@@ -643,7 +643,7 @@ type
     switches a chart off in every mode. }
   TTyChartAnimationMode = (camAuto, camAlways, camOff);
 
-  { UPSTREAM'S setOption(option, opts) [Batch 97].
+  (* UPSTREAM'S setOption(option, opts) [Batch 97].
     NotMerge: replace the option whole (a new set of models).
     ReplaceMerge: the main types whose models only an id keeps -- the rest
       are removed and leave index holes; ignored by a notMerge and by the
@@ -654,7 +654,7 @@ type
     Transition [F3c]: `transition` -- the series the update's universal
       transition takes, `{from, to}` finders (seriesIndex / seriesId) or a
       list of them, instead of the series' own keys (HasTransition: given
-      and truthy). }
+      and truthy). *)
   TTySetOptionOpts = record
     NotMerge, LazyUpdate, Silent: Boolean;
     ReplaceMerge: TTyStringArray;
@@ -662,11 +662,11 @@ type
     Transition: TTyUtTransitionArray;
   end;
 
-{ The options object as JSON text -- `{notMerge, replaceMerge, lazyUpdate,
+(* The options object as JSON text -- `{notMerge, replaceMerge, lazyUpdate,
   silent, transition}`, replaceMerge a main type or an array of them, the
   flags read for their JavaScript truthiness, `transition` as
   TyUtParseTransition reads it [F3c], other keys ignored. '' is no
-  options. False when the text is no object. }
+  options. False when the text is no object. *)
 function TySetOptionOptsOf(const AJson: string; out AOpts: TTySetOptionOpts): Boolean;
 
 type
@@ -1458,11 +1458,11 @@ type
     FStCarryHoverSeries, FStCarryHoverRaw: Integer;
     FStGen, FStBuiltGen: Integer;
     FStRerender, FStDirty: Boolean;
-    { [R5-I] a layout that snapped (a resize, an export at another size):
+    (* [R5-I] a layout that snapped (a resize, an export at another size):
       the next sync puts each element's states back WITHOUT a transition --
       renderSeries' updateStates over an update of {duration: 0}, whose
       animateOrSetProps stopped every animator [was: the proxies were new,
-      a hovered element's state tweened again from normal] }
+      a hovered element's state tweened again from normal] *)
     FStSnapPut, FStSnapNow: Boolean;
     { [R5-F] the lines' temporary symbols; a render takes them away
       (LineView.render removes every __temp) }
@@ -1551,9 +1551,9 @@ type
     FLegendEntries: array of TTyLegendEntryArray;
     FLegendFlags: array of TTyLegendFlags;
     FLegends: array of TTyLegendLayout;
-    { THE LEGEND MODELS HAVE BEEN LOADED from this option [Batch 93]: init's
+    (* THE LEGEND MODELS HAVE BEEN LOADED from this option [Batch 93]: init's
       `selected ||= {}` and optionUpdated's single-mode pick ran -- once per
-      option; after it the map is what the actions made of it. }
+      option; after it the map is what the actions made of it. *)
     FLegendLoaded: Boolean;
     { [Batch 98] THE SELECTOR BUTTON UNDER THE POINTER, in its hovered ink:
       legend and button, -1 none. A re-render of the legend makes new
@@ -1621,8 +1621,8 @@ type
       pointer where it was last); where the hovered target was found }
     FVmLive: array of TTyVmLive;
     FVmIndBag, FVmLabBag: array of TTyAnimBag;
-    { [R5-I] the handle labels' opacity ('h0', 'h1'): their blur fades
-      (stateTransition {duration: 200}) }
+    (* [R5-I] the handle labels' opacity ('h0', 'h1'): their blur fades
+      (stateTransition {duration: 200}) *)
     FVmBlurBag: array of TTyAnimBag;
     { [R5-I] a blur's fade waiting for the frame that applies it (api.enterBlur
       marks the state; the next frame's render applies it, its animator
@@ -1826,11 +1826,11 @@ type
     { `itemStyle.color: 'none'` -- the series paints NO fill. Not the same as
       unwritten, which is the palette's. }
     FSeriesColorNone: array of Boolean;
-    { AND THE PALETTE PICK ITSELF, kept apart from the resolved colour
+    (* AND THE PALETTE PICK ITSELF, kept apart from the resolved colour
       because `auto` resolves to the PICK and not to the fill. A series that
       writes `itemStyle: { color: '#fff', borderColor: 'auto' }` is white
       with a border in the palette colour -- so both numbers exist at once
-      and one field could not hold them. }
+      and one field could not hold them. *)
     FSeriesPick: array of TTyPalettePick;
     FSeriesPickAsked: array of Boolean;
     { the fill IS the pick: unwritten, or written `auto` [Batch 105] }
@@ -3957,9 +3957,9 @@ type
       const ADefaultFormatter: string): TTyLabelSpec; overload;
     { The fonts and the four inks a pie label is drawn with. }
     function PieLabelInk: TTyPieLabelInk;
-    { `series.name`, which is what `{a}` in a label formatter means -- and,
+    (* `series.name`, which is what `{a}` in a label formatter means -- and,
       for a series that named itself nothing and reads a dataset, the name
-      of the dimension it took its values from. }
+      of the dimension it took its values from. *)
     function SeriesNameOf(ASlot: Integer): string;
     { The two name lists a legend needs: what it falls back to when the
       option lists no `data`, and what it is allowed to match. They are not
@@ -4043,9 +4043,9 @@ type
       [Batch 100] }
     procedure HeatmapTipDims(ASlot: Integer; const AEnc: TTySeriesEncode;
       AStore: TTyDataStore; ASysValue: Boolean = False);
-    { The series' MODEL name -- what `{a}` and a handler's seriesName print:
+    (* The series' MODEL name -- what `{a}` and a handler's seriesName print:
       as written, '' when written '', and the auto name `series\0<index>`
-      when not written at all. SeriesNameOf is the DISPLAY name, '' then. }
+      when not written at all. SeriesNameOf is the DISPLAY name, '' then. *)
     function SeriesModelName(ASeriesIndex: Integer): string;
     { A radar's own item tooltip: headed by the item, a row per indicator. }
     function RadarTooltip(ASlot, ARow: Integer; const AColor: TTyChartColor;
@@ -4486,8 +4486,8 @@ type
       asked for [Milestone D9-D14] }
     procedure DropStaticKeepList;
   protected
-    { Every surviving series as a formatter would see it, in section order --
-      so `{a0}` is the first row of the first section. }
+    (* Every surviving series as a formatter would see it, in section order --
+      so `{a0}` is the first row of the first section. *)
     function AxisTooltipParams(const AHits: TTyAxisHitArray): TTyChartParams;
     { The elements the last render built, series and labels -- the list the
       hit test walks and the painter draws, read-only. }
@@ -4664,10 +4664,10 @@ type
       richInheritPlainLabel, and the chart's global text font -- the skin's
       label font with the root textStyle's over it [Batch 86] }
     function RtGlobal: TTyRtGlobal;
-    { the styles an axis' labels and name are painted in: the theme's, with
+    (* the styles an axis' labels and name are painted in: the theme's, with
       the family, size, weight and colour the layout measured them in -- the
       author's where written [Batch 83]. A time axis' heavier `{primary|...}`
-      part is a rich piece of the label's block [Batch 104]. }
+      part is a rich piece of the label's block [Batch 104]. *)
     procedure AxisTextStyles(ASpec: PTyAxisLayoutSpec; out ALabel,
       AName: TTyStyleSet);
     procedure AxisTextOver(var AStyle: TTyStyleSet; const AName: string;
@@ -4829,8 +4829,8 @@ type
       to read more of it -- call inherited for the rest. }
     function TooltipHtmlLines(const AHtml: string;
       const AInk: TTyTooltipInk): TTyTooltipLineArray; virtual;
-    { [Batch 100] THE POINTERS THE OPTION SHOWS BY ITSELF: an axis'
-      `axisPointer: {status: 'show', value}` before any pointer event }
+    (* [Batch 100] THE POINTERS THE OPTION SHOWS BY ITSELF: an axis'
+      `axisPointer: {status: 'show', value}` before any pointer event *)
     function OptionPointerHits: TTyAxisHitArray;
     function OptPtrIsBack(const AMainType: string; AIndex: Integer): Boolean;
     procedure OptPtrTakePiece(APiece: TJSONData);
@@ -5163,8 +5163,8 @@ type
       selected map of those, written back into EVERY legend, the full update,
       then the event }
     procedure DoLegendAction(APayload: TJSONObject);
-    { eachComponent({mainType: 'legend', query}): legendIndex, legendId,
-      legendName; none is every legend }
+    (* eachComponent({mainType: 'legend', query}): legendIndex, legendId,
+      legendName; none is every legend *)
     function LegendQuery(APayload: TJSONObject): TTyIntegerArray;
     { makeSelectedMap: every name of the legend's data but the line breaks,
       ANDed into AMap }
@@ -5509,9 +5509,9 @@ type
       the last render. False / empty where there is none. }
     function VisualMapCount: Integer;
     function VisualMapSpec(AIndex: Integer): TTyVisualMapSpec;
-    { [R3-B] visualMap AIndex's model's own inRange / outOfRange / target /
+    (* [R3-B] visualMap AIndex's model's own inRange / outOfRange / target /
       controller as JSON -- what completeVisualOption made of them and the
-      merges kept, the theme's defaults filled in; '{}' for none }
+      merges kept, the theme's defaults filled in; '{}' for none *)
     function VisualMapVisualsJson(AIndex: Integer): string;
     function VisualRow(ASeriesIndex, ARawIndex: Integer;
       out ARow: TTyVisualRow): Boolean;
@@ -5631,10 +5631,10 @@ type
     function MarkPointPictures(ASeriesIndex: Integer): TTyMkPointPicArray;
     { THE markArea PICTURES likewise }
     function MarkAreaPictures(ASeriesIndex: Integer): TTyMkAreaPicArray;
-    { THE dataZoom ACTION, upstream's dispatchAction({type: 'dataZoom',
+    (* THE dataZoom ACTION, upstream's dispatchAction({type: 'dataZoom',
       dataZoomIndex, start, end}): the percent window goes on dataZoom AIndex
       and on every dataZoom linked to it through a shared axis, and the chart
-      follows at once. False when there is no such dataZoom. }
+      follows at once. False when there is no such dataZoom. *)
     function DispatchDataZoom(AIndex: Integer; AStart, AEnd: Double): Boolean;
     { UPSTREAM'S dispatchAction for the state actions [Batch 88], the payload
       as JSON text: `select`, `unselect`, `toggleSelect` (by seriesIndex /
@@ -5649,7 +5649,7 @@ type
       chart at once and publish legendselectchanged, legendselected,
       legendunselected, legendselectall or legendinverseselect. }
     function DispatchAction(const APayloadJson: string): Boolean; overload;
-    { dispatchAction(payload, silent) [Batch 141]: ASilent publishes no
+    (* dispatchAction(payload, silent) [Batch 141]: ASilent publishes no
       event at all -- not the action's, not updated, not the brushselected
       it causes -- and so sends nothing to a connected group.
 
@@ -5658,7 +5658,7 @@ type
       null, with ONE update and ONE event {type, escapeConnect, batch:
       [each item's event]}. Taken for highlight, downplay, select, unselect,
       toggleSelect, the five legend actions, dataZoom and brushSelect; any
-      other type with a batch answers False. }
+      other type with a batch answers False. *)
     function DispatchAction(const APayloadJson: string; ASilent: Boolean): Boolean; overload;
     { THE COMBINED EXPORT, getConnectedDataURL [Batch 141]: in a connected
       group, every chart of the group (in creation order) rendered with the
@@ -5685,8 +5685,8 @@ type
     function SelectedDataIndices(ASeriesIndex: Integer): TTyIntegerArray;
     { the series' selectedMap as JSON: null, "all" or an object }
     function SelectedMapText(ASeriesIndex: Integer): string;
-    { LEGEND AIndex's `selected` map as the actions left it, as JSON in
-      JavaScript's key order; '{}' when it has none [Batch 93] }
+    (* LEGEND AIndex's `selected` map as the actions left it, as JSON in
+      JavaScript's key order; '{}' when it has none [Batch 93] *)
     function LegendSelectedText(AIndex: Integer): string;
     { THE STATE OF A DATA ITEM'S ELEMENTS, as the last paint left it: flags,
       state list, rest and current values -- for a bar, a pie slice (with its
@@ -5880,13 +5880,13 @@ type
       state in the tree series ASeriesIndex (-1: every tree). Not gated by
       `expandAndCollapse`, which gates the click only. False for a series
       that is no tree, row 0 or a row past the end. [Batch 81] }
-    { THE CHART'S MOUSE EVENTS, upstream's chart.on / chart.off [Batch 84]:
+    (* THE CHART'S MOUSE EVENTS, upstream's chart.on / chart.off [Batch 84]:
       AType one of click, dblclick, mousedown, mouseup, mousemove, mouseover,
       mouseout, globalout, contextmenu (any case); AQuery '' for every event,
       a class type ('series.bar'), or a JSON object ('{"seriesIndex":1}').
       The same handler registered twice for one type is kept once, as
       upstream keeps it. Answers the registration's id, or -1 for a type the
-      chart does not emit. }
+      chart does not emit. *)
     function ChartOn(const AType: string; AHandler: TTyChartEventHandler;
       const AQuery: string = ''): Integer;
     procedure ChartOff(AId: Integer);
@@ -6062,8 +6062,8 @@ type
       option as it was and OptionError saying why, for what MergeOption
       refuses and for a replaceMerge naming no component main type. }
     function SetOption(const AJson: string; const AOpts: TTySetOptionOpts): Boolean; overload;
-    { the same with the options as JSON text, '{"replaceMerge":["series"]}';
-      refused when that text is no object }
+    (* the same with the options as JSON text, '{"replaceMerge":["series"]}';
+      refused when that text is no object *)
     function SetOption(const AJson, AOptsJson: string): Boolean; overload;
     { THE VIEW KEY the next update pairs series ASeries by -- its model id,
       or a key no old view has when replaceMerge made it brand new -- and
@@ -6971,8 +6971,8 @@ begin
   SetExceptionMask(AMask);
 end;
 
-{ extend({}, payload) with its type set: an action's event object, as
-  JSON in JavaScript's key order and number text [Batch 141] }
+(* extend({}, payload) with its type set: an action's event object, as
+  JSON in JavaScript's key order and number text [Batch 141] *)
 function CopyWithType(APayload: TJSONObject; const AType: string): string;
 var o: TJSONObject;
 begin
@@ -6985,10 +6985,10 @@ begin
   end;
 end;
 
-{ doDispatchAction's batch items: map(payload.batch, item => defaults(
+(* doDispatchAction's batch items: map(payload.batch, item => defaults(
   extend({}, item), payload)), each item's `batch` then null. A batch that is
   no list maps to none; an item that is no object is an empty one.
-  [Batch 141] }
+  [Batch 141] *)
 function BatchItemsOf(APayload: TJSONObject): TJSONArray;
 var
   arr, x: TJSONData;
@@ -7017,8 +7017,8 @@ begin
   end;
 end;
 
-{ the batched event's head: {type, escapeConnect, batch: ...}, the
-  escapeConnect only when the payload has one }
+(* the batched event's head: {type, escapeConnect, batch: ...}, the
+  escapeConnect only when the payload has one *)
 function BatchEventHead(APayload: TJSONObject; const AType: string): string;
 begin
   Result := '{"type":"' + StringToJSONString(AType) + '"';

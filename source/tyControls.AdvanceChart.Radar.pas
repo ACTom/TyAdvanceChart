@@ -148,9 +148,9 @@ type
     FontSizeLogical: Integer;
     { [R5-A] fontStyle as written (TyFontStyleCode) }
     FontStyle: Byte;
-    { [R7-I] axisLabel.formatter (makeLabelFormatter on the indicator's
+    (* [R7-I] axisLabel.formatter (makeLabelFormatter on the indicator's
       value axis): a template's first '{value}' is the rawLabel, a handler
-      ('@name') is handed the tick's value and its index }
+      ('@name') is handed the tick's value and its index *)
     HasFormatter: Boolean;
     Formatter: string;
   end;
@@ -319,9 +319,9 @@ type
     EmptyFill: TTyChartColor;
     Z: Integer;
     Z2: Integer;
-    { per RAW row, the item's decal: the area polygon takes it through
+    (* per RAW row, the item's decal: the area polygon takes it through
       defaults(areaStyle, {decal}) and every point -- createSymbol's, which
-      keeps it -- through the item's style [F4a] }
+      keeps it -- through the item's style [F4a] *)
     Decals: TTyChartDecalArray;
     { AN ITEM'S OWN areaStyle, per RAW row [F4a]: RadarView reads the area
       through the item's model, whose parent is the series' -- an item that
@@ -332,9 +332,9 @@ type
     RowAreaColour: TTyChartColorArray;
     RowAreaOpacitySet: TTyBoolArray;
     RowAreaOpacity: TTyDoubleArray;
-    { [R2-A] THE POINTS' LABELS: the series' `label` (position 'top' unless
+    (* [R2-A] THE POINTS' LABELS: the series' `label` (position 'top' unless
       written, RadarSeries' default) and, per RAW row, an item's own over it;
-      the series' name for `{a}`. A zero Label_ shows nothing. }
+      the series' name for `{a}`. A zero Label_ shows nothing. *)
     Label_: TTyLabelSpec;
     ItemLabels: TTyLabelSpecArray;
     HasItemLabel: TTyBoolArray;
@@ -441,11 +441,11 @@ function TyBuildRadarGrid(ARadar: TTyRadar; const AInk: TTyRadarInk;
   AList: TTyPaintList): Integer;
 
 type
-  { [R7-I] AN INDICATOR'S TEXT the grid drew (an AxisBuilder's name or
+  (* [R7-I] AN INDICATOR'S TEXT the grid drew (an AxisBuilder's name or
     label upstream): the list element, its spoke, its ring (a label's index
     among the axis' labels; -1 a name), and a label's rawLabel
     (scale.getLabel of its tick: what its eventData's value and a tooltip's
-    {c} are, the formatter's output being the drawn text) }
+    {c} are, the formatter's output being the drawn text) *)
   TTyRadarText = record
     Element, Spoke, Ring: Integer;
     IsName: Boolean;
@@ -707,7 +707,7 @@ begin
   Result.AxisLine.Show := True;
   Result.AxisLine.WidthLogical := 1;
   Result.AxisLine.Opacity := 1;
-  { [R5-G] AxisBuilder's axis line: extend({lineCap: 'round'}, lineStyle) }
+  (* [R5-G] AxisBuilder's axis line: extend({lineCap: 'round'}, lineStyle) *)
   Result.AxisLine.Cap := cTyCapRound;
 
   { OFF BY DEFAULT, both of them -- upstream flips the value axis' own defaults
@@ -901,7 +901,7 @@ begin
     ReadPenEnds(ObjIn(n2, 'lineStyle'), Result.AxisTick.Cap, Result.AxisTick.Join,
       Result.AxisTick.MiterLimit);
   end;
-  { ELSE THE LINE'S COLOUR: defaults(tickStyle, {stroke: axisLine's}) }
+  (* ELSE THE LINE'S COLOUR: defaults(tickStyle, {stroke: axisLine's}) *)
   if not Result.AxisTick.HasColour and (Length(Result.AxisLine.Colours) > 0) then
   begin
     Result.AxisTick.HasColour := True;
@@ -1527,10 +1527,10 @@ var
     else Result := AInk.LabelFontSizeLogical;
   end;
 
-  { [R7-I] ring AQ's label on spoke AI as drawn: makeLabelFormatter over the
+  (* [R7-I] ring AQ's label on spoke AI as drawn: makeLabelFormatter over the
     rawLabel ARaw (Interval.getLabel: the tick's own decimals, grouped) --
     a template's first '{value}' replaced, a handler run with the value and
-    the index; the rawLabel itself without one }
+    the index; the rawLabel itself without one *)
   function LabelWords(AI, AQ: Integer; const ARaw: string): string;
   begin
     if not spec.AxisLabel.HasFormatter then Exit(ARaw);
@@ -2058,12 +2058,12 @@ end;
 
 { ==================== the series ==================== }
 
-{ [R2-A] ONE POINT'S WORDS (RadarView: setLabelStyle on the symbol with
+(* [R2-A] ONE POINT'S WORDS (RadarView: setLabelStyle on the symbol with
   labelDimIndex the spoke): no formatter, the spoke's STORED value -- a
   number, printed as String() prints it, and nothing for NaN; a template,
   with `{c}` the spoke's RAW value as written (getFormattedLabel takes
   params.value[labelDimIndex]: '12.50', '-', null, undefined past the end).
-  A handler is called once per point with that value. }
+  A handler is called once per point with that value. *)
 function RadarLabelText(const ASpec: TTyLabelSpec; AStore: TTyDataStore;
   ARow, ADim, ASeriesIndex: Integer; const ASeriesName: string;
   AColour: TTyChartColor): string;

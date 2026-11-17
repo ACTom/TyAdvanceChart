@@ -364,7 +364,7 @@ begin
 
     NoteWhatCannotDraw(opt, C);
 
-    { Nothing wrong -- which is worth saying, because a correct bar config
+    (* Nothing wrong -- which is worth saying, because a correct bar config
       draws axes and no bars today, and a developer told nothing concludes the
       editor lied.
 
@@ -373,7 +373,7 @@ begin
       user it "draws its axes". And it was gated on `resolved > 0`, so a valid
       option with no series at all -- `{ xAxis: {}, yAxis: {} }` -- produced an
       EMPTY list, which is exactly the silence this row was invented to
-      prevent. }
+      prevent. *)
     if C.Count = 0 then
     begin
       withAxes := False;

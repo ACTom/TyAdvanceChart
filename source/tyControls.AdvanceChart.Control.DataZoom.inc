@@ -430,8 +430,8 @@ begin
     if st.NonRealtime and st.Built and (FZoomHost[rep] >= 0)
       and (FZoomHost[rep] <= High(FZoomSpecs)) then
     begin
-      { calculateDataWindow({start, end}): no startValue / endValue, so an
-        end the host reads in value mode falls back to the data's end }
+      (* calculateDataWindow({start, end}): no startValue / endValue, so an
+        end the host reads in value mode falls back to the data's end *)
       hostSpec := FZoomSpecs[FZoomHost[rep]];
       for k := 0 to 1 do
       begin
@@ -1386,10 +1386,10 @@ begin
       end;
   end;
   if AAction.Batch then FDzFrom := -1 else FDzFrom := AAction.FromSlider;
-  { THE PAYLOAD'S animation [Batch 96]: the inside roam's {cubicOut, 100}
+  (* THE PAYLOAD'S animation [Batch 96]: the inside roam's {cubicOut, 100}
     (roams.ts), a realtime slider's {cubicOut, 100, delay 0}
     (SliderZoomView's REALTIME_ANIMATION_CONFIG); none for the slider's other
-    dispatches (`animation: null`) and for the API's }
+    dispatches (`animation: null`) and for the API's *)
   pay := TyAnimNoOverride;
   hasPay := False;
   { A DISPATCHED PAYLOAD'S animation [Batch 141]: an object's duration,
@@ -2158,10 +2158,10 @@ begin
   end;
 end;
 
-{ the payload the port's own dispatcher stands for, as upstream's builds it:
+(* the payload the port's own dispatcher stands for, as upstream's builds it:
   the inside roams' batch {dataZoomId, start, end} with the animation; the
   toolbox's batch with its `from`; a slider's own {from, dataZoomId,
-  animation, start, end}; the API's {dataZoomIndex, start, end} }
+  animation, start, end}; the API's {dataZoomIndex, start, end} *)
 function TTyCustomAdvanceChart.DzPayloadOf(const AAction: TTyDzAction): TJSONObject;
 var
   arr: TJSONArray;

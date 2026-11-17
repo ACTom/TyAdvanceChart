@@ -929,8 +929,8 @@ var
 begin
   Result := AZoom;
   if ASolved.Series = nil then Exit;
-  { the default {max: 5, min: 0.2} merged under the series' own; written
-    null, it is gone and nothing clamps }
+  (* the default {max: 5, min: 0.2} merged under the series' own; written
+    null, it is gone and nothing clamps *)
   sl := ASolved.Series.Find('scaleLimit');
   if (sl <> nil) and (sl.JSONType = jtNull) then Exit;
   lo := 0.2;

@@ -473,14 +473,14 @@ begin
   if (Result <> nil) and (ATarget.HdGen <> Result.Gen) then Result := nil;
 end;
 
-{ [R5-I] A TIMELINE TICK AS A DATA ITEM (SliderTimelineView._renderAxisTick):
+(* [R5-I] A TIMELINE TICK AS A DATA ITEM (SliderTimelineView._renderAxisTick):
   where its item model says tooltip -- the item's own key (null falls
   through), the timeline's, the model's default {trigger: 'item'} -- the
   tick's ecData has its value as the dataIndex and the timeline as its
   dataModel: the tooltip's data item, and the chart's mouse events carry
   the timeline's getDataParams. A category timeline's data: the value its
   index, the name the item's value as a string; any other, the value as
-  written and no name. }
+  written and no name. *)
 function TTyCustomAdvanceChart.TlTickData(ATl, AEl: Integer;
   out AParams: TTyChartCallbackParams; out AModel: TTyEventModel): Boolean;
 var
@@ -561,9 +561,9 @@ begin
   Result := True;
 end;
 
-{ _showSeriesItemTooltip's cascade over a timeline's data item: [the
+(* _showSeriesItemTooltip's cascade over a timeline's data item: [the
   item's model, the timeline's (its default tooltip {trigger: 'item'})]
-  over the global component }
+  over the global component *)
 function TTyCustomAdvanceChart.TipTlSpec(ATl, ATick: Integer): TTyTooltipSpec;
 var
   node: TJSONObject;
@@ -596,9 +596,9 @@ begin
   end;
 end;
 
-{ its text: a formatter over the timeline's getDataParams (formatTpl: {a}
+(* its text: a formatter over the timeline's getDataParams (formatTpl: {a}
   the series' name, undefined here; {b} the name; {c} the value), else
-  formatTooltip's nameValue with no name -- the tick's axis label }
+  formatTooltip's nameValue with no name -- the tick's axis label *)
 function TTyCustomAdvanceChart.TipTlText(ATl, ATick: Integer;
   const ASpec: TTyTooltipSpec): string;
 var

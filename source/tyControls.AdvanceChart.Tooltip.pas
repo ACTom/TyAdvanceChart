@@ -111,13 +111,13 @@ type
     BorderRadiusLogical: Double;
     HasPadding: Boolean;
     PadLeft, PadTop, PadRight, PadBottom: Double;
-    { textStyle is read WHOLESALE. Upstream's Model.get walks to the parent
+    (* textStyle is read WHOLESALE. Upstream's Model.get walks to the parent
       only when the entire resolved path is null, so a series-level
       `textStyle: {fontWeight:'bold'}` REPLACES the global object rather than
       merging into it, and the keys it did not write fall back to the
       renderer's own constants -- not to the global's values. Reproduced by
       taking every text key from the first cascade level that has a textStyle
-      at all. }
+      at all. *)
     HasTextColour: Boolean;
     TextColour: TTyChartColor;
     HasTextSize: Boolean;
@@ -162,7 +162,7 @@ type
     or a series whose dimensions have display names. }
   TTyTooltipMarker = (ttmNone, ttmItem, ttmSubItem);
 
-  { THE MARKUP TREE, which is what upstream's default content actually is.
+  (* THE MARKUP TREE, which is what upstream's default content actually is.
 
     There is no default string template. `'{a}<br/>{b}: {c}'` is not the 6.1
     default of anything -- the default is a tree of `section` and `nameValue`
@@ -173,7 +173,7 @@ type
     An item tooltip is one section holding one nameValue. An axis tooltip is a
     headerless root holding one section per axis, each holding one nameValue
     per series -- which is why this is a tree and not a list, even though only
-    the first shape is built today. }
+    the first shape is built today. *)
   TTyTooltipBlock = class
   private
     FIsSection: Boolean;
@@ -367,11 +367,11 @@ function TyTooltipSpecOf(AOption: TTyChartOption; ASeriesIndex: Integer;
   `tooltip` is read as the series' is (a string a formatter). }
 function TyTooltipSpecOf(AOption: TTyChartOption; ASeriesIndex: Integer;
   ARawIndex: Integer; ACoordNode: TJSONData): TTyTooltipSpec; overload;
-{ [R5-D] buildTooltipModel over plain option levels, top first, then the
+(* [R5-D] buildTooltipModel over plain option levels, top first, then the
   global component: a string level is `{formatter: it}`, an object is
   merged, anything else (nil, null, a number) is skipped -- the axis
   tooltip's [e.tooltipOption], a showTip proxy's [tooltip option, its
-  content's level]. }
+  content's level]. *)
 function TyTooltipSpecOfLevels(AOption: TTyChartOption;
   const ALevels: array of TJSONData): TTyTooltipSpec;
 { `triggerOn` matching, upstream's way: a raw substring test, not equality and
@@ -388,11 +388,11 @@ function TyTooltipComponent(AOption: TTyChartOption): TJSONObject;
   `trigger: 'axis'` the marker shows no box of its own. }
 function TyTooltipSpecOfMarker(AOption: TTyChartOption; AHostSeries: Integer;
   const AKind: string; AItem: Integer; ACoordNode: TJSONData = nil): TTyTooltipSpec;
-{ [Batch 147] A MATRIX CELL'S cascade (TooltipView._showComponentItemTooltip
+(* [Batch 147] A MATRIX CELL'S cascade (TooltipView._showComponentItemTooltip
   over setTooltipConfig): the matrix's `tooltip` (a string is its
   formatter), the matrix model itself, `{formatter: AContent}` -- the cell's
   name, so there is always a formatter --, then the global component. The
-  trigger is not consulted for a component item: always 'item'. }
+  trigger is not consulted for a component item: always 'item'. *)
 function TyTooltipSpecOfMatrix(AOption: TTyChartOption; AMatrixIndex: Integer;
   const AContent: string): TTyTooltipSpec;
 { [Batch 148] A GEO REGION'S CASCADE (setTooltipConfig and
@@ -422,14 +422,14 @@ function TyTooltipRenderModeIsHtml(AOption: TTyChartOption;
   AAutoRichText: Boolean): Boolean;
 
 { ---- content ---- }
-{ How a VALUE reaches the default content: grouped in threes, `1048` becoming
+(* How a VALUE reaches the default content: grouped in threes, `1048` becoming
   `1,048`.
 
   NOT TyChartNumToStr: upstream's default markup runs values through
   `addCommas` and a `{c}` in a template does not, so they are two functions
   here rather than one with a flag. (Axis tick labels are neither -- they
   are IntervalScale.getLabel, grouped as well, in TyScaleValueLabel. This
-  said they were ungrouped; that was never upstream.) }
+  said they were ungrouped; that was never upstream.) *)
 function TyTooltipValueText(AValue: Double): string;
 
 { ---- placement [Batch 100] ---- }
@@ -766,9 +766,9 @@ begin
   d := TJSONObject(ANode).Find('tooltip');
   if d = nil then Exit;
   if d is TJSONObject then Exit(TJSONObject(d));
-  { `tooltip: 'some text'` is sugar for `{formatter: 'some text'}` at any
+  (* `tooltip: 'some text'` is sugar for `{formatter: 'some text'}` at any
     cascade level. Answering nil here would silently drop it, so the caller
-    checks for the string form separately. }
+    checks for the string form separately. *)
 end;
 
 function SeenHas(const ASeen: TTyStringArray; const AKey: string): Boolean;
@@ -1063,11 +1063,11 @@ begin
   end;
   if Fresh('padding') then ReadPadding(ANode, ASpec);
 
-  { WHOLESALE. The first level that writes a textStyle at all supplies the
+  (* WHOLESALE. The first level that writes a textStyle at all supplies the
     whole of it; the keys it left out do NOT fall through to the level above,
     because upstream's Model.get replaces an object-valued key rather than
     merging it. Getting this wrong is invisible until somebody writes
-    `textStyle: {fontWeight: 'bold'}` and the colour changes too. }
+    `textStyle: {fontWeight: 'bold'}` and the colour changes too. *)
   if Fresh('textStyle') then
   begin
     d := ANode.Find('textStyle');

@@ -153,18 +153,18 @@ type
       an author stops the topmost grid line from doubling the plot's edge. }
     ShowMinLine: Boolean;
     ShowMaxLine: Boolean;
-    { LOGICAL px, and NaN for `the theme decides`. NOT -1: upstream reads a
+    (* LOGICAL px, and NaN for `the theme decides`. NOT -1: upstream reads a
       NEGATIVE length as a direction -- `axisTick: { length: -5 }` points the
       mark the other way -- so a negative sentinel would swallow a legal
-      value and there would be no way to write it at all. }
+      value and there would be no way to write it at all. *)
     TickLengthLogical: Double;
     MinorTickLengthLogical: Double;
     LabelMarginLogical: Double;
     { DEGREES, clockwise on screen, which is how the option spells it. }
     LabelRotateDeg: Double;
-    { `axisLabel.formatter` when it is a STRING: its first '{value}' becomes
+    (* `axisLabel.formatter` when it is a STRING: its first '{value}' becomes
       the label. '' is a string too, and blanks every label. A function
-      cannot come through an option text. }
+      cannot come through an option text. *)
     LabelFormatter: string;
     HasLabelFormatter: Boolean;
     { `axis.offset`, LOGICAL px, default 0 -- and the default is declared
@@ -553,10 +553,10 @@ function TyAxisRtPieces(const ASpec: TTyAxisLayoutSpec; const ABlock: TTyRtBlock
   AColour: Cardinal; AH: TTyTextAnchorH; AV: TTyTextAnchorV;
   const AMeasurer: ITyTextMeasurer): TTyRtPieceArray;
 
-{ One tick's label as upstream's makeLabelFormatter makes it for a category,
+(* One tick's label as upstream's makeLabelFormatter makes it for a category,
   value or log axis: the scale's own label -- the category, or the number as
   IntervalScale.getLabel prints it, '1,234.5' -- and with a string formatter,
-  that formatter with its FIRST '{value}' replaced. A time axis has its own. }
+  that formatter with its FIRST '{value}' replaced. A time axis has its own. *)
 function TyAxisTickLabel(AAxis: TTyAxis; AValue: Double;
   AHasFormatter: Boolean; const AFormatter: string): string;
 { ... and a handler formatter ('@name') too, handed the tick's value and
@@ -646,7 +646,7 @@ function TyFillSeriesStore(AOption: TTyChartOption; ASeriesIndex: Integer;
 function TyFillSeriesStoreArray(AOption: TTyChartOption; ASeriesIndex: Integer;
   AArray: TJSONArray; const ADims: TTySeriesDimArray; AStore: TTyDataStore): Integer;
 
-{ The same job from a DATASET. AEncode says which source dimension feeds each
+(* The same job from a DATASET. AEncode says which source dimension feeds each
   of ADims; a coordinate it leaves at -1 gets no value at all.
 
   IT IS A SECOND FUNCTION AND NOT A PARAMETER, because three of the rules the
@@ -668,7 +668,7 @@ function TyFillSeriesStoreArray(AOption: TTyChartOption; ASeriesIndex: Integer;
     `value` out of it would eat a column called value.
 
   What IS shared is the cell parsing, which is the part that has rules worth
-  sharing. }
+  sharing. *)
 function TyFillStoreFromSource(const ASource: TTyChartSource;
   const AEncode: TTySeriesEncode; const ADims: TTySeriesDimArray;
   AStore: TTyDataStore): Integer;
@@ -802,7 +802,7 @@ function StrIn(ANode: TJSONObject; const AKey, ADefault: string): string;
 var d: TJSONData;
 begin
   d := FindIn(ANode, AKey);
-  { An ARRAY or an OBJECT where a string was expected RAISES out of AsString --
+  (* An ARRAY or an OBJECT where a string was expected RAISES out of AsString --
     fpjson's ConvertError. Its two siblings below both test the type and fall
     back; this one did not, and `{ xAxis: { name: [1] } }` is legal JSON that a
     half-finished edit produces all the time.
@@ -814,7 +814,7 @@ begin
     throwing is wrong for us precisely because a design-time editor renders on
     every keystroke.
 
-    Option.pas' own string reader already had the right shape. }
+    Option.pas' own string reader already had the right shape. *)
   if (d = nil) or (d.JSONType in [jtNull, jtArray, jtObject]) then
     Exit(ADefault);
   Result := d.AsString;
@@ -1018,12 +1018,12 @@ begin
     item := arr.Items[i];
     v := nil;
     if item is TJSONObject then v := TJSONObject(item).Find('value');
-    { A CATEGORY IS A SCALAR OR IT IS NOTHING. `AsString` on an object or an
+    (* A CATEGORY IS A SCALAR OR IT IS NOTHING. `AsString` on an object or an
       array does not stringify it, it RAISES -- and both shapes are legal:
       `data: [{ value: 3, textStyle: {} }]` is how a single category is
       styled, and its `value` can be an array as easily as its item can. An
       unnameable category becomes the empty name rather than the end of the
-      render. }
+      render. *)
     if (v <> nil) and (v.JSONType <> jtNull) then
     begin
       if v.JSONType in [jtObject, jtArray] then cats[i] := ''
@@ -1782,7 +1782,7 @@ begin
     AHasColour, AColour, AH, AV, AMeasurer);
 end;
 
-{ THE TIME AXIS' LABEL BLOCK [Batch 104]: the author's axisLabel over the time
+(* THE TIME AXIS' LABEL BLOCK [Batch 104]: the author's axisLabel over the time
   axis' own default, `rich: { primary: { fontWeight: 'bold' } }`
   (coord/axisDefault.ts) -- the weight the skin's primary label rule gives,
   bold where it gives none. A tag the author, the root textStyle and the label
@@ -1791,7 +1791,7 @@ end;
 
   An author's `rich` that is there and not an object -- false, null -- keeps
   the default out: the model's merge never overwrites a key the option has, so
-  upstream's labels then have no rich at all. }
+  upstream's labels then have no rich at all. *)
 function TimeAxisRtOf(ANode: TJSONObject; const AText: TTyAxisTextStyle;
   AHasLabelColour: Boolean): TTyRtBlockStyle;
 var
@@ -2272,7 +2272,7 @@ var
 
 begin
   AFurn.LinePen := SubPen('axisLine');
-  { defaults(..., {stroke: axisLine.lineStyle.color}): the colour alone }
+  (* defaults(..., {stroke: axisLine.lineStyle.color}): the colour alone *)
   lineColour := Default(TTyAxisPen);
   lineColour.Width := NaN;
   lineColour.Opacity := NaN;
@@ -2660,11 +2660,11 @@ begin
   end;
 end;
 
-{ A data item AS WRITTEN, for the text a label or a tooltip prints --
+(* A data item AS WRITTEN, for the text a label or a tooltip prints --
   upstream's getDataItemValue, not UnwrapItem: `{value: null}` is a null and
   an object with no `value` is absent, where UnwrapItem hands both back as the
   object. A whisker-box series on a category axis has its row index put in
-  front, as upstream's unshift does. }
+  front, as upstream's unshift does. *)
 function RawItemOf(AItem: TJSONData; APrepend: Boolean;
   ARowIndex: Integer): TTyRawItem;
 var
@@ -2722,8 +2722,8 @@ begin
   else Result := False;
 end;
 
-{ Declared dimensions, by position: the name `{@name}` finds, the display
-  name a tooltip sub-row shows, the declared type. }
+(* Declared dimensions, by position: the name `{@name}` finds, the display
+  name a tooltip sub-row shows, the declared type. *)
 procedure DeclareDims(AStore: TTyDataStore; const ADims: TTySourceDimArray);
 var k: Integer; t: TTyDimType;
 begin
@@ -3062,9 +3062,9 @@ begin
       and not TyIsSpreadDim(ADims[k].Name) then
       AStore.SetRawDimDisplay(pos, ADims[k].Name);
   end;
-  { THE NAMES `{@name}` FINDS: the series' own `dimensions` when it has them
+  (* THE NAMES `{@name}` FINDS: the series' own `dimensions` when it has them
     -- which replace the coordinate names outright -- and otherwise each
-    column's name at the position it reads. }
+    column's name at the position it reads. *)
   d := node.Find('dimensions');
   if (d <> nil) and (d is TJSONArray) then
   begin
@@ -3080,9 +3080,9 @@ begin
       if (AStore.RawDimPos(k) >= 0) and (ADims[k].Name <> '') then
         AStore.SetRawDimName(AStore.RawDimPos(k), ADims[k].Name);
     NameSpreadPositions(AStore, ADims);
-    { EVERY OTHER POSITION THE DATA HAS gets a generated name, in order --
+    (* EVERY OTHER POSITION THE DATA HAS gets a generated name, in order --
       `value`, then `value0`, `value1`, ... skipping any already taken --
-      which is how `{@value}` finds a scatter's third number. }
+      which is how `{@value}` finds a scatter's third number. *)
     src := TySeriesDetectedDimCount(arr);
     if prepend then Inc(src);
     AStore.RawWidth := src;
@@ -3652,7 +3652,7 @@ procedure TyAxisBreakLineOf(var ASpec: TTyAxisLayoutSpec; AAxis: TTyAxis;
       AAxis.ComponentIndex))) then Exit;
     ASpec.HasBreakLine := True;
     brks := AAxis.Scale.BreakMapper.BreakList;
-    { the break pairs: getTicks({breakTicks: 'only_break'}) }
+    (* the break pairs: getTicks({breakTicks: 'only_break'}) *)
     brkTicks := AAxis.Scale.GetTicksOpt(TyTicksOpt(tbmOnly, tpmAuto));
     pairs := nil;
     ids := nil;
@@ -4172,10 +4172,10 @@ var
 begin
   ASpec := Default(TTyAxisLayoutSpec);
   ASpec.Side := AAxis.Side;
-  { `axisLabel.show`, NOT the axis' own `show` -- the axis-level one is
+  (* `axisLabel.show`, NOT the axis' own `show` -- the axis-level one is
     handled at the bottom of this routine. Reading it here as well meant
     `axisLabel: { show: false }` did nothing while a hidden axis was asked
-    about twice. }
+    about twice. *)
   ASpec.ShowLabels := AFurn.ShowLabels;
   { legacy containLabel measures these even on a hidden axis }
   ASpec.LegacyLabels := AFurn.ShowLabels;
@@ -4234,7 +4234,7 @@ begin
     ASpec.TickLengthLogical := AFurn.TickLengthLogical;
   ASpec.NameGapLogical := AText.NameGapLogical;
   ReadName(ASpec, AAxis, ANode, AText, AMeasurer, APPI, AContainLabel);
-  { `xAxis.show: false` MUST GIVE THE GUTTER BACK. Upstream builds nothing
+  (* `xAxis.show: false` MUST GIVE THE GUTTER BACK. Upstream builds nothing
     at all for a hidden axis and skips it again when it folds the shrink,
     so the plot grows into the band. The port hid it at PAINT time only:
     `yAxis: { show: false }` stopped drawing the numbers and went on
@@ -4243,7 +4243,7 @@ begin
 
     Zeroed rather than skipped because FSpecs is index-parallel to the
     grid's axis lists -- SpecFor and FurnitureFor both walk them by
-    position -- and a spec that costs nothing is the same answer. }
+    position -- and a spec that costs nothing is the same answer. *)
   if not AAxis.Visible then
   begin
     ASpec.ShowLabels := False;
@@ -4268,12 +4268,12 @@ begin
     ASpec.RotationRad := -AFurn.LabelRotateDeg * Pi / 180
   else
     ASpec.RotationRad := AFurn.LabelRotateDeg * Pi / 180;
-  { MAJORS ONLY. GetTicks hands back majors and minors in one array with
+  (* MAJORS ONLY. GetTicks hands back majors and minors in one array with
     Level saying which is which, and its own comment says a caller that wants
     only the majors tests Level. This did not -- so `minorTick: { show: true
     }`, which is applied earlier in the same rebuild, multiplied the label
     count by the minor split and asked the layout to fit five times as many
-    strings as the axis has numbers. }
+    strings as the axis has numbers. *)
   { axisLabel.width + overflow. `none` is ECharts' default and is what this
     already did: no bound, and crowding handled by thinning the labels.
 
@@ -4358,13 +4358,13 @@ begin
     if ticks[q].Level <> 0 then Continue;
     if isTime then
     begin
-      { A NAMED HANDLER ANSWERS A TEMPLATE, not the text: upstream's
+      (* A NAMED HANDLER ANSWERS A TEMPLATE, not the text: upstream's
         leveledFormat runs whatever the function returns through the same
         time format a string formatter goes through. A string formatter is
         that template for every level; the dictionary (the default too)
         gives each tick the template of its own unit at its own level --
         `{primary|Feb}` among the days, where nobody wrote a unit.
-        [Batch 104] }
+        [Batch 104] *)
       if tfmt.Kind = tfkHandler then
       begin
         { leveledFormat's extra: the level, and a break end's break [F4a] }
@@ -4845,13 +4845,13 @@ var
       outer := raw
     else if (s = '') or (s = 'auto') then
     begin
-      { the bounds on the canvas: OUTER_BOUNDS_DEFAULT {left, right, top,
+      (* the bounds on the canvas: OUTER_BOUNDS_DEFAULT {left, right, top,
         bottom: 0} under grid.outerBounds, merged as a box at init
         (GridModel.mergeDefaultAndTheme) -- a merge wrote back what its own
         mergeLayoutParam made, a null where it dropped a key [R3-B] -- then
         getLayoutRect, a null or a missing key NaN, `containerRect.x || 0`
         included (a calendar day off its range has a size and no place
-        [Batch 151]) }
+        [Batch 151]) *)
       ob := nil;
       if AGridNode <> nil then ob := ObjOf(AGridNode.Find('outerBounds'));
       obBox := Default(TTyRawBox);

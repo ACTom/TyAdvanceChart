@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.Legend;
 {$mode objfpc}{$H+}
-{ The legend -- the component that names the series and, once it can be
+(* The legend -- the component that names the series and, once it can be
   clicked, decides which of them are drawn.
 
   103 of the 244 converted examples carry one, which is more than any other
@@ -95,7 +95,7 @@ unit tyControls.AdvanceChart.Legend;
   says in a comment why that order and no other.
 
   PURE: SysUtils, Math, fpjson and the AdvanceChart units. Text is MEASURED through
-  the injected measurer; ink and fonts arrive resolved from the theme. }
+  the injected measurer; ink and fonts arrive resolved from the theme. *)
 interface
 uses
   SysUtils, Math, fpjson,
@@ -341,8 +341,8 @@ type
     { [F6a] `symbolKeepAspect`, true by default (LegendModel): a picture
       icon keeps its aspect in the item box (makeImage 'center') }
     KeepAspect: Boolean;
-    { A `{name}` template. Replaced ONCE, because upstream calls
-      String.replace with a string pattern rather than a global regexp. }
+    (* A `{name}` template. Replaced ONCE, because upstream calls
+      String.replace with a string pattern rather than a global regexp. *)
     Formatter: string;
     SelectedMode: TTyLegendSelectedMode;
     HasBackground: Boolean;
@@ -699,8 +699,8 @@ function TyLegendNameSelected(AOption: TTyChartOption; AIndex: Integer;
   the host wrote it), and everything above that reads `selected` reads what
   the actions wrote. }
 
-{ `option.selected ||= {}`: the map, made when missing (and when what is
-  there is not an object). nil when the legend itself is not an object. }
+(* `option.selected ||= {}`: the map, made when missing (and when what is
+  there is not an object). nil when the legend itself is not an object. *)
 function TyLegendSelectedNode(AOption: TTyChartOption; AIndex: Integer): TJSONObject;
 { isSelected: not switched off in the map (any falsy value is off), and a
   name the chart offers. }
@@ -729,10 +729,10 @@ procedure TyLegendResolveSingle(AOption: TTyChartOption; AIndex: Integer;
 { An object's keys in JavaScript's own order: integer-like keys ascending,
   then the rest in insertion order. }
 function TyJsKeyOrder(AObj: TJSONObject): TTyLegendNames;
-{ The legend's `selected` map as JSON, in that order; '{}' when it has none. }
+(* The legend's `selected` map as JSON, in that order; '{}' when it has none. *)
 function TyLegendSelectedJson(AOption: TTyChartOption; AIndex: Integer): string;
 
-{ `{name}`, replaced once. An empty formatter answers the name unchanged. }
+(* `{name}`, replaced once. An empty formatter answers the name unchanged. *)
 function TyLegendText(const AFormatter, AName: string): string;
 
 { The `legendIcon` visual a series of this type publishes: ITS OWN SYMBOL
@@ -1474,9 +1474,9 @@ begin
 
   if (d <> nil) and (d is TJSONArray) then
   begin
-    { AN EMPTY ARRAY IS AN ANSWER. `this.get('data') || potentialData` falls
+    (* AN EMPTY ARRAY IS AN ANSWER. `this.get('data') || potentialData` falls
       back only on a MISSING data, and [] is truthy in JavaScript -- so
-      `legend: {data: []}` asks for a legend with no items in it. }
+      `legend: {data: []}` asks for a legend with no items in it. *)
     arr := TJSONArray(d);
     for i := 0 to arr.Count - 1 do
     begin
@@ -2540,8 +2540,8 @@ var
   pad: array[0..3] of Double;
   box: TTyRawBox;
 begin
-  { defaults({width, height}, params): the measured pair never goes missing,
-    so it wins over anything written. }
+  (* defaults({width, height}, params): the measured pair never goes missing,
+    so it wins over anything written. *)
   PadOf(ASpec, APPI, pad);
   if ASpec.PadJs.Js then
   begin
@@ -3540,9 +3540,9 @@ begin
   mainW := TyRectFWidth(content);
   mainH := TyRectFHeight(content);
 
-  { THE SECOND SOLVE, and the measured size WINS over `legend.width`: upstream
+  (* THE SECOND SOLVE, and the measured size WINS over `legend.width`: upstream
     merges {width, height} with defaults(), which only fills in what is
-    missing, and the measured pair is never missing. }
+    missing, and the measured pair is never missing. *)
   layoutBox := TyLegendPlaceRect(ASpec, AContainer, mainW, mainH, APPI);
 
   { The content group is shifted so that its own top-left lands on the solved

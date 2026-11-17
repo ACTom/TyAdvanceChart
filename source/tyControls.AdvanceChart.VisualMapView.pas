@@ -1231,11 +1231,11 @@ begin
   Result.Y := AY;
   Result.AlignH := AH;
   Result.AlignV := AV;
-  { [R7-M] THE BLOCK: createTextStyle(textStyleModel, {x, y, align,
+  (* [R7-M] THE BLOCK: createTextStyle(textStyleModel, {x, y, align,
     verticalAlign, text}) -- laid out at the style's place (a numeric
     string size joins it), aligned as the view says (what it specifies
     overrides the model's align), its own fill the ink's; the Text's rect is
-    the union of its children }
+    the union of its children *)
   if AInk.HasRt and (AMeasurer <> nil) and (AText <> '') then
   begin
     sc := AInk.RtScale;
@@ -1340,7 +1340,7 @@ end;
 
 { ==================== the layout ==================== }
 
-{ getControllerVisual(v, 'color', {forceState, convertOpacityToAlpha}) }
+(* getControllerVisual(v, 'color', {forceState, convertOpacityToAlpha}) *)
 function ControllerColour(const AModel: TTyVisualMapSpec; AState: TTyVisualState;
   AValue: Double; const AContent: TTyVisualColor): TTyVisualColor;
 var
@@ -1385,7 +1385,7 @@ begin
   Push(A1, 1);
 end;
 
-{ getControllerVisual(v, 'symbolSize', {forceState}), CSS px }
+(* getControllerVisual(v, 'symbolSize', {forceState}), CSS px *)
 function ControllerSize(const AModel: TTyVisualMapSpec; AState: TTyVisualState;
   AValue, AItemW: Double): Double;
 var

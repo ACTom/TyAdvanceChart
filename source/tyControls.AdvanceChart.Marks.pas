@@ -72,12 +72,12 @@ type
     HasArea: Boolean;
     AreaOrigin: TTyAreaOrigin;
     AreaOriginValue: Double;
-    { 0..1, and the default is 0.7 -- NOT 1. The view puts the area in with
+    (* 0..1, and the default is 0.7 -- NOT 1. The view puts the area in with
       `defaults(getAreaStyle(), {fill: visualColor, opacity: 0.7})`, so an
       `areaStyle: {}` is a SEVENTY PER CENT wash of the series colour and
       not a solid block of it. Radar does the same. An opaque area hides
       whatever is stacked behind it, which is the visible half of getting
-      this wrong. }
+      this wrong. *)
     AreaOpacity: Double;
     { `areaStyle.color`, when the author named one. Separate from the
       series colour because an area named its own colour does not make the
@@ -370,10 +370,10 @@ type
       thinned it) builds one at the row's point, inside the symbol clip }
     TempRows: TTyIntegerArray;
     HeatHasRadii: TTyBoolArray;
-    { Which store column `{c}` and the default text read. -1 means neither
-      has a value to show. }
+    (* Which store column `{c}` and the default text read. -1 means neither
+      has a value to show. *)
     LabelValueDim: Integer;
-    { `{a}`. The option's own series name, resolved by the control. }
+    (* `{a}`. The option's own series name, resolved by the control. *)
     SeriesName: string;
     { Which series and what type, for what a named label handler is given;
       -1 and '' when no control filled them. }
@@ -418,11 +418,11 @@ type
 { A visual with the defaults: a filled mark, no stroke, upstream's bar gap. }
 function TySeriesVisual(AFill: TTyChartColor): TTySeriesVisual;
 
-{ The line-shaped options of the series in slot ASlot.
+(* The line-shaped options of the series in slot ASlot.
 
   Every default is upstream's: `step: false`, `connectNulls: false`, and no
   areaStyle at all -- its mere PRESENCE turns the area on, which is why an
-  empty `areaStyle: {}` is a real instruction and not a no-op. }
+  empty `areaStyle: {}` is a real instruction and not a no-op. *)
 { `itemStyle.color` / `color0` / `borderColor` / `borderColor0` /
   `borderColorDoji` / `borderWidth`, over whatever the theme supplied.
 
@@ -816,10 +816,10 @@ begin
       Result.ShowAllSymbol := sasAuto;
   end;
 
-  { PRESENCE IS THE SWITCH. `areaStyle: {}` fills the area; there is no
+  (* PRESENCE IS THE SWITCH. `areaStyle: {}` fills the area; there is no
     `show` and no default block to inherit. [R7-U] The series' own: the
     root's areaStyle is the parent of the series' model (getAreaStyle reads
-    it) but isEmpty is the series' option alone. }
+    it) but isEmpty is the series' option alone. *)
   if not (AOption.SeriesOwnStyle(ASlot).Find('areaStyle') is TJSONObject) then Exit;
   d := node.Find('areaStyle');
   if (d = nil) or not (d is TJSONObject) then Exit;
@@ -1103,7 +1103,7 @@ begin
   end;
 end;
 
-{ THIS ROW'S OWN COLOUR AND OPACITY, when the author gave them.
+(* THIS ROW'S OWN COLOUR AND OPACITY, when the author gave them.
 
   `data: [1, 2, { value: 3, itemStyle: { color: 'red' } }]` is how a single
   bar or a single slice is picked out, and it is the commonest reason a
@@ -1112,7 +1112,7 @@ end;
   second reader of the option.
 
   A row that names an unreadable colour keeps the series' -- the same rule
-  the series level follows. }
+  the series level follows. *)
 { [R6-E] Number() of an item's own value as the store keeps it: a number,
   a string's Number, a boolean 1 or 0 }
 function OverrideNumber(const AValue: TTyDataValue): Double;
@@ -5531,12 +5531,12 @@ begin
   for i := 0 to High(Result) do Result[i] := Default(TTyBrushItemLayout);
   { large mode keeps no item layout: nothing is selected }
   if AVisual.Large <> lgkNone then Exit;
-  { [R5-G] A BAR ON A POLAR: barPolar lays every row out as a sector
+  (* [R5-G] A BAR ON A POLAR: barPolar lays every row out as a sector
     ({cx, cy, r0, r, startAngle, endAngle}), which BarSeries' brushSelector
     hands to selectors.rect -- no x, y, width or height, so a rect area's
     BoundingRect.intersect compares not-a-numbers, finds no gap and
     selects it, and a line or a polygon area does not [was: never
-    selected] }
+    selected] *)
   if (PolarOf(ABinding) <> nil) and (ABinding.SeriesType = 'bar') then
   begin
     for i := 0 to AStore.Count - 1 do

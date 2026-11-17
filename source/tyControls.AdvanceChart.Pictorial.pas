@@ -112,7 +112,7 @@ type
 function TyPictorialSpecDefault: TTyPictorialSpec;
 function TyPictorialSpecOf(AOption: TTyChartOption; ASlot: Integer): TTyPictorialSpec;
 
-{ ASpec with whatever ONE ROW wrote of its own laid over it.
+(* ASpec with whatever ONE ROW wrote of its own laid over it.
 
   EVERY ONE OF THESE OPTIONS IS PER-DATUM UPSTREAM, and not as a courtesy: the
   view reads all of them through the item model, which is what lets one series
@@ -126,7 +126,7 @@ function TyPictorialSpecOf(AOption: TTyChartOption; ASlot: Integer): TTyPictoria
   '100%']` or `symbolOffset: [5, '-50%']` is read the way the series' is --
   upstream's visual takes the row's own array (visual/symbol.ts, getShallow),
   whole, over the series'. [Was: only the scalar forms arrived, and a row's
-  pair kept the series' size.] }
+  pair kept the series' size.] *)
 function TyPictorialRowSpec(const ASpec: TTyPictorialSpec;
   AStore: TTyDataStore; ARow: Integer): TTyPictorialSpec;
 

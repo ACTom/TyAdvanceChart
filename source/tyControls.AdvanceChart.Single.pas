@@ -211,9 +211,9 @@ function TySinglePointerShape(ASingle: TTySingle; APixel, ABandWidth: Double;
 procedure TySinglePointerLabelAnchor(ASingle: TTySingle; AOption: TTyChartOption;
   AValue, AMarginPx: Double; out AX, AY: Double; out AH: TTyTextAnchorH;
   out AV: TTyTextAnchorV);
-{ [R5-D] SingleAxisPointer.getHandleTransform: getTransformedPosition with
+(* [R5-D] SingleAxisPointer.getHandleTransform: getTransformedPosition with
   layout(axisModel, {labelInside: false}) and labelMargin = the handle's
-  margin; the turn the layout's, + pi where the label direction is negative }
+  margin; the turn the layout's, + pi where the label direction is negative *)
 procedure TySingleHandlePlace(ASingle: TTySingle; AOption: TTyChartOption;
   AValue, AMarginPx: Double; out AX, AY, ARotation: Double);
 

@@ -511,9 +511,9 @@ begin
     FSankeyLocal[si][ADataIndex].HasY := AHasY;
     FSankeyLocal[si][ADataIndex].Y := ALocalY;
     Result := True;
-    { the action's event, 'dragnode', with the payload -- SankeyView's
+    (* the action's event, 'dragnode', with the payload -- SankeyView's
       {type, seriesId, dataIndex, localX, localY}: the model's id
-      [R5-G: was seriesIndex] }
+      [R5-G: was seriesIndex] *)
     ev := TJSONObject.Create;
     try
       ev.Strings['type'] := 'dragNode';
@@ -1096,12 +1096,12 @@ begin
   Result.Strings['targetNode'] := AId;
 end;
 
-{ [R2-B] THE VIEW'S OWN DISPATCH (TreemapView._zoomToNode / _rootToNode, for
+(* [R2-B] THE VIEW'S OWN DISPATCH (TreemapView._zoomToNode / _rootToNode, for
   a click on a node and a breadcrumb item's onclick alike): {type, from: the
   view's uid, seriesId: the series model's id, targetNode} -- the TreeNode
   as its id, which the action resolves the same way (retrieveTargetInfo
   takes a string targetNode to getNodeById) [was: seriesIndex and
-  targetNode, the public methods' payload] }
+  targetNode, the public methods' payload] *)
 function TTyCustomAdvanceChart.TreemapViewPayload(const AType: string; ASeries: Integer;
   const AId: string): TJSONObject;
 begin
@@ -1112,10 +1112,10 @@ begin
   Result.Strings['targetNode'] := AId;
 end;
 
-{ [R2-I1] THE VIEW'S OWN ROAM DISPATCH (TreemapView._onPan's treemapMove,
+(* [R2-I1] THE VIEW'S OWN ROAM DISPATCH (TreemapView._onPan's treemapMove,
   _onZoom's treemapRender): {type, from: the view's uid, seriesId, rootRect}
   -- and AJs, the same as the event prints it (JavaScript's numbers) [was:
-  {type, seriesIndex, rootRect}, the public method's] }
+  {type, seriesIndex, rootRect}, the public method's] *)
 function TTyCustomAdvanceChart.TreemapRoamPayload(const AType: string; ASeries: Integer;
   AX, AY, AW, AH: Double; out AJs: string): TJSONObject;
 var r: TJSONObject; from: string;
@@ -3085,9 +3085,9 @@ begin
       any := True;
   { a row TreeFlip refuses (TreeToggle's rule) does nothing }
   if not any then Exit;
-  { TreeView's click: dispatchAction({type: 'treeExpandAndCollapse',
+  (* TreeView's click: dispatchAction({type: 'treeExpandAndCollapse',
     seriesId, dataIndex}) -- the update (with its payload: the brush's
-    visual stage dispatches brushSelect), the event, `updated` }
+    visual stage dispatches brushSelect), the event, `updated` *)
   FBrushPayload := True;
   FullUpdate;
   ev := TJSONObject.Create;
@@ -3125,8 +3125,8 @@ begin
       ev.Floats['originX'] := APayload.OriginX;
       ev.Floats['originY'] := APayload.OriginY;
     end;
-    { roamHelper: defaults({type}, extra), payloadDisableAnimation, then
-      `${mainType}Id` }
+    (* roamHelper: defaults({type}, extra), payloadDisableAnimation, then
+      `${mainType}Id` *)
     if FRoamEvSrc = 1 then
     begin
       anim := TJSONObject.Create;
@@ -3588,9 +3588,9 @@ begin
     Result.CrumbFill := col;
   if TyTryParseChartColor(TyStReadString([sNode], ['breadcrumb', 'itemStyle', 'textStyle', 'color'], has), col) and has then
     crumb.Colour := col;
-  { [R7-M] ITS WORDS ARE createTextStyle(textStyleModel, {text})
+  (* [R7-M] ITS WORDS ARE createTextStyle(textStyleModel, {text})
     (Breadcrumb.ts): the textStyle's box, sizes, rich, halo and shadow, a
-    free text in the crumb's ink [was: the colour only] }
+    free text in the crumb's ink [was: the colour only] *)
   crumbTs := nil;
   if sNode <> nil then
   begin
@@ -3936,12 +3936,12 @@ begin
     end;
   end;
 
-  { A NODE'S LABEL IS ITS NAME, and the graph is the only series here whose
+  (* A NODE'S LABEL IS ITS NAME, and the graph is the only series here whose
     default formatter says so: `label.formatter: '{b}'` is in its own
     defaultOption -- a TEMPLATE, so a name is read the way formatTpl reads it.
     Being a default, the option can take it away: `formatter: null` stays
     null through upstream's merge, and a node then shows what every other
-    series shows, its VALUE (on a cartesian graph, the value axis' column). }
+    series shows, its VALUE (on a cartesian graph, the value axis' column). *)
   Result.Label_ := LabelSpecFor(ASlot, '{b}');
   Result.Label_.DefaultText := tldValue;
   Result.SeriesName := SeriesModelName(FBindings[ASlot].SeriesIndex);

@@ -84,7 +84,7 @@ begin
   AStore.SetTooltipPositions(tip);
 end;
 
-{ A LINE'S END LABEL (LineView._initOrUpdateEndLabel and, for its place
+(* A LINE'S END LABEL (LineView._initOrUpdateEndLabel and, for its place
   and words, _endLabelOnDuring at percent 1 -- the call createLineClipPath
   makes to "set to the final frame"): on the last legal point, pushed
   `distance` along the base axis, aligned off it; the value as the words
@@ -93,7 +93,7 @@ end;
   label), and its tag carries what the clip's during needs.
   NOT HERE: a state's endLabel.show, a rich end label (one run), a step
   line's path (the unstepped one is walked), a line of one point (no run).
-  [Batch 92, AN4] }
+  [Batch 92, AN4] *)
 function TTyCustomAdvanceChart.BuildEndLabel(ASlot: Integer; const AVisual: TTySeriesVisual;
   const AMeasurer: ITyTextMeasurer; APPI: Integer; AList: TTyPaintList): Integer;
 var
@@ -373,8 +373,8 @@ begin
     slot := SlotOfSeries(ASeriesIndex);
     if (slot < 0) or (slot > High(FStores)) or (FStores[slot] = nil) then Exit;
     if not (FEndLbls[i].Spec.HasFormatter and TyChartIsHandlerRef(FEndLbls[i].Spec.Formatter)) then Exit;
-    { getFormattedLabel(dataIndex, 'normal', ..., {interpolatedValue}): the
-      last row's params, the value the interpolated one }
+    (* getFormattedLabel(dataIndex, 'normal', ..., {interpolatedValue}): the
+      last row's params, the value the interpolated one *)
     prm := TyLabelParams(FStores[slot], FEndLbls[i].Last, FEndLbls[i].Name,
       FEndLbls[i].ValueDim, NaN, False, ASeriesIndex, 'line', 0, '');
     if Length(prm.Values) > 0 then

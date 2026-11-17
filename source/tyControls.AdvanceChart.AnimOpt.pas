@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.AnimOpt;
 {$mode objfpc}{$H+}
-{ TTyAdvanceChart -- which animation an option asks for, and ECharts'
+(* TTyAdvanceChart -- which animation an option asks for, and ECharts'
   initProps / updateProps / removeElement over the engine. [Batch 87, AN1]
 
   WHERE A SETTING COMES FROM. Model.getShallow on the animatable model: the
@@ -45,7 +45,7 @@ unit tyControls.AdvanceChart.AnimOpt;
   DEVIATIONS (tiny): a STRING duration or delay is taken by Number() --
   upstream keeps the string, which for a delay concatenates onto the clock
   and freezes the clip at its start; an unregistered handler name is
-  not-a-number, so a duration handler that is missing means no animation. }
+  not-a-number, so a duration handler that is missing means no animation. *)
 interface
 uses SysUtils, Classes, Math, fpjson,
   tyControls.AdvanceChart.Anim;

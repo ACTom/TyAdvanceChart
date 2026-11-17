@@ -65,10 +65,10 @@ type
     DataName, DataIndex, DataType: TTyEventQueryValue;
   end;
 
-{ AQuery as written: '' (no query), a class type ('series.bar'), or a JSON
+(* AQuery as written: '' (no query), a class type ('series.bar'), or a JSON
   object ('{"seriesIndex": 1}'). A JSON text that does not parse, or nests
   deeper than TyOptionMaxNesting, is taken as a class type, as a string
-  would be. }
+  would be. *)
 function TyEventQueryOf(const AQuery: string): TTyEventQuery;
 
 { ECEventProcessor.filter }

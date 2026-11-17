@@ -321,14 +321,14 @@ type
     FontName: string;
     FontSizeLogical: Integer;
     FontWeight: Integer;
-    { THE TIME AXIS' `rich.primary`, from the skin: the weight (and the
+    (* THE TIME AXIS' `rich.primary`, from the skin: the weight (and the
       colour, where the skin gives one) its coarse ticks' `{primary|...}`
       tags are drawn in -- upstream's default is `fontWeight: 'bold'`. An
       author's axisLabel.rich.primary is laid over it. Resolved from the theme
       by the caller, like everything else in this record, because these are
       visual values and this library does not put those in control code.
       [Revised in batch 104: the weight of a whole label marked emphasised;
-      now the default of a rich style, so only the tagged part is heavier.] }
+      now the default of a rich style, so only the tagged part is heavier.] *)
     EmphasisFontWeight: Integer;
     HasEmphasisColour: Boolean;
     EmphasisColour: Cardinal;
@@ -1726,10 +1726,10 @@ begin
   SetLength(AAlongEach, Length(ASpec.Labels));
   for i := 0 to High(ASpec.Labels) do
   begin
-    { MEASURED AS IT WILL BE DRAWN: a time axis' `{primary|...}` part is
+    (* MEASURED AS IT WILL BE DRAWN: a time axis' `{primary|...}` part is
       bold, and the label meter lays the tags out in their own weight -- a
       label measured light and drawn bold is how an axis comes to overlap the
-      one thing the measuring was for. }
+      one thing the measuring was for. *)
     LabelMeterOf(ASpec, AMeasurer).MeasureLine(ASpec.Labels[i], ASpec.FontName,
       ASpec.FontSizeLogical, ASpec.FontWeight, w, h);
     RotatedExtent(w, h, ASpec.RotationRad, rw, rh);

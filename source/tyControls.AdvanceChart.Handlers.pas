@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.Handlers;
 {$mode objfpc}{$H+}
-{ Named handlers and template strings -- what a function-valued ECharts option
+(* Named handlers and template strings -- what a function-valued ECharts option
   becomes when the host cannot run JavaScript.
 
   THE PROBLEM. Roughly 1,212 nodes in the option schema accept a function, and
@@ -31,7 +31,7 @@ unit tyControls.AdvanceChart.Handlers;
   it now costs nothing; migrating it once handlers exist in user code is the
   most expensive kind of change to absorb.
 
-  LCL-free: SysUtils, Classes, Math and the AdvanceChart units. }
+  LCL-free: SysUtils, Classes, Math and the AdvanceChart units. *)
 interface
 uses
   SysUtils, Classes, Math, fpjson,
@@ -90,9 +90,9 @@ type
       the null every other axis passes. }
     Level: Integer;
     HasLevel: Boolean;
-    { THE VALUE AS JavaScript's String() PRINTS IT -- an array joined by
+    (* THE VALUE AS JavaScript's String() PRINTS IT -- an array joined by
       commas, 'undefined', 'null' -- which is what `{c}` and every upstream
-      function formatter that concatenates params.value would show. }
+      function formatter that concatenates params.value would show. *)
     ValueText: string;
     { AN EVENT'S params beyond a formatter's [Batch 84]: the component's
       subtype ('bar' for a bar series, '' where upstream has none) and index,
@@ -119,8 +119,8 @@ type
       JSON text (an empty object where the model map holds none); '' everywhere else.
       A geo event's geoIndex is its ComponentIndex. }
     Region: string;
-    { A TREEMAP BREADCRUMB ITEM'S eventData.nodeData [F2a]: {dataIndex,
-      name} as JSON text; '' everywhere else }
+    (* A TREEMAP BREADCRUMB ITEM'S eventData.nodeData [F2a]: {dataIndex,
+      name} as JSON text; '' everywhere else *)
     NodeData: string;
     { A BREAK'S END [F4a]: an axis label formatter's extra.break -- 'start'
       or 'end', and the break's two ends as the extent clamps them (on a log
@@ -130,10 +130,10 @@ type
       everywhere else. }
     BreakType: string;
     BreakStart, BreakEnd: Double;
-    { A SUNBURST'S OR A TREEMAP'S NODE [R2-E]: upstream's treePathInfo --
+    (* A SUNBURST'S OR A TREEMAP'S NODE [R2-E]: upstream's treePathInfo --
       every node from the virtual root down to this one, {name, dataIndex,
       value} -- as JSON text; '' everywhere else (the treemap's
-      treeAncestors is the same list) }
+      treeAncestors is the same list) *)
     TreePathInfo: string;
     { [R2-J3] A TOOLTIP FORMATTER'S params.marker: the richText marker
       upstream's TooltipMarkupStyleCreator writes -- an empty rich token of
@@ -473,13 +473,13 @@ function TyChartPosAbsent: TTyChartPosValue;
   "$'" what comes after. There are no groups, so '$1' stays as written. }
 function TyJsReplaceFirst(const ASubject, APattern, AReplacement: string): string;
 
-{ upstream's formatTpl. AVars[s] holds series s's texts in the order of the
+(* upstream's formatTpl. AVars[s] holds series s's texts in the order of the
   template letters a, b, c (and d when AVarCount is 4). First every bare
   letter token -- its first occurrence -- becomes the series-0 form, `{a}` to
   `{a0}`; then, for each series in turn, the first `{a0}`, `{b0}` ... of that
   series is replaced. Everything else stays as written: a second `{c}`, an
   `{e}`, an index past the series count, a `{d}` where there is no
-  percentage. }
+  percentage. *)
 function TyJsFormatTpl(const ATemplate: string; AVarCount: Integer;
   const AVars: array of TTyStringArray): string;
 

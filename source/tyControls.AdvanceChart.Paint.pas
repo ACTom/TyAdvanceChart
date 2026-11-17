@@ -446,9 +446,9 @@ type
     PaddingText: array[0..3] of string;
     HasBackground: Boolean;
     Background: TTyChartColor;
-    { [R2-F] backgroundColor: {image}: the picture's source ('' none) --
+    (* [R2-F] backgroundColor: {image}: the picture's source ('' none) --
       a ZRImage over the box, the box's own rect only for a lineHeight or a
-      border (Text.ts _renderBackground) }
+      border (Text.ts _renderBackground) *)
     BgImage: string;
     HasBorderColor: Boolean;
     BorderColor: TTyChartColor;
@@ -601,9 +601,9 @@ type
       out wholly at NaN stands as, where its TSpans are bounded, so the
       label layout and the pointer still find it }
     Placeholder: Boolean;
-    { [R2-F] a rect's picture (backgroundColor: {image}), drawn over the
+    (* [R2-F] a rect's picture (backgroundColor: {image}), drawn over the
       rect's border, at ImageOpacity: the style's opacity where the picture
-      is the box's only element, else zrender's own 1 }
+      is the box's only element, else zrender's own 1 *)
     Image: string;
     ImageOpacity: Double;
     Text: string;

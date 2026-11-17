@@ -45,10 +45,10 @@ type
 
 { Anchor enums -> the LCL's, for handing a placement to DrawTextRotated. }
 function TyAnchorToAlignment(A: TTyTextAnchorH): TAlignment;
-{ A chart text as it is MEASURED AND DRAWN: without its NULs. An unnamed
+(* A chart text as it is MEASURED AND DRAWN: without its NULs. An unnamed
   series is `series#0<index>` -- upstream's auto name, which `{a}` prints and
   the text keeps -- and a NUL handed to a text API that takes a PChar ends the
-  string there. A browser draws it as nothing, and so does this. }
+  string there. A browser draws it as nothing, and so does this. *)
 function TyInkText(const AText: string): string;
 function TyAnchorToLayout(A: TTyTextAnchorV): TTextLayout;
 

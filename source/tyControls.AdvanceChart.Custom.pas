@@ -998,10 +998,10 @@ begin
     or (AShape.IndexOfName('d') >= 0));
 end;
 
-{ [R2-J] createEl's 'path': graphicUtil.makePath(pathData, null, pathRect,
+(* [R2-J] createEl's 'path': graphicUtil.makePath(pathData, null, pathRect,
   shape.layout || 'center') -- the path data parsed, and fitted into the
   rect {x || 0, y || 0, width, height} when both sizes are written (the
-  'center' layout keeping its aspect, any other stretching it) }
+  'center' layout keeping its aspect, any other stretching it) *)
 function CuMakeSvgPath(AShape: TJSONObject; out APathData: string): TTyGfxEl;
 var
   x, y: Double;

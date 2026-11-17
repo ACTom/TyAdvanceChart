@@ -4032,12 +4032,12 @@ begin
       Result.RowLineDashOffset[k] := os.DashOffset;
     end;
   end;
-  { AN AREA ONLY WHEN THE AUTHOR ASKED FOR ONE, and `areaStyle: {}` counts as
+  (* AN AREA ONLY WHEN THE AUTHOR ASKED FOR ONE, and `areaStyle: {}` counts as
     asking -- upstream's test is whether the option object exists at all, not
     whether it has anything in it. That is why an empty object is the documented
     way to fill a radar. [R7-U] Whether the series' own option has one
     (isEmpty); its keys climb to the root's (getAreaStyle), an item's area
-    over them too. }
+    over them too. *)
   Result.HasArea := FOption.SeriesOwnStyle(FBindings[ASlot].SeriesIndex).Find('areaStyle') is TJSONObject;
   Result.Area := Result.Fill;
   d := node.Find('areaStyle');
@@ -4323,10 +4323,10 @@ begin
       and FDatumAsked[ASlot][k] then
       Result[k] := TTyChartColor(PickColor(FDatumPicks[ASlot][k]));
   end;
-  { AND A DATUM THAT NAMED ITS OWN COLOUR KEEPS IT. `data: [{ value: 5,
+  (* AND A DATUM THAT NAMED ITS OWN COLOUR KEEPS IT. `data: [{ value: 5,
     itemStyle: { color: '#c23531' } }]` is the commonest thing anybody writes
     on either chart, and it beats the ramp -- the same rule a bar follows,
-    reached through the same parked override. }
+    reached through the same parked override. *)
   for k := 0 to rawN - 1 do
     if FStores[ASlot].HasOverrideByRaw(k, TyOverrideKey('itemStyle.color')) then
     begin
@@ -4349,14 +4349,14 @@ var
   ov: TTyDataValue;
 begin
   Result := TyPieVisual(0);
-  { colorBy:''data''. Each SECTOR takes the next slot of the same nine-colour
+  (* colorBy:''data''. Each SECTOR takes the next slot of the same nine-colour
     ramp a bar series cycles across series -- which is what makes a pie read
     at all, and what makes it re-skin with the accent like everything else.
 
     A SLICE THAT NAMED ITS OWN COLOUR KEEPS IT. `data: [{ value: 5,
     itemStyle: { color: ''#c23531'' } }]` is the commonest thing anybody
     writes on a pie, and it beats the ramp -- the same rule a bar follows,
-    reached through the same parked override. }
+    reached through the same parked override. *)
   { ONE COLOUR PER RAW ROW, TAKEN IN RAW ORDER, before a single sector is
     looked at. A slice that was filtered out -- a negative value, a legend
     click -- still consumes its slot, which is the only way the surviving

@@ -100,12 +100,12 @@ function TyRtLayAt(const AText: string; const ABlock: TTyRtBlockStyle;
   const ADefault: TTyRtDefault; ABaseX, ABaseY, AScale: Double;
   const AMeasurer: ITyTextMeasurer): TTyRtPieceArray;
 
-{ [R7-H] THE PIECES OF A TEXT UPSTREAM PLACES BY ITS STYLE'S x / y (a
+(* [R7-H] THE PIECES OF A TEXT UPSTREAM PLACES BY ITS STYLE'S x / y (a
   gauge's words: `createTextStyle(model, {x, y, ...})`), laid out at that
   place (AHangX / AHangY, CSS px) and moved back to hang about it. zrender
   joins a size written as a string to the place it lays the box out at
   (x + '600'), so the place is upstream's, not (0, 0). A style with no such
-  size is TyRtLay's. }
+  size is TyRtLay's. *)
 function TyRtLayHung(const AText: string; const ABlock: TTyRtBlockStyle;
   const ADefault: TTyRtDefault; AHangX, AHangY, AScale: Double;
   const AMeasurer: ITyTextMeasurer): TTyRtPieceArray;
@@ -1000,7 +1000,7 @@ begin
       end;
     end;
     SpreadRadius(Get(AOwn, 'borderRadius'), S);
-    { [R2-F] backgroundColor: {image: src}: a picture (isImageBg) }
+    (* [R2-F] backgroundColor: {image: src}: a picture (isImageBg) *)
     d := Get(AOwn, 'backgroundColor');
     if (d is TJSONObject) and (TJSONObject(d).Find('image') <> nil)
       and (TJSONObject(d).Find('image').JSONType = jtString)

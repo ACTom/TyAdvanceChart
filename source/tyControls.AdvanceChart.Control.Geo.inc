@@ -1358,9 +1358,9 @@ begin
         end;
       if found then Continue;
       r := AStore.AppendRow([NaN]);
-      { [spec 242] appendData's {name} items: a dataset's rows provider
+      (* [spec 242] appendData's {name} items: a dataset's rows provider
         reads them by column, so they come out with no name (and the
-        region keeps no row) }
+        region keeps no row) *)
       if not fromDataset then AStore.SetName(r, nm);
     end;
   finally
@@ -1619,11 +1619,11 @@ begin
       if raw < cnt then item := TJSONArray(data).Items[raw];
       if item is TJSONObject then opt := TJSONObject(item.Clone)
       else if raw >= cnt then opt := TJSONObject.Create(['name', nm]);
-      { [spec 244] getInitialData: a data item of the name takes the style of
+      (* [spec 244] getInitialData: a data item of the name takes the style of
         EVERY region of it, in turn and not overwriting (the first region's
         keys win); an appended item is one region's own -- each region the
         data does not name appends its own {name} item, and the name finds
-        the first of them }
+        the first of them *)
       if (opt <> nil) and (AGeo.Source <> nil) then
       begin
         app := -1;

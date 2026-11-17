@@ -234,11 +234,11 @@ begin
     Exit(TyTooltipSpecOf(FOption, -1, -1));
   { [R2-I8] the content, encodeHTML'd in html mode (setTooltipConfig) }
   Result := TyTooltipSpecOfItem(FOption, mainT, idx, nil, TipContentName(nm));
-  { the axis' defaults: `tooltip: {show: false}` under what it writes -- a
+  (* the axis' defaults: `tooltip: {show: false}` under what it writes -- a
     show it does not write is false, before the global's is asked (a null
     one is no value, and the global's stands) -- [R7-I] a single axis'
     `{show: true}`; a radar's model has no tooltip default at all, so the
-    global's show stands }
+    global's show stands *)
   AxisTextNode(ADatum, node, showDef);
   if showDef = 2 then Exit;
   tip := nil;
@@ -587,11 +587,11 @@ begin
     Result := FOption.ComponentAt('geo', b.GeoIndex);
 end;
 
-{ [R5-D] THE PROXY'S CASCADE (_showComponentItemTooltip over the proxy
+(* [R5-D] THE PROXY'S CASCADE (_showComponentItemTooltip over the proxy
   rect's tooltipConfig {name: null, option: payload.tooltip}): the option
   -- a string is {content: it, formatter: it} --, no component (its main
   type is none), {formatter: option.content} -- skipped when there is no
-  content, so the global formatter is reached --, the global component. }
+  content, so the global formatter is reached --, the global component. *)
 function TTyCustomAdvanceChart.TipProxySpec(const AJson: string): TTyTooltipSpec;
 var
   d: TJSONData;
@@ -632,10 +632,10 @@ begin
   end;
 end;
 
-{ [R5-D] A TOOLBOX ICON'S CASCADE (_showComponentItemTooltip over the
+(* [R5-D] A TOOLBOX ICON'S CASCADE (_showComponentItemTooltip over the
   icon's tooltipConfig: content the icon's name): the toolbox's `tooltip`
   over its model's default {show: false, position: 'bottom'}, then
-  {formatter: the name}, then the global component }
+  {formatter: the name}, then the global component *)
 function TTyCustomAdvanceChart.TipTbSpec(ATb, AIcon: Integer): TTyTooltipSpec;
 var
   n, tt: TJSONData;
@@ -707,9 +707,9 @@ begin
   Result := True;
 end;
 
-{ its cascade (_showComponentItemTooltip): the item's own tooltip option,
+(* its cascade (_showComponentItemTooltip): the item's own tooltip option,
   the legend's tooltip (over its model's default {show: false}), then
-  {formatter: the name}, over the global component }
+  {formatter: the name}, over the global component *)
 function TTyCustomAdvanceChart.TipLgSpec(ALegend, AItem: Integer): TTyTooltipSpec;
 var
   n, tt, it: TJSONData;
@@ -750,8 +750,8 @@ begin
   end;
 end;
 
-{ its text: formatTpl over the params' $vars [name] -- `{a}` the name,
-  encodeHTML'd, the first only }
+(* its text: formatTpl over the params' $vars [name] -- `{a}` the name,
+  encodeHTML'd, the first only *)
 function TTyCustomAdvanceChart.TipLgText(ALegend, AItem: Integer;
   const ASpec: TTyTooltipSpec): string;
 var
@@ -769,9 +769,9 @@ begin
   if p > 0 then Result := Copy(Result, 1, p - 1) + TyChartEncodeHtml(nm) + Copy(Result, p + 4, MaxInt);
 end;
 
-{ its text: formatTpl over the params' $vars [name, title] -- `{a}` the
+(* its text: formatTpl over the params' $vars [name, title] -- `{a}` the
   icon's name, `{b}` its title, each value encodeHTML'd, the first of each
-  only (String.replace) }
+  only (String.replace) *)
 function TTyCustomAdvanceChart.TipTbText(ATb, AIcon: Integer;
   const ASpec: TTyTooltipSpec): string;
 var
@@ -1158,10 +1158,10 @@ begin
   Result.Name := st.GetItemName(ADatum.DataIndex);
   Result.Raw := st.RawItem(ADatum.DataIndex);
 
-  { THE d LETTER, which only a pie and a funnel have: the pie's seats (the
+  (* THE d LETTER, which only a pie and a funnel have: the pie's seats (the
     largest-remainder shares, to percentPrecision) and the funnel's two-place
     share, both over the slices there are. Everywhere else `{d}` is no
-    letter at all and a template leaves it as written. }
+    letter at all and a template leaves it as written. *)
   if (Result.SeriesType = TyPieSeriesTypeName) and (slot <= High(FPies)) then
   begin
     Result.HasPercent := True;
@@ -2049,9 +2049,9 @@ begin
       An axis stepping by twenty labels its pointer 37.25 and one stepping by
       one 3.00. It was the step's own decimals, unpadded, and read 37 and 3. }
     Result := TyScaleValueLabel(AAxis.Scale, AValue, TyLabelPrecision(lpAuto));
-  { FIRST OCCURRENCE ONLY, which is upstream's `.replace('{value}', text)` --
+  (* FIRST OCCURRENCE ONLY, which is upstream's `.replace('{value}', text)` --
     a plain string pattern, not a global one. An empty formatter was never
-    taken, as upstream ignores a falsy one. }
+    taken, as upstream ignores a falsy one. *)
   if ALabel.HasFormatter then
     Result := StringReplace(ALabel.Formatter, '{value}', Result, []);
 end;
@@ -3059,7 +3059,7 @@ begin
   SetLength(Result, n);
 end;
 
-{ [R7-N] buildLabelElOption's style: createTextStyle(labelModel, {text, font,
+(* [R7-N] buildLabelElOption's style: createTextStyle(labelModel, {text, font,
   fill: getTextColor(), padding, backgroundColor}) -- every key of the label
   model (LabelSpec.Json: the axis' own label over the tooltip's over the
   root's) and the root textStyle's under it, as any free text takes them,
@@ -3067,7 +3067,7 @@ end;
   where nothing is written -- the ink, the padding, the plate, its radius,
   the font -- is the skin's (TyAdvChartAxisPointerLabel); a border the label
   does not write is the skin's too (upstream's default is none). The font
-  is getFont's: the label's parts, the root textStyle's, the skin's. }
+  is getFont's: the label's parts, the root textStyle's, the skin's. *)
 function TTyCustomAdvanceChart.PtrLabelStyle(const AHit: TTyAxisHit;
   APPI: Integer): TTyPtrLabel;
 var
@@ -5430,12 +5430,12 @@ var
   ev, ax, tip: TJSONObject;
   done: array of Boolean;
 
-  { [R5-D] dispatchHighDownActually: every shown axis whose model says
+  (* [R5-D] dispatchHighDownActually: every shown axis whose model says
     triggerEmphasis gives its rows (seriesIndex|dataIndex, the first keeps
     its place), in the axisPointer model's order; what the last call lit
     and this one does not is downplayed, then what is new is highlighted --
     {type, escapeConnect, notBlur, batch [{seriesIndex, dataIndex}]}
-    through api.dispatchAction, so they wait for this action to finish }
+    through api.dispatchAction, so they wait for this action to finish *)
   procedure HighDown(const AOrder: TTyAxisArray);
   var
     ns, nd: TTyIntegerArray;
@@ -7805,10 +7805,10 @@ begin
         OvStep(e, 60, 0);
         ALines[i].Runs[j].Colour := e.Style.FillColor;
         CompDrew(nil, 'tooltip0', 0, 0, False, e);
-        { [R7-AG] AND THE TWO SPACES after the token (getTooltipMarker's
+        (* [R7-AG] AND THE TWO SPACES after the token (getTooltipMarker's
           '{marker|}  '): a plain span in the Text's own fill and shadow and
           zrender's default font, 12px sans-serif -- a refused font after it
-          is that one }
+          is that one *)
         e := Default(TTyChartElement);
         e.Style.Alpha := 1;
         e.Caption.FontName := 'sans-serif';
@@ -8060,9 +8060,9 @@ begin
         dflt.Free;
       end;
       SetLength(params, 1);
-      { A FORMATTER UNDER AN AXIS TRIGGER IS GIVEN EVERY SERIES, in the order
+      (* A FORMATTER UNDER AN AXIS TRIGGER IS GIVEN EVERY SERIES, in the order
         the sections hold them -- which is what makes `{a1}` and `{c2}` mean
-        anything at all. }
+        anything at all. *)
       if onAxis then params := AxisTooltipParams(snap.Hits)
       else params[0] := TooltipParams(snap.Datum);
       if Length(params) = 0 then Exit;
@@ -8093,12 +8093,12 @@ begin
           mkColours[High(mkColours)] := params[k].Color;
         end;
       fmtText := spec.Formatter;
-      { A TEMPLATE UNDER A TIME AXIS IS A TIME TEMPLATE FIRST: TooltipView
+      (* A TEMPLATE UNDER A TIME AXIS IS A TIME TEMPLATE FIRST: TooltipView
         runs the string through util/time.ts format at the first series'
         axis value before formatTpl sees it -- so `{a}` there is am / pm and
         `{d}` the day, never the series name or the percent. Only an axis
         trigger's params carry an axis type, and only an axis trigger has
-        sections to walk: an item tooltip is left alone. [Batch 104] }
+        sections to walk: an item tooltip is left alone. [Batch 104] *)
       if not TyChartIsHandlerRef(fmtText) then
         for k := 0 to High(snap.Hits) do
         begin
