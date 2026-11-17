@@ -101,7 +101,7 @@ uses
   test.advchart.builtinthemes, test.advchart.themelint, test.advchart.danglingrefs,
   test.advchart.componentleaks, test.advchart.freewhileownerlives, test.advchart.wheelevents,
   test.advchart.measurefont, test.advchart.paletteicons, test.advchart.dpicontrols,
-  test.advchart.runnerstate;
+  test.advchart.runnerstate, test.pascalscan, test.advchart.delphisyntax;
 
 type
   TTyTestRunner = class(TTestRunner)
