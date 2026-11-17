@@ -49,6 +49,7 @@ type
     procedure TestFpcOnlyNames;
     procedure TestFloatCastOperands;
     procedure TestFinalizationHasInitialization;
+    procedure TestOptionLinksLazUtf8;
   end;
 
 implementation
@@ -773,7 +774,8 @@ begin
     'TThread.GetTickCount64; for TryStrToQWord TryStrToUInt64; for TryStrToDWord TryStrToUInt; ' +
     'for Floor64 and Ceil64 TyFloor64 and TyCeil64; for GetLocalTimeOffset TyLocalTimeOffsetMinutes; ' +
     'for UTF8Decode TyJsUnits; for UTF8Encode TyFromJsUnits; for UnicodeToUTF8 TyCodePointStr; ' +
-    'for IndexByte over a string Pos; no LazUTF8 in uses: tyControls.AdvanceChart.NativeStr)',
+    'for IndexByte over a string Pos; no LazUTF8 in uses but Option''s {$IFDEF FPC} line: ' +
+    'tyControls.AdvanceChart.NativeStr)',
     ['DefaultFormatSettings', 'LineEnding', 'SarLongint', 'StrToQWord', 'TStringArray', 'TArray',
     'TFPList', 'GetTickCount64', 'TryStrToQWord', 'TryStrToDWord', 'Floor64', 'Ceil64',
     'GetLocalTimeOffset', 'UTF8Decode', 'UTF8Encode', 'UnicodeToUTF8', 'IndexByte', 'LazUTF8'],
@@ -935,6 +937,48 @@ begin
   finally
     w.Free;
   end;
+end;
+
+{ Option links LazUTF8 under FPC for its initialization, which sets the RTL's code page to UTF-8:
+  nothing else in source/ does, and a program without the LCL would run with the ANSI code page.
+  TestFpcOnlyNames keeps the name out of every other line. }
+procedure TAdvChartDelphiSyntaxTest.TestOptionLinksLazUtf8;
+const
+  Why = 'Option links LazUTF8 under FPC for its initialization, which makes UTF-8 the RTL''s code ' +
+    'page (the chart''s strings are UTF-8 under FPC) also in a program without the LCL; nothing ' +
+    'else in source/ does. Write it once, as {$IFDEF FPC}LazUTF8,{$ENDIF} on one line';
+var
+  f: TSourceFile;
+  i, j, n, found, ln: Integer;
+begin
+  Load;
+  f := nil;
+  for i := 0 to Files.Count - 1 do
+    if Lower(FileAt(i).Name) = 'tycontrols.advancechart.option.pas' then
+      f := FileAt(i);
+  AssertTrue('tyControls.AdvanceChart.Option.pas not found under source/', f <> nil);
+  found := 0;
+  ln := 0;
+  n := Length(f.Code);
+  i := 1;
+  while i <= n do
+    if IsIdentChar(f.Code[i]) then
+    begin
+      j := i;
+      while (j <= n) and IsIdentChar(f.Code[j]) do
+        Inc(j);
+      if Lower(Copy(f.Code, i, j - i)) = 'lazutf8' then
+      begin
+        Inc(found);
+        ln := LineOf(f, i);
+      end;
+      i := j;
+    end
+    else
+      Inc(i);
+  AssertEquals('LazUTF8 in the code of tyControls.AdvanceChart.Option.pas. ' + Why, 1, found);
+  AssertTrue('LazUTF8 on line ' + IntToStr(ln) + ' of tyControls.AdvanceChart.Option.pas, a line ' +
+    'without {$IFDEF FPC} (Delphi has no LazUTF8). ' + Why, LineHasIfdefFpc(f, ln));
 end;
 
 initialization

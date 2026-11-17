@@ -21,7 +21,8 @@ uses SysUtils;
 { S as JavaScript sees it: a string of UTF-16 code units. Upstream counts
   its length and indexes it in these units. }
 function TyJsUnits(const S: string): UnicodeString;
-{ The reverse of TyJsUnits. }
+{ The reverse of TyJsUnits, except for an unpaired surrogate: under FPC it is
+  dropped (UTF8Encode's behaviour), under Delphi it is kept. }
 function TyFromJsUnits(const U: UnicodeString): string;
 { The string of one code point. ACode is not checked: a caller that may
   hold an invalid code point deals with it first. }

@@ -94,9 +94,9 @@ type
   end;
 
   { Where a text box sits on the anchor it is placed at. Deliberately NOT LCL's
-    TAlignment/TTextLayout: those live in Classes/Graphics, and pulling either in
-    would end this unit's independence from the LCL. The bridge that talks to the
-    painter converts. }
+    TAlignment/TTextLayout: those are the LCL's vocabulary, and TTextLayout lives
+    in Graphics, an LCL unit -- pulling it in would end this unit's independence
+    from the LCL. The bridge that talks to the painter converts. }
   TTyTextAnchorH = (tahLeft, tahCentre, tahRight);
   TTyTextAnchorV = (tavTop, tavMiddle, tavBottom);
 

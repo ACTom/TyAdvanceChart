@@ -354,9 +354,12 @@ procedure TyJsonFastForTest(AOn: Boolean);
 implementation
 
 uses
-  { Only for the diagnostic resourcestrings; kept out of the interface uses so
-    the dependency stays one-way and invisible to hosts. }
-  tyControls.AdvanceChart.StrConsts, Math, tyControls.FontUnits,
+  { StrConsts only for the diagnostic resourcestrings; kept out of the interface
+    uses so the dependency stays one-way and invisible to hosts. LazUTF8 is
+    linked for its initialization, which makes UTF-8 the RTL's code page (the
+    chart's strings are UTF-8 under FPC) also in a program that does not use
+    the LCL. }
+  tyControls.AdvanceChart.StrConsts, {$IFDEF FPC}LazUTF8,{$ENDIF} Math, tyControls.FontUnits,
   tyControls.AdvanceChart.Scale, tyControls.AdvanceChart.Data,
   tyControls.AdvanceChart.BackwardCompat, tyControls.AdvanceChart.NativeStr;
 
