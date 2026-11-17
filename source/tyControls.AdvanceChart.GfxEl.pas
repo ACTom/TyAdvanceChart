@@ -3306,7 +3306,7 @@ begin
         if hasStroke and (AOut.ZrHit.LineScale > 1e-10) and not IsInfinite(lw) then
         begin
           if hasFill then AOut.ZrHit.LineWidth := Max(lw, 0) / AOut.ZrHit.LineScale
-          else AOut.ZrHit.LineWidth := Max(lw, Double(5)) / AOut.ZrHit.LineScale;
+          else AOut.ZrHit.LineWidth := Max(lw, Double(5.0)) / AOut.ZrHit.LineScale;
           AOut.ZrHit.Box := TyGrowByStroke(AOut.ZrHit.PathBox, True, AOut.ZrHit.LineWidth);
         end
         else AOut.ZrHit.Stroke := False;

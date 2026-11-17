@@ -239,7 +239,7 @@ procedure TyFadeOutElement(AEl: TTyAnimElement; const AModel: TTyAnimModel;
 
 implementation
 
-uses tyControls.AdvanceChart.Data;
+uses tyControls.AdvanceChart.Data, tyControls.AdvanceChart.Types;
 
 type
   TTimingEntry = record
@@ -696,7 +696,7 @@ begin
   { count() > animationThreshold: strictly greater, and a comparison with
     not-a-number is false }
   if Result and AModel.IsSeries then
-    if Double(AModel.DataCount) > OptToNumber(TyAnimGetShallow(AModel, 'animationThreshold')) then
+    if TyIntToDouble(AModel.DataCount) > OptToNumber(TyAnimGetShallow(AModel, 'animationThreshold')) then
       Result := False;
   if Result and AModel.IsSeries and (AModel.TypeKey = 'graph') and GraphForceAnimates(AModel.Own) then
     Result := False;

@@ -1118,7 +1118,7 @@ begin
         { CLAMPED BEFORE IT IS MULTIPLIED. 1e308 degrees times Pi/180 is an
           overflow, and the paint layer would carry the infinity into every
           coordinate. }
-        Result.AxisLabel.RotateDeg := Max(Double(-360), Min(Double(360),
+        Result.AxisLabel.RotateDeg := Max(Double(-360.0), Min(Double(360.0),
           d.AsFloat));
       end;
     end;
@@ -1379,7 +1379,7 @@ begin
   begin
     frac := ASpec.AxisLine.Stops[High(ASpec.AxisLine.Stops)].Frac;
     if IsNan(frac) then frac := 0;
-    frac := Max(Double(0), Min(Double(1), frac));
+    frac := Max(Double(0.0), Min(Double(1.0), frac));
     Result.BandEndRad := startA + Result.Span * frac;
   end;
   Result.Valid := True;
@@ -1592,7 +1592,7 @@ function BandElement(const ALayout: TTyGaugeLayout; AFrom, ATo: Double;
   AFill: TTyChartColor; AZ: Integer; ARound: Boolean): TTyChartElement;
 begin
   Result := TyChartElement(TyShapeSector(ALayout.CX, ALayout.CY,
-    Max(Double(0), ALayout.R - ALayout.AxisWidth), ALayout.R, AFrom, ATo));
+    Max(Double(0.0), ALayout.R - ALayout.AxisWidth), ALayout.R, AFrom, ATo));
   Result.Shape.Sausage := ARound;
   Result.Style.HasFill := True;
   Result.Style.FillColor := AFill;
@@ -1742,7 +1742,7 @@ begin
       begin
         frac := ASpec.AxisLine.Stops[i].Frac;
         if IsNan(frac) then frac := 0;
-        frac := Max(Double(0), Min(Double(1), frac));
+        frac := Max(Double(0.0), Min(Double(1.0), frac));
         endA := ALayout.StartRad + ALayout.Span * frac;
         if Abs(endA - prevEnd) > cSweepEps then
         begin
@@ -2566,7 +2566,7 @@ begin
         and (r1 > 0) then
       begin
         el := TyChartElement(TyShapeSector(ALayout.CX, ALayout.CY,
-          Max(Double(0), r0), r1, ALayout.StartRad, endA));
+          Max(Double(0.0), r0), r1, ALayout.StartRad, endA));
         el.Style.HasFill := True;
         { [R7-D] progress.itemStyle's, the item's over the series' }
         if it.ProgressHasColour then el.Style.FillColor := it.ProgressColour
@@ -2592,7 +2592,7 @@ begin
         el.Anim.Index := k;
         el.Anim.G[0] := ALayout.CX;
         el.Anim.G[1] := ALayout.CY;
-        el.Anim.G[2] := Max(Double(0), r0);
+        el.Anim.G[2] := Max(Double(0.0), r0);
         el.Anim.G[3] := r1;
         el.Anim.G[4] := ALayout.StartRad;
         el.Anim.G[5] := endA;

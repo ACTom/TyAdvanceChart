@@ -1089,7 +1089,7 @@ begin
           AVisual.StrokeWidthLogical * AVisual.PxScale);
     end;
     if (i <= High(AVisual.Alphas)) and not IsNan(AVisual.Alphas[i]) then
-      el.Style.Alpha := Min(Double(1), Max(Double(0), AVisual.Alphas[i]));
+      el.Style.Alpha := Min(Double(1.0), Max(Double(0.0), AVisual.Alphas[i]));
     el.Z := AVisual.Z;
     el.Z2 := AVisual.Z2;
     el.Silent := False;

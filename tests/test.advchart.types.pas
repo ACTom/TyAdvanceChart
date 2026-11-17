@@ -17,6 +17,7 @@ type
     procedure TestInvalidRectIsNotValid;
     procedure TestValidRectIsValid;
     procedure TestRectWithNaNIsNotValid;
+    procedure TestIntToDouble;
   end;
 implementation
 
@@ -109,6 +110,16 @@ begin
   r := TyRectF(0, 0, 10, 10);
   r.Right := NaN;
   AssertFalse('NaN edge', TyRectFIsValid(r));
+end;
+
+procedure TAdvChartTypesTest.TestIntToDouble;
+begin
+  AssertTrue(TyIntToDouble(0) = 0.0);
+  AssertTrue(TyIntToDouble(1) / 3 = Double(1.0) / 3);
+  AssertTrue(TyIntToDouble(-360) = -360.0);
+  AssertTrue(TyIntToDouble(High(Integer)) = 2147483647.0);
+  AssertTrue(TyIntToDouble(Int64(9007199254740993)) = 9007199254740992.0);  // 2^53 + 1 rounds to even
+  AssertTrue(TyIntToDouble(Low(Int64)) = -9223372036854775808.0);
 end;
 
 initialization

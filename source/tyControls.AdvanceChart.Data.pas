@@ -1383,7 +1383,7 @@ begin
   t := time_t(Trunc(s));
   FillChar(tm, SizeOf(tm), 0);
   if ty_localtime_r(@t, @tm) = nil then Exit;
-  AOffset := Double(tm.tm_gmtoff) * 1000;
+  AOffset := TyIntToDouble(tm.tm_gmtoff) * 1000;
   Result := True;
 end;
 {$ELSE}

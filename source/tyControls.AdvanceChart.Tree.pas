@@ -1330,7 +1330,7 @@ begin
         AEl.Shape.Cmds[k].X2, AEl.Shape.Cmds[k].Y2, AEl.Shape.Cmds[k].X,
         AEl.Shape.Cmds[k].Y);
     end;
-  lw := Math.Max(AEl.Style.StrokeWidthLogical, Double(5));
+  lw := Math.Max(AEl.Style.StrokeWidthLogical, Double(5.0));
   AEl.HitSlopLogical := lw / 2;
   if Length(zp) = 0 then Exit;
   lw := lw * AScale;

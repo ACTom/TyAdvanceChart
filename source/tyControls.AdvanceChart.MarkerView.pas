@@ -2194,7 +2194,7 @@ begin
       { THE POINTER'S RIBBON: zrender's Path.contain widens a stroke with no
         fill to its strokeContainThreshold, 5 -- a 1 px line is hit within
         2.5 px of it, not only on it }
-      el.HitSlopLogical := Math.Max(APics[i].LineWidth, Double(5)) / 2;
+      el.HitSlopLogical := Math.Max(APics[i].LineWidth, Double(5.0)) / 2;
       AList.Add(el);
       Inc(Result);
       TagLast(first, carMarkLine, APics[i]);

@@ -422,7 +422,7 @@ begin
   begin
     d := lbl.Find('margin');
     if d.JSONType = jtNumber then
-      ASpec.MarginLogical := Max(Double(0), Min(Double(400), d.AsFloat));
+      ASpec.MarginLogical := Max(Double(0.0), Min(Double(400.0), d.AsFloat));
   end;
   if Claim(lbl, 'color', ASeen, 'label.') then
   begin
@@ -473,7 +473,7 @@ begin
     if d.JSONType = jtNumber then
     begin
       ASpec.HasBorderWidth := True;
-      ASpec.BorderWidthLogical := Max(Double(0), Min(Double(64), d.AsFloat));
+      ASpec.BorderWidthLogical := Max(Double(0.0), Min(Double(64.0), d.AsFloat));
     end;
   end;
   if Claim(lbl, 'borderRadius', ASeen, 'label.') then
@@ -482,7 +482,7 @@ begin
     if d.JSONType = jtNumber then
     begin
       ASpec.HasBorderRadius := True;
-      ASpec.BorderRadiusLogical := Max(Double(0), Min(Double(256), d.AsFloat));
+      ASpec.BorderRadiusLogical := Max(Double(0.0), Min(Double(256.0), d.AsFloat));
     end;
   end;
   if Claim(lbl, 'padding', ASeen, 'label.') then
@@ -685,7 +685,7 @@ begin
       else if not IsNan(st.BorderWidthLogical) then
       begin
         ASpec.HasLineWidth := True;
-        ASpec.LineWidthLogical := Max(Double(0), Min(Double(64),
+        ASpec.LineWidthLogical := Max(Double(0.0), Min(Double(64.0),
           st.BorderWidthLogical));
       end;
       Break;

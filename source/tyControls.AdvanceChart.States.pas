@@ -1268,7 +1268,7 @@ begin
   p[High(p)] := 'opacity';
   dd := TyStFind(ANodes, p);
   Result := (dd <> nil) and (dd.JSONType = jtNumber) and not IsNan(dd.AsFloat);
-  if Result then AStyle.Alpha := Min(Double(1), Max(Double(0), dd.AsFloat));
+  if Result then AStyle.Alpha := Min(Double(1.0), Max(Double(0.0), dd.AsFloat));
 end;
 
 function TyStReadShadow(const ANodes: array of TJSONObject; const APath,

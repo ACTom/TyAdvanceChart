@@ -464,7 +464,7 @@ begin
     { `labelRotate *= Math.PI / 180`: the factor first [Batch 103: it was
       (r * Pi) / 180, an ulp off] }
     Result.RotationRad :=
-      Max(Double(-360), Min(Double(360), d.AsFloat)) * (Pi / 180);
+      Max(Double(-360.0), Min(Double(360.0), d.AsFloat)) * (Pi / 180);
 
   { align / verticalAlign (baseline its old name), normalised as zrender's
     Text normalizeStyle does }
@@ -733,7 +733,7 @@ begin
     if (d <> nil) and (d.JSONType = jtNumber) then
     begin
       c.HasRotation := True;
-      c.RotationRad := Max(Double(-360), Min(Double(360), d.AsFloat)) * (Pi / 180);
+      c.RotationRad := Max(Double(-360.0), Min(Double(360.0), d.AsFloat)) * (Pi / 180);
     end;
     ASpec.StateCfg[k] := c;
   end;

@@ -866,7 +866,7 @@ begin
   r := ARadius - ACR;
   sgn := x11 * y10 - x10 * y11;
   if dy < 0 then d := -1 else d := 1;
-  d := d * Sqrt(Max(Double(0), r * r * d2 - sgn * sgn));
+  d := d * Sqrt(Max(Double(0.0), r * r * d2 - sgn * sgn));
   cx0 := (sgn * dy - dx * d) / d2;
   cy0 := (-sgn * dx - dy * d) / d2;
   cx1 := (sgn * dy + dx * d) / d2;
@@ -936,8 +936,8 @@ begin
   n := 0;
   if AShape.Kind <> cskSector then Exit;
 
-  radius := Max(Double(0), AShape.R1);
-  innerRadius := Max(Double(0), AShape.R0);
+  radius := Max(Double(0.0), AShape.R1);
+  innerRadius := Max(Double(0.0), AShape.R0);
   if (radius <= 0) and (innerRadius <= 0) then Exit;
   { UNREACHABLE THROUGH TyShapeSector, which orders the two radii, so a zero
     outer radius means a zero inner one and the line above has already

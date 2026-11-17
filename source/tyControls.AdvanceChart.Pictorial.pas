@@ -342,7 +342,7 @@ begin
     overflows, and the infinity reaches every coordinate of the glyph. }
   v := NumIn(node, 'symbolRotate', 0);
   if IsNan(v) then v := 0;
-  Result.RotateDeg := Max(Double(-360), Min(Double(360), v));
+  Result.RotateDeg := Max(Double(-360.0), Min(Double(360.0), v));
 
   { THREE WORDS AND A CATCH-ALL, and the catch-all is NOT the default.
     The read is `get('symbolPosition') || 'start'` and the branch that
@@ -557,7 +557,7 @@ begin
 
   s := RowText(AStore, ARow, TyOverrideKey('symbolRotate'));
   if (s <> '') and NumOf(s, v) and not IsNan(v) then
-    Result.RotateDeg := Max(Double(-360), Min(Double(360), v));
+    Result.RotateDeg := Max(Double(-360.0), Min(Double(360.0), v));
 
   s := RowText(AStore, ARow, TyOverrideKey('symbolPosition'));
   if s <> '' then
@@ -665,7 +665,7 @@ var
   n: Integer;
 begin
   Result := Default(TTyPictorialRun);
-  Result.Unit_ := Max(Double(0), AGlyphLen);
+  Result.Unit_ := Max(Double(0.0), AGlyphLen);
   Result.PathLen := Result.Unit_;
   Result.Count := 1;
   if ASpec.Repeat_ = prNone then Exit;
@@ -673,7 +673,7 @@ begin
   absBound := Abs(ABoundingLen);
   margin := TyBoxResolve(ASpec.Margin, AMarginBase);
   if IsNan(margin) or IsInfinite(margin) then margin := 0;
-  uLen := Max(Double(0), Result.Unit_ + margin * 2);
+  uLen := Max(Double(0.0), Result.Unit_ + margin * 2);
   if ASpec.MarginEndGap then endFix := 0 else endFix := margin * 2;
 
   { PASS ONE: how many fit. A written count skips it outright, and with it the
@@ -721,7 +721,7 @@ begin
   { REAL DIVISION, not integer: an odd count shifts the whole run by half a
     glyph if this is done with `div`. And the halves are written as Doubles
     because an Integer beside a bare 0.5 evaluates in Single here. }
-  Result := ARun.Unit_ * (AIndex - ARun.Count / Double(2) + Double(0.5))
+  Result := ARun.Unit_ * (AIndex - ARun.Count / Double(2.0) + Double(0.5))
             + AAnchor;
 end;
 

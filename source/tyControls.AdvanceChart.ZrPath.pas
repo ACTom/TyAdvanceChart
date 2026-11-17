@@ -1899,8 +1899,8 @@ end;
 procedure ZrSausage(var APath: TTyZrPath; const AShape: TTyChartShape);
 var r0, r, dr, rc, sa, ea: Double;
 begin
-  r0 := Max(Double(0), AShape.R0);
-  r := Max(Double(0), AShape.R1);
+  r0 := Max(Double(0.0), AShape.R0);
+  r := Max(Double(0.0), AShape.R1);
   dr := (r - r0) * 0.5;
   rc := r0 + dr;
   sa := AShape.StartRad;

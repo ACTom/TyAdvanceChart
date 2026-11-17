@@ -3344,7 +3344,7 @@ begin
   begin
     d := TJSONObject(node).Find('z');
     if (d <> nil) and (d.JSONType = jtNumber) and not IsNan(d.AsFloat) and not IsInfinite(d.AsFloat) then
-      Result := Round(Max(Double(-100000), Min(Double(100000), d.AsFloat)));
+      Result := Round(Max(Double(-100000.0), Min(Double(100000.0), d.AsFloat)));
   end;
 end;
 
@@ -5853,7 +5853,7 @@ var
     if (x = nil) or (x.JSONType <> jtNumber) then Exit;
     v := x.AsFloat;
     if IsNan(v) or IsInfinite(v) then Exit;
-    Result := Round(Max(Double(-100000), Min(Double(100000), v)));
+    Result := Round(Max(Double(-100000.0), Min(Double(100000.0), v)));
   end;
 
 begin

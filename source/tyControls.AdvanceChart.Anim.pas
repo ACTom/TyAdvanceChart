@@ -790,11 +790,11 @@ begin
   t := GetTickCount64;
   if not GClockInited then
   begin
-    GClockBase := Double(DateTimeToUnix(Now, False)) * 1000;
+    GClockBase := TyIntToDouble(DateTimeToUnix(Now, False)) * 1000;
     GClockTick := t;
     GClockInited := True;
   end;
-  Result := GClockBase + Double(Int64(t - GClockTick));
+  Result := GClockBase + TyIntToDouble(Int64(t - GClockTick));
 end;
 
 { Math.floor(v) || 0: NaN and minus nought are 0 [F3b] }

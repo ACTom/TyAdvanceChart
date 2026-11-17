@@ -1528,7 +1528,7 @@ begin
     el.Silent := False;
     el.Datum := TyChartDatum(ASolved.SeriesIndex, r.Row, r.Raw);
     { Path.contain: the stroke at max(lineWidth, strokeContainThreshold 5) }
-    el.HitSlopLogical := Math.Max(r.Width, Double(5)) / 2;
+    el.HitSlopLogical := Math.Max(r.Width, Double(5.0)) / 2;
     { [R7-Y] a width of +Infinity: stroked at the lineWidth the canvas had
       (TyLinesCanvasLeftovers), never hit [was: no pen] }
     if r.WidthInf and (((r.Stroke shr 24) <> 0)) then

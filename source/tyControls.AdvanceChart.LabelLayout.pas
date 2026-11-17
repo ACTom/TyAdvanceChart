@@ -574,8 +574,8 @@ var
 begin
   path := nil;
   Result := TyXYWH(0, 0, -1, -1);
-  radius := Max(AR, Double(0));
-  if IsNan(AR0) then inner := 0 else inner := Max(AR0, Double(0));
+  radius := Max(AR, Double(0.0));
+  if IsNan(AR0) then inner := 0 else inner := Max(AR0, Double(0.0));
   if not ((radius > 0) or (inner > 0)) then Exit;
   if not (radius > 0) then
   begin
@@ -730,7 +730,7 @@ var
     begin
       prevEnd := RectPos(AItems[list[q - 1]].Box.Rect, ADim);
       gap := JsMax(RectPos(AItems[list[q]].Box.Rect, ADim) - prevEnd
-        - RectSize(AItems[list[q - 1]].Box.Rect, ADim), Double(0));
+        - RectSize(AItems[list[q - 1]].Box.Rect, ADim), Double(0.0));
       gaps[q - 1] := gap;
       total := total + gap;
     end;

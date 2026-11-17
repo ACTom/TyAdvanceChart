@@ -20,6 +20,7 @@ const
   ExpBarePushPop = 0;
   ExpConditionalSymbols = 0;
   ExpFpcOnlyNames = 0;
+  ExpIntegerCastToFloat = 0;
 
 type
   TPascalScanTest = class(TTestCase)
@@ -43,6 +44,7 @@ type
     procedure TestBarePushPop;
     procedure TestConditionalSymbols;
     procedure TestFpcOnlyNames;
+    procedure TestIntegerCastToFloat;
   end;
 
 implementation
@@ -659,6 +661,71 @@ procedure TAdvChartDelphiSyntaxTest.TestFpcOnlyNames;
 begin
   CountNames('FPC-only names outside {$IFDEF FPC} lines', ['DefaultFormatSettings', 'LineEnding',
     'SarLongint', 'StrToQWord'], True, ExpFpcOnlyNames);
+end;
+
+type
+  { Double, Single, Extended or Real, then ( an optionally signed decimal or $ hex literal ) --
+    white space allowed around each part. }
+  TIntCastCounter = class(TWordWalker)
+    procedure OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer); override;
+  end;
+
+procedure TIntCastCounter.OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer);
+var
+  c: string;
+  j, n, d: Integer;
+
+  procedure SkipSpace;
+  begin
+    while (j <= n) and (c[j] in [' ', #9, #10, #13]) do
+      Inc(j);
+  end;
+
+begin
+  if (AWord <> 'double') and (AWord <> 'single') and (AWord <> 'extended') and (AWord <> 'real') then
+    Exit;
+  c := AFile.Code;
+  n := Length(c);
+  j := AEnd;
+  SkipSpace;
+  if (j > n) or (c[j] <> '(') then
+    Exit;
+  Inc(j);
+  SkipSpace;
+  if (j <= n) and (c[j] in ['+', '-']) then
+  begin
+    Inc(j);
+    SkipSpace;
+  end;
+  d := j;
+  if (j <= n) and (c[j] = '$') then
+  begin
+    Inc(j);
+    d := j;
+    while (j <= n) and (c[j] in ['0'..'9', 'A'..'F', 'a'..'f']) do
+      Inc(j);
+  end
+  else
+    while (j <= n) and (c[j] in ['0'..'9']) do
+      Inc(j);
+  if j = d then
+    Exit;
+  SkipSpace;
+  if (j <= n) and (c[j] = ')') then
+    Finds.Add(AFile, LineOf(AFile, AStart));
+end;
+
+procedure TAdvChartDelphiSyntaxTest.TestIntegerCastToFloat;
+var
+  w: TIntCastCounter;
+begin
+  w := TIntCastCounter.Create;
+  try
+    w.Walk;
+    w.Finds.Check('Double/Single/Extended/Real of an integer literal', ExpIntegerCastToFloat);
+  finally
+    w.Free;
+  end;
 end;
 
 initialization

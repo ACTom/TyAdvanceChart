@@ -1445,7 +1445,7 @@ begin
   if (d = nil) or (d.JSONType <> jtNumber) then Exit;
   v := d.AsFloat;
   if IsNan(v) or IsInfinite(v) then Exit;
-  Result := Round(Max(Double(-100000), Min(Double(100000), v)));
+  Result := Round(Max(Double(-100000.0), Min(Double(100000.0), v)));
 end;
 
 function TTyCustomAdvanceChart.ZStaticTop: Integer;
@@ -1455,7 +1455,7 @@ begin
   if not FLoadShown or (csDesigning in ComponentState) then Exit;
   v := FLoadCfg.ZLevel;
   if IsNan(v) or IsInfinite(v) then Exit;
-  Result := Max(ZBase, Round(Max(Double(-100000), Min(Double(100000), v))));
+  Result := Max(ZBase, Round(Max(Double(-100000.0), Min(Double(100000.0), v))));
 end;
 
 { [R5-G] the elements of AList over the components' zlevel and up to the
@@ -1651,7 +1651,7 @@ begin
     if (d = nil) or (d.JSONType <> jtNumber) then Exit;
     v := d.AsFloat;
     if IsNan(v) or IsInfinite(v) then Exit;
-    Exit(Round(Max(Double(-100000), Min(Double(100000), v))));
+    Exit(Round(Max(Double(-100000.0), Min(Double(100000.0), v))));
   end;
   d := nil;
   node := FOption.ComponentAt(AMainType, AIndex);
@@ -1662,7 +1662,7 @@ begin
   if (d = nil) or (d.JSONType <> jtNumber) then Exit;
   v := d.AsFloat;
   if IsNan(v) or IsInfinite(v) then Exit;
-  Result := Round(Max(Double(-100000), Min(Double(100000), v)));
+  Result := Round(Max(Double(-100000.0), Min(Double(100000.0), v)));
 end;
 
 const
@@ -1875,7 +1875,7 @@ begin
   lastKey := '';
   for i := 0 to n - 1 do
   begin
-    zl := Round(Max(Double(-100000), Min(Double(100000), items[i].ZLevel)));
+    zl := Round(Max(Double(-100000.0), Min(Double(100000.0), items[i].ZLevel)));
     if hasLast then zl := Max(lastZl, zl);
     if items[i].Key <> '' then
     begin
@@ -1986,8 +1986,8 @@ begin
         d := TJSONObject(mk).Find('zlevel');
         if (d <> nil) and (d.JSONType = jtNumber) and not IsNan(d.AsFloat)
           and not IsInfinite(d.AsFloat) then
-          if Round(Max(Double(-100000), Min(Double(100000), d.AsFloat))) < Result then
-            Result := Round(Max(Double(-100000), Min(Double(100000), d.AsFloat)));
+          if Round(Max(Double(-100000.0), Min(Double(100000.0), d.AsFloat))) < Result then
+            Result := Round(Max(Double(-100000.0), Min(Double(100000.0), d.AsFloat)));
       end;
     end;
 end;
@@ -2316,7 +2316,7 @@ begin
   begin
     d := TJSONObject(node).Find('z');
     if (d <> nil) and (d.JSONType = jtNumber) and not IsNan(d.AsFloat) and not IsInfinite(d.AsFloat) then
-      z := Round(Max(Double(-100000), Min(Double(100000), d.AsFloat)));
+      z := Round(Max(Double(-100000.0), Min(Double(100000.0), d.AsFloat)));
   end;
   { THE PENS, as PaintAxis resolves them }
   model := ActiveController.Model;
@@ -3761,7 +3761,7 @@ begin
         begin
           d := TJSONObject(node).Find('z');
           if (d <> nil) and (d.JSONType = jtNumber) and not IsNan(d.AsFloat) and not IsInfinite(d.AsFloat) then
-            z := Round(Max(Double(-100000), Min(Double(100000), d.AsFloat)));
+            z := Round(Max(Double(-100000.0), Min(Double(100000.0), d.AsFloat)));
         end;
         for q := n to High(parts) do parts[q].Z := z;
       end;
@@ -4413,7 +4413,7 @@ begin
   if IsNan(v) or IsInfinite(v) then Exit;
   { CLAMPED, because Round targets an Int64 and the paint list's key is an
     Integer -- a z of 1e18 is not an order, it is an overflow. }
-  v := Max(Double(-100000), Min(Double(100000), v));
+  v := Max(Double(-100000.0), Min(Double(100000.0), v));
   Result := Round(v);
 end;
 
@@ -4680,7 +4680,7 @@ begin
     el.Z := 0;
     d := node.Find('z');
     if (d <> nil) and (d.JSONType = jtNumber) and not IsNan(d.AsFloat) then
-      el.Z := Round(Max(Double(-100000), Min(Double(100000), d.AsFloat)));
+      el.Z := Round(Max(Double(-100000.0), Min(Double(100000.0), d.AsFloat)));
     el.Z2 := -1;
     d := node.Find('zlevel');
     if ((d = nil) or (d.JSONType <> jtNumber)) and (FOption.Root is TJSONObject) then
@@ -4689,7 +4689,7 @@ begin
     begin
       v := d.AsFloat;
       if not IsNan(v) and not IsInfinite(v) then
-        el.ZLevel := Round(Max(Double(-100000), Min(Double(100000), v)));
+        el.ZLevel := Round(Max(Double(-100000.0), Min(Double(100000.0), v)));
     end;
     el.Silent := True;
     { [R7-AH] its view's place in the root (the grid's) }

@@ -1764,13 +1764,13 @@ begin
     same whatever the offset; what changes is where it starts, so the band
     it needs is the offset plus the furniture. A negative offset would eat
     into the plot rather than give room back, so it is floored. }
-  Result := Max(Double(0), AxisScaleF(ASpec.OffsetLogical, APPI));
+  Result := Max(Double(0.0), AxisScaleF(ASpec.OffsetLogical, APPI));
   if ASpec.ShowTicks and (not ASpec.TickInside) then
     { MAX, because a NEGATIVE length is upstream's other way of pointing the
       mark into the plot. Inward furniture reserves nothing outside, and
       subtracting from the gutter would let a long inward tick pull the plot
       out past its own container. }
-    Result := Result + Max(Double(0), AxisScaleF(ASpec.TickLengthLogical, APPI));
+    Result := Result + Max(Double(0.0), AxisScaleF(ASpec.TickLengthLogical, APPI));
   MeasureLabels(ASpec, AMeasurer, across, along, each);
   if (across > 0) and (not ASpec.LabelInside) then
     Result := Result + AxisScaleF(ASpec.LabelMarginLogical, APPI) + across;
@@ -2698,7 +2698,7 @@ begin
   sum := AHi + ALo;
   old := ASize;
   ASize := ASize + sum;
-  least := Max(Double(0), Min(AMin, old));
+  least := Max(Double(0.0), Min(AMin, old));
   if ASize < least then
   begin
     ASize := least;
@@ -2718,7 +2718,7 @@ var d: TTyMargin4;
 begin
   { negative margins are none; then, to SHRINK, every one is negated }
   for i := 0 to 3 do
-    d[i] := -Max(Double(0), AMargin[i]);
+    d[i] := -Max(Double(0.0), AMargin[i]);
   if IsNan(AMinW) then AMinW := 0;
   if IsNan(AMinH) then AMinH := 0;
   ShrinkOneDimension(ARect.X, ARect.W, d[3], d[1], AMinW);

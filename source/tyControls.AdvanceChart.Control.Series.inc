@@ -1876,7 +1876,7 @@ begin
   else if only then
     bw := px * 0.8;
   if IsNan(bw) or IsInfinite(bw) then Result := 1
-  else Result := Math.Max(Double(1), bw);
+  else Result := Math.Max(Double(1.0), bw);
 end;
 
 function TTyCustomAdvanceChart.PolarPointerGeometry(const AHit: TTyAxisHit;
@@ -4057,7 +4057,7 @@ begin
       Result.AreaNone := True;
     d := ar.Find('opacity');
     if (d <> nil) and (d.JSONType = jtNumber) then
-      Result.AreaOpacity := Max(Double(0), Min(Double(1), d.AsFloat));
+      Result.AreaOpacity := Max(Double(0.0), Min(Double(1.0), d.AsFloat));
   end;
   { AN ITEM'S OWN areaStyle [F4a]: Model.isEmpty is `option == null`, so any
     object an item writes shows its polygon; its colour and opacity over the

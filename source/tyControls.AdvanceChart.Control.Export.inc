@@ -393,7 +393,7 @@ var v: Double;
 begin
   v := FLoadCfg.ZLevel;
   if IsNan(v) or IsInfinite(v) then Result := 0
-  else Result := Round(Max(Double(-100000), Min(Double(100000), v)));
+  else Result := Round(Max(Double(-100000.0), Min(Double(100000.0), v)));
   { as the static layer draws it (ZStaticTop): never under the components
     drawn apart from the list -- they are the static layer's, the mask the
     dynamic layer's over it }

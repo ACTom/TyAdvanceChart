@@ -3317,7 +3317,7 @@ begin
       measured and drawn at }
     if src.LineNone then it.LineWidthLogical := 0;
     if (not it.Selected) and src.HasRuleInactiveWidth then
-      it.LineWidthLogical := Max(Double(0), src.RuleInactiveWidth);
+      it.LineWidthLogical := Max(Double(0.0), src.RuleInactiveWidth);
     it.LineGrad := src.LineGrad;
     it.RuleKeys := src.RuleKeys;
     it.MarkKeys := src.MarkKeys;
@@ -3383,9 +3383,9 @@ begin
     if it.Selected or not ASpec.InactiveBorderAuto then
     begin
       if not IsNan(it.Own.BorderWidth) then
-        it.IconPen := Max(Double(0), it.Own.BorderWidth)
+        it.IconPen := Max(Double(0.0), it.Own.BorderWidth)
       else if it.Own.BorderWidthInherit then
-        it.IconPen := Max(Double(0), src.VisualLineWidth);
+        it.IconPen := Max(Double(0.0), src.VisualLineWidth);
     end
     { unselected under 'auto': 2 where the series has a width and the
       resolved style a stroke (the legend's own borderColor included) [R7-T] }
@@ -3409,7 +3409,7 @@ begin
     begin
       if it.Own.HasLineColour then it.LineColour := it.Own.LineColour;
       if not IsNan(it.Own.LineWidth) and (it.LineWidthLogical > 0) then
-        it.LineWidthLogical := Max(Double(0), it.Own.LineWidth);
+        it.LineWidthLogical := Max(Double(0.0), it.Own.LineWidth);
     end;
     it.FontName := AFont.Name;
     it.FontSizeLogical := AFont.SizeLogical;

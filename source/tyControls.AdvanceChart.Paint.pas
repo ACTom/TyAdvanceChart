@@ -2632,7 +2632,7 @@ begin
   if AEl.Style.StrokeWidthLogical > 0 then
   begin
     if AEl.Style.HasFill then reach := AEl.Style.StrokeWidthLogical / 2
-    else reach := Max(AEl.Style.StrokeWidthLogical, Double(5)) / 2;
+    else reach := Max(AEl.Style.StrokeWidthLogical, Double(5.0)) / 2;
   end;
   if reach > cSymbolTargetLogical then reach := cSymbolTargetLogical;
   AEl.HitSlopLogical := reach;
@@ -2662,7 +2662,7 @@ begin
   if not ElFills(AEl) and (AEl.Shape.HitSym = '') then
   begin
     if AEl.HitMinScale > 0 then w := Max(w, 5 * AEl.HitMinScale)
-    else w := Max(w, Double(5));
+    else w := Max(w, Double(5.0));
   end;
   ps := AEl.Style.PenScale;
   if ps > 0 then w := w * ps;
@@ -3134,7 +3134,7 @@ begin
   h.Box := TyZrStrokeRect(AEl.ZrHit.PathBox, Length(AEl.ZrHit.Path), True, False,
     w, AEl.ZrHit.LineScale);
   h.Stroke := True;
-  h.LineWidth := Max(w, Double(5) * s) / AEl.ZrHit.LineScale;
+  h.LineWidth := Max(w, Double(5.0) * s) / AEl.ZrHit.LineScale;
   Result := TyZrHitContains(h, AX, AY);
 end;
 
@@ -3162,7 +3162,7 @@ begin
   { an infinite pen: the stroked rect is not a number, nothing is inside }
   if stroke and IsInfinite(lw) then Exit(False);
   w := lw;
-  if stroke and not h.Fill then w := Max(w, Double(5));
+  if stroke and not h.Fill then w := Max(w, Double(5.0));
   if not (h.LineScale > 1e-10) then stroke := False;
   h.Box := h.PathBox;
   if stroke then

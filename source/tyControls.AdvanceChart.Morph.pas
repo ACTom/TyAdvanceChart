@@ -1210,7 +1210,7 @@ begin
       ry := 0;
       if (x and s) > 0 then rx := 1;
       if (y and s) > 0 then ry := 1;
-      d := d + Double(s) * s * ((3 * rx) xor ry);
+      d := d + TyIntToDouble(s) * s * ((3 * rx) xor ry);
       if ry = 0 then
       begin
         if rx = 1 then

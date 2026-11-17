@@ -2467,7 +2467,7 @@ begin
     d := node.Find('z');
     if (d <> nil) and (d.JSONType = jtNumber) and JsFinite(d.AsFloat) then
     begin
-      zv := Max(Double(-100000), Min(Double(100000), d.AsFloat));
+      zv := Max(Double(-100000.0), Min(Double(100000.0), d.AsFloat));
       Result.Z := Floor(zv);
       Result.ZFrac := zv - Result.Z;
     end
@@ -2478,7 +2478,7 @@ begin
   begin
     { [spec 244] the floor and the fraction [was: truncated]; clamped as
       every z the list keeps (an Integer key) }
-    zv := Max(Double(-100000), Min(Double(100000), TyJsonToNumber(d)));
+    zv := Max(Double(-100000.0), Min(Double(100000.0), TyJsonToNumber(d)));
     Result.Z := Floor(zv);
     Result.ZFrac := zv - Result.Z;
   end

@@ -698,7 +698,7 @@ begin
   { a turned path is turned at draw time about its own point }
   if (AEl.Shape.Kind = cskPath) and (AEl.Shape.RotationRad <> 0) then
     box := RotatedBox(box, AEl.Shape.RotationRad, AEl.Shape.RotCX, AEl.Shape.RotCY);
-  sw := Max(Double(0), AEl.Style.StrokeWidthLogical) * s;
+  sw := Max(Double(0.0), AEl.Style.StrokeWidthLogical) * s;
   if sw > 0 then
   begin
     box := TyGrowByStroke(box, AEl.Style.HasFill, sw);
@@ -718,7 +718,7 @@ begin
   begin
     { the rich pieces carry boxes, shadows and words of their own }
     if Length(AEl.Caption.RtPieces) > 0 then Exit(False);
-    halo := Ceil(Max(Double(0), AEl.Caption.StrokeWidthLogical) / 2 * s) + 1;
+    halo := Ceil(Max(Double(0.0), AEl.Caption.StrokeWidthLogical) / 2 * s) + 1;
     if AEl.Caption.RotationRad <> 0 then
     begin
       { turned about its anchor, which lies on its box: the box's two sides

@@ -1049,7 +1049,7 @@ begin
     if d.JSONType = jtNumber then
     begin
       ASpec.HasBorderWidth := True;
-      ASpec.BorderWidthLogical := Max(Double(0), Min(Double(64), d.AsFloat));
+      ASpec.BorderWidthLogical := Max(Double(0.0), Min(Double(64.0), d.AsFloat));
     end;
   end;
   if Fresh('borderRadius') then
@@ -1058,7 +1058,7 @@ begin
     if d.JSONType = jtNumber then
     begin
       ASpec.HasBorderRadius := True;
-      ASpec.BorderRadiusLogical := Max(Double(0), Min(Double(256), d.AsFloat));
+      ASpec.BorderRadiusLogical := Max(Double(0.0), Min(Double(256.0), d.AsFloat));
     end;
   end;
   if Fresh('padding') then ReadPadding(ANode, ASpec);
@@ -1087,7 +1087,7 @@ begin
       if (d <> nil) and (d.JSONType = jtNumber) then
       begin
         ASpec.HasTextSize := True;
-        ASpec.TextSizeLogical := Max(Double(1), Min(Double(400), d.AsFloat));
+        ASpec.TextSizeLogical := Max(Double(1.0), Min(Double(400.0), d.AsFloat));
       end;
       ASpec.TextFontStyle := TyFontStyleCode(ts.Find('fontStyle'));
       { [R7-AG] the weight, and the rich tokens' font refused }
@@ -1702,8 +1702,8 @@ begin
       y := Min(y + h, AIn.ViewH) - h;
       { a typed nought: Max of a Double and an integer literal is the Single
         overload, and a fractional point lost its low bits [Batch 153] }
-      x := Max(x, Double(0));
-      y := Max(y, Double(0));
+      x := Max(x, Double(0.0));
+      y := Max(y, Double(0.0));
     end
     else if ASpec.Confine then
     begin

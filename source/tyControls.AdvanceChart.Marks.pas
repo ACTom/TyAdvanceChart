@@ -680,7 +680,7 @@ begin
   d := item.Find('borderWidth');
   if (d <> nil) and (d.JSONType <> jtNull) then
   begin
-    Result.BorderWidthLogical := Max(Double(0), Min(Double(64), TyOptPenWidth(d)));
+    Result.BorderWidthLogical := Max(Double(0.0), Min(Double(64.0), TyOptPenWidth(d)));
     Result.BorderWidthInf := TyOptIsPosInf(d);
   end;
 end;
@@ -731,7 +731,7 @@ begin
   d := item.Find('borderWidth');
   if (d <> nil) and (d.JSONType <> jtNull) then
   begin
-    Result.Spec.BorderWidthLogical := Max(Double(0), Min(Double(64), TyOptPenWidth(d)));
+    Result.Spec.BorderWidthLogical := Max(Double(0.0), Min(Double(64.0), TyOptPenWidth(d)));
     Result.Spec.BorderWidthInf := TyOptIsPosInf(d);
   end;
   d := item.Find('opacity');
@@ -842,7 +842,7 @@ begin
       SINGLE overload and quietly rounds the result to a 24-bit mantissa. It
       would not matter for an alpha; the shape is what matters, because the
       next thing clamped this way might be a coordinate. }
-    Result.AreaOpacity := Min(Double(1), Max(Double(0), d.AsFloat));
+    Result.AreaOpacity := Min(Double(1.0), Max(Double(0.0), d.AsFloat));
 
   d := area.Find('origin');
   if d = nil then Exit;
@@ -3541,7 +3541,7 @@ begin
   begin
     band := ABinding.BaseAxis.BandWidth;
     if band <= 0 then band := 8;
-    width := Max(Double(1), band / 2);
+    width := Max(Double(1.0), band / 2);
   end;
   { A CANDLE NARROWER THAN A PEN IS A LINE. Upstream calls it a simple box and
     switches at 1.3 px -- below that the body has no inside to fill and the
@@ -3626,7 +3626,7 @@ begin
         v.Fill := TyVisualToChart(AVisual.VisualRows[AStore.GetRawIndex(i)].Color);
       if AVisual.VisualRows[AStore.GetRawIndex(i)].LateOpacity
         and not IsNan(AVisual.VisualRows[AStore.GetRawIndex(i)].Opacity) then
-        v.Alpha := Min(Double(1), Max(Double(0),
+        v.Alpha := Min(Double(1.0), Max(Double(0.0),
           AVisual.VisualRows[AStore.GetRawIndex(i)].Opacity));
     end;
 
@@ -5391,7 +5391,7 @@ begin
     g.Sign := cSigns[k];
     { containStroke at max(lineWidth, 5) for a path with no fill; no pen
       at all is never hit }
-    if lw > 0 then g.StrokeHit := Max(lw, Double(5)) * scale else g.StrokeHit := 0;
+    if lw > 0 then g.StrokeHit := Max(lw, Double(5.0)) * scale else g.StrokeHit := 0;
     if clipOn then
     begin
       g.ClipOn := True;
@@ -5674,7 +5674,7 @@ begin
       begin
         band := ABinding.BaseAxis.BandWidth;
         if band <= 0 then band := 8;
-        width := Max(Double(1), band / 2);
+        width := Max(Double(1.0), band / 2);
       end;
       for i := 0 to AStore.Count - 1 do
       begin

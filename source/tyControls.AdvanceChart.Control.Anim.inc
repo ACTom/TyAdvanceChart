@@ -2214,8 +2214,8 @@ begin
       changed }
     differs := False;
     e := sc.GetExtent;
-    t := Math.Max(Double(0), e.Start);
-    tMax := Math.Min(e.Stop, Double(cats - 1));
+    t := Math.Max(Double(0.0), e.Start);
+    tMax := Math.Min(e.Stop, TyIntToDouble(cats - 1));
     while t <= tMax do
     begin
       if (Frac(t) <> 0) or (t >= n) then

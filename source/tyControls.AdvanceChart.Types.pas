@@ -211,6 +211,10 @@ function TyRangeContains(const AR: TTyRange; AValue: Double): Boolean;
 function TyInvalidPointF: TTyPointF;
 function TyInvalidRectF: TTyRectF;
 
+{ An integer as a Double: the value. Not Double(AnInteger), which FPC in Delphi mode reads as the integer's bits
+  when it has 8 bytes and rejects when it has 4. }
+function TyIntToDouble(const AValue: Int64): Double; inline;
+
 implementation
 
 { ==================== TTyNonRefCountedObject ==================== }
@@ -387,6 +391,12 @@ begin
   if AValue <= ALo then Exit(ALo);
   if AValue >= AHi then Exit(AHi);
   Result := Trunc(AValue);
+end;
+
+
+function TyIntToDouble(const AValue: Int64): Double;
+begin
+  Result := AValue;
 end;
 
 end.

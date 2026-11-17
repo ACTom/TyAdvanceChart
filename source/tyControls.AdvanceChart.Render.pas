@@ -912,8 +912,8 @@ end;
 procedure TraceSausage(P: TTyPainter; const AShape: TTyChartShape);
 var r0, r, dr, rc, sa, ea: Double;
 begin
-  r0 := Max(Double(0), AShape.R0);
-  r := Max(Double(0), AShape.R1);
+  r0 := Max(Double(0.0), AShape.R0);
+  r := Max(Double(0.0), AShape.R1);
   dr := (r - r0) * 0.5;
   rc := r0 + dr;
   sa := AShape.StartRad;
@@ -1844,7 +1844,7 @@ var
       pat := Copy(ADashDevice, 0, n);
     { a pattern that never advances draws the contour whole }
     t := 0;
-    for j := 0 to High(pat) do t := t + Max(Double(0), pat[j]);
+    for j := 0 to High(pat) do t := t + Max(Double(0.0), pat[j]);
     if not (t > 0) then
     begin
       P.MoveTo(px[0], py[0]);
@@ -3644,7 +3644,7 @@ var
     if (area.Right <= area.Left) or (area.Bottom <= area.Top) then Exit;
     if AStroke then c := TyColorToBGRA(TTyColor(AElement.Style.StrokeColor))
     else c := TyColorToBGRA(TTyColor(AElement.Style.FillColor));
-    op := Round(Max(Double(0), Min(Double(1), AElement.Style.Alpha)) * c.alpha);
+    op := Round(Max(Double(0.0), Min(Double(1.0), AElement.Style.Alpha)) * c.alpha);
     if op <= 0 then Exit;
     c.alpha := 255;
     { pixel-centred primitives: the canvas' (0, 0) is a pixel's corner }
@@ -3775,7 +3775,7 @@ var
     { the tiles are the layer's pixels, the device scale times device px
       (#83); the antialiased edge and the pen reach past the shape }
     s := P.DeviceScale;
-    margin := 2 + Max(Double(0), AElement.Style.StrokeWidthLogical) * P.PPI / 96 * s;
+    margin := 2 + Max(Double(0.0), AElement.Style.StrokeWidthLogical) * P.PPI / 96 * s;
     SetLength(counts, nx * ny);
     SetLength(starts, nx * ny + 1);
     for t := 0 to nx * ny - 1 do counts[t] := 0;

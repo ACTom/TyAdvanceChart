@@ -626,7 +626,7 @@ end;
 function ClampUnit(AValue: Double): Double;
 begin
   if IsNan(AValue) then Exit(0);
-  Result := Max(Double(0), Min(Double(1), AValue));
+  Result := Max(Double(0.0), Min(Double(1.0), AValue));
 end;
 
 { A channel argument: a percentage of 255, or a plain number TRUNCATED --

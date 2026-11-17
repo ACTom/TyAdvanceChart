@@ -196,7 +196,7 @@ var
 begin
   AMtvX := 0;
   AMtvY := 0;
-  t := Max(Double(0), ATouchThreshold);
+  t := Max(Double(0.0), ATouchThreshold);
   C.MinX := Infinity;
   C.MinY := Infinity;
   C.MaxX := 0;

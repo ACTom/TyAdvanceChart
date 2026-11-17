@@ -462,7 +462,7 @@ begin
     AC1 := TySubPixelOptimize(AC1, 1, True);
   end;
   { arbitrary floors against a dead loop }
-  minS := Max(Double(2), AMinSpan);
+  minS := Max(Double(2.0), AMinSpan);
   if IsNan(AMinSpan) or (AMinSpan = 0) then minS := 2;
   maxS := Max(minS, AMaxSpan);
   if IsNan(AMaxSpan) or (AMaxSpan = 0) then maxS := minS;
@@ -872,7 +872,7 @@ var
 begin
   AMtvX := 0;
   AMtvY := 0;
-  C.Touch := Max(Double(0), ATouch);
+  C.Touch := Max(Double(0.0), ATouch);
   C.NegativeSize := False;
   C.MinX := Infinity;
   C.MinY := Infinity;

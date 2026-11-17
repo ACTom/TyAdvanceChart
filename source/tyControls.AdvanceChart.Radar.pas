@@ -2296,7 +2296,7 @@ begin
     { [R2-I3] zrender's Path.contain on a stroke with no fill: max(lineWidth,
       strokeContainThreshold 5), half each side -- the ring's own width, as a
       line series' run and a graph's edge [was: the series' width / 2 + 4] }
-    el.HitSlopLogical := Math.Max(el.Style.StrokeWidthLogical, Double(5)) / 2;
+    el.HitSlopLogical := Math.Max(el.Style.StrokeWidthLogical, Double(5.0)) / 2;
     el.Anim.Role := carRadarLine;
     el.Anim.Series := ABinding.SeriesIndex;
     el.Anim.Index := k;
@@ -2409,7 +2409,7 @@ begin
         if (raw >= 0) and (raw <= High(AVisual.RowOpacity))
           and not IsNan(AVisual.RowOpacity[raw]) then
           op := AVisual.RowOpacity[raw];
-        if not IsNan(op) then el.Style.Alpha := Min(Double(1), Max(Double(0), op));
+        if not IsNan(op) then el.Style.Alpha := Min(Double(1.0), Max(Double(0.0), op));
         { then setColor(color): an empty symbol's pen is the colour at 2, a
           line's the colour at the border's width [was: both at 2, the
           border never drawn] }

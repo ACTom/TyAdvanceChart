@@ -1280,7 +1280,7 @@ var
       if not hasExp then
       begin
         if sig = 0 then f := 0
-        else f := Double(m) / TyJsPow10(fracLen);
+        else f := TyIntToDouble(m) / TyJsPow10(fracLen);
         if neg then f := -f;
         AValue := CreateJSON(f);
         Exit(True);
@@ -1609,8 +1609,8 @@ begin
   if (p = stop) and (d <= 15) and (expo >= -22) and (expo <= 22) then
   begin
     if d = 0 then Result := 0
-    else if expo >= 0 then Result := Double(m) * TyJsPow10(expo)
-    else Result := Double(m) / TyJsPow10(-expo);
+    else if expo >= 0 then Result := TyIntToDouble(m) * TyJsPow10(expo)
+    else Result := TyIntToDouble(m) / TyJsPow10(-expo);
     if neg then Result := -Result;
   end
   else if (p = stop) and (d > 15) and TyJsDecimalIsNearest(

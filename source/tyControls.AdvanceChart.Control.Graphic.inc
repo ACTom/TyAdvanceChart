@@ -170,7 +170,7 @@ var
       order with the series' and the components' [was: folded into z, the
       element on canvas 0] }
     if IsNan(AEl.ZLevel) or IsInfinite(AEl.ZLevel) then pe.ZLevel := 0
-    else pe.ZLevel := Round(Max(Double(-100000), Min(Double(100000), AEl.ZLevel)));
+    else pe.ZLevel := Round(Max(Double(-100000.0), Min(Double(100000.0), AEl.ZLevel)));
     pe.Z := Round(AEl.Z);
     pe.Z2 := Round(AEl.Z2);
     pe.GfxUnder := (AEl.ZLevel = 0) and (AEl.Z <= 0);

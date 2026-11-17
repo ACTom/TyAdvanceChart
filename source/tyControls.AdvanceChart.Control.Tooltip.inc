@@ -1844,7 +1844,7 @@ begin
       bw := px * 0.8;
   end;
   if IsNan(bw) or IsInfinite(bw) then bw := 1
-  else bw := Math.Max(Double(1), bw);
+  else bw := Math.Max(Double(1.0), bw);
   { THE ENDS, each clamped to the axis on its own (calcAxisPointerShadowEnds) }
   t0 := ax.ToGlobal(t0);
   t1 := ax.ToGlobal(t1);
@@ -3257,8 +3257,8 @@ begin
   begin
     AX := Math.Min(AX + AW, AViewW) - AW;
     AY := Math.Min(AY + AH, AViewH) - AH;
-    AX := Math.Max(AX, Double(0));
-    AY := Math.Max(AY, Double(0));
+    AX := Math.Max(AX, Double(0.0));
+    AY := Math.Max(AY, Double(0.0));
     Exit;
   end;
   { [R7-AK] confineInContainer with the size as JS holds it: `position[0] +
@@ -4325,7 +4325,7 @@ begin
   Result := TyShapeBounds(el.Shape);
   if not TyRectFIsValid(Result) or (el.Style.StrokeWidthLogical <= 0) then Exit;
   w := el.Style.StrokeWidthLogical;
-  if not el.Style.HasFill then w := Max(w, Double(4));
+  if not el.Style.HasFill then w := Max(w, Double(4.0));
   w := w * APPI / 96;
   Result.Left := Result.Left - w / 2;
   Result.Top := Result.Top - w / 2;
@@ -7781,7 +7781,7 @@ begin
   if tpShadow in ASt.Present then
   begin
     ASt.ShadowColor := TTyColor(e.Style.ShadowColor);
-    ASt.ShadowBlur := Round(Max(Double(0), e.Style.ShadowBlur));
+    ASt.ShadowBlur := Round(Max(Double(0.0), e.Style.ShadowBlur));
   end;
   CompDrew(nil, 'tooltip0', 0, 0, False, e);
   { the tokens, in their lines' order (a copy: the show's lines stay) }
@@ -8354,7 +8354,7 @@ begin
     sc := APainter.ScaleF(1);
     if rich then
     begin
-      richBw := Max(Double(0), st.BorderWidth);
+      richBw := Max(Double(0.0), st.BorderWidth);
       sBlur := 0;
       sOffX := 0;
       sOffY := 0;
@@ -8367,13 +8367,13 @@ begin
       if (spec.ShadowKeys and 1) <> 0 then sBlur := spec.ShadowBlur;
       if (spec.ShadowKeys and 2) <> 0 then sOffX := spec.ShadowOffsetX;
       if (spec.ShadowKeys and 4) <> 0 then sOffY := spec.ShadowOffsetY;
-      sBlur := Max(Double(0), sBlur);
-      sOffX := Max(Double(0), sOffX);
-      sOffY := Max(Double(0), sOffY);
-      outL := Max(Double(0), sBlur - sOffX) * sc;
-      outR := Max(Double(0), sBlur + sOffX) * sc;
-      outT := Max(Double(0), sBlur - sOffY) * sc;
-      outB := Max(Double(0), sBlur + sOffY) * sc;
+      sBlur := Max(Double(0.0), sBlur);
+      sOffX := Max(Double(0.0), sOffX);
+      sOffY := Max(Double(0.0), sOffY);
+      outL := Max(Double(0.0), sBlur - sOffX) * sc;
+      outR := Max(Double(0.0), sBlur + sOffX) * sc;
+      outT := Max(Double(0.0), sBlur - sOffY) * sc;
+      outB := Max(Double(0.0), sBlur + sOffY) * sc;
       w := w + 2 * richBw * sc + outL + outR;
       h := h + 2 * richBw * sc + outT + outB;
     end;

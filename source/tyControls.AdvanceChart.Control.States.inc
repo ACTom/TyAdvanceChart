@@ -7267,7 +7267,7 @@ begin
   { [R5-A] the declared shadow, key by key; a shadow brought on an element of
     none in zrender's '#000' unless it names its colour }
   if TyChartStyleHas(st, cskShadowBlur) then
-    AElement.Style.ShadowBlur := Max(Double(0), st.Num[cskShadowBlur]);
+    AElement.Style.ShadowBlur := Max(Double(0.0), st.Num[cskShadowBlur]);
   if TyChartStyleHas(st, cskShadowOffsetX) then
     AElement.Style.ShadowOffsetX := st.Num[cskShadowOffsetX];
   if TyChartStyleHas(st, cskShadowOffsetY) then

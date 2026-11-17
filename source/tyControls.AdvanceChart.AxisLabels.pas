@@ -187,7 +187,7 @@ begin
   m := Min(dw, dh);
   if IsInfinite(m) then Exit(Infinity);
   { Math.floor; never negative here }
-  Result := Max(Double(0), Int(m));
+  Result := Max(Double(0.0), Int(m));
 end;
 
 procedure TyCategoryBuiltList(AStart, ACount: Integer; AInterval: Double;
@@ -214,7 +214,7 @@ begin
   e1 := AStart + ACount - 1;
   { Math.max((interval || 0) + 1, 1) }
   if IsNan(AInterval) then AInterval := 0;
-  step := Max(AInterval + 1, Double(1));
+  step := Max(AInterval + 1, Double(1.0));
   start := e0;
   { FROM NOUGHT, so that a window that starts part-way keeps its labels }
   if (start <> 0) and (step > 1) and (ACount / step > 2) then
@@ -443,7 +443,7 @@ begin
   oa := MakeObb(A);
   ob := MakeObb(B);
   { reset(opt, true) }
-  C.Threshold := Max(Double(0), AThreshold);
+  C.Threshold := Max(Double(0.0), AThreshold);
   C.Negative := False;
   C.MinX := Infinity;
   C.MinY := Infinity;
@@ -486,7 +486,7 @@ var
   t, ax0, ax1, ay0, ay1, bx0, bx1, by0, by1: Double;
 begin
   { BoundingRect.intersect with no translation }
-  t := Max(Double(0), AThreshold);
+  t := Max(Double(0.0), AThreshold);
   ax0 := A.Rect.X + t;
   ax1 := A.Rect.X + A.Rect.W - t;
   ay0 := A.Rect.Y + t;

@@ -656,8 +656,8 @@ initialization
   cBack1525 := FromBits($3FF8666666666666);   // 1.525
   cElasticP := FromBits($3FD999999999999A);   // 0.4
   cEps := FromBits($3E45798EE2308C3A);        // 1e-8
-  cOneThird := 1 / Double(3);
-  cThreeSqrt := Sqrt(Double(3));
+  cOneThird := 1 / Double(3.0);
+  cThreeSqrt := Sqrt(Double(3.0));
   cHalf := 0.5;
   cBounce := 7.5625;
   cB275 := 2.75;

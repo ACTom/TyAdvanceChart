@@ -2414,7 +2414,7 @@ begin
   ReadNodeSize(node, Result);
   d := node.Find('symbolRotate');
   if (d <> nil) and (d.JSONType = jtNumber) then
-    Result.Symbol.RotateDeg := Max(Double(-360), Min(Double(360), d.AsFloat));
+    Result.Symbol.RotateDeg := Max(Double(-360.0), Min(Double(360.0), d.AsFloat));
   d := node.Find('symbolKeepAspect');
   if (d <> nil) and (d.JSONType = jtBoolean) then
     Result.Symbol.KeepAspect := d.AsBoolean;
@@ -3708,7 +3708,7 @@ begin
       does not follow the zoom. At zoom one on a box the data already fills,
       this is one. }
     sz := sz * ANodeScale;
-    half := ArcSin(Min(Double(1), sz / 2 / r));
+    half := ArcSin(Min(Double(1.0), sz / 2 / r));
     { A SYMBOL WIDER THAN THE RING takes a quarter turn to itself. Upstream
       reaches this by asking for the arcsine of something over one and getting
       a not-a-number back; asking for the arcsine of a clamped one is the same
@@ -4433,7 +4433,7 @@ begin
     ten million builds a ten-million-entry array, and of infinity never
     terminates. }
   if IsNan(len) then Exit(0);
-  len := Max(Double(-1), Min(Double(100000), len));
+  len := Max(Double(-1.0), Min(Double(100000.0), len));
   { "MAKE SURE THE LENGTH IS EVEN", says the comment, and it does the opposite:
     this is odd for every integer input, so the documented twenty-entry table
     is really twenty-three. }
@@ -7395,7 +7395,7 @@ begin
       pointer within max(lineWidth, strokeContainThreshold 5) / 2 of its line
       (Path.contain; the line is strokeNoScale, so in canvas px) [was a
       fixed 4] }
-    el.HitSlopLogical := Math.Max(el.Style.StrokeWidthLogical, Double(5)) / 2;
+    el.HitSlopLogical := Math.Max(el.Style.StrokeWidthLogical, Double(5.0)) / 2;
 
     { THE LABEL, at the place Line.beforeUpdate gives it [Batch 114] }
     EdgeLabel(i, el);

@@ -546,7 +546,7 @@ begin
     was dropped] }
   if Result.HasSub then
     gh := Max(Result.TextH, Result.TextH + gap + Result.SubH)
-      - Min(Double(0), Result.TextH + gap);
+      - Min(Double(0.0), Result.TextH + gap);
   if (gw <= 0) or (gh <= 0) then Exit;
 
   { getLayoutRect on the merged option with the measured block as the size --

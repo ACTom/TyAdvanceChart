@@ -185,7 +185,7 @@ begin
     if (pe^.Style.StrokeWidthLogical > 0) and ((pe^.Style.StrokeColor shr 24) <> 0) then
     begin
       w := pe^.Style.StrokeWidthLogical;
-      if not pe^.Style.HasFill then w := Max(w, Double(4));
+      if not pe^.Style.HasFill then w := Max(w, Double(4.0));
       w := w * sc;
       b := TyRectF(b.Left - w / 2, b.Top - w / 2, b.Right + w / 2, b.Bottom + w / 2);
     end;
@@ -1764,8 +1764,8 @@ var
     begin
       bw := AOld.Nodes[ARow].BorderWidth;
       Result := TyAnimProps([TmNum('shape.x', bw), TmNum('shape.y', bw),
-        TmNum('shape.width', Math.Max(AOld.Nodes[ARow].W - 2 * bw, Double(0))),
-        TmNum('shape.height', Math.Max(AOld.Nodes[ARow].H - 2 * bw, Double(0)))]);
+        TmNum('shape.width', Math.Max(AOld.Nodes[ARow].W - 2 * bw, Double(0.0))),
+        TmNum('shape.height', Math.Max(AOld.Nodes[ARow].H - 2 * bw, Double(0.0)))]);
     end;
   end;
 
@@ -1779,8 +1779,8 @@ var
     begin
       bw := TS^.Nodes[ARow].BorderWidth;
       Result := TyAnimProps([TmNum('shape.x', bw), TmNum('shape.y', bw),
-        TmNum('shape.width', Math.Max(TS^.Nodes[ARow].W - 2 * bw, Double(0))),
-        TmNum('shape.height', Math.Max(TS^.Nodes[ARow].H - 2 * bw, Double(0)))]);
+        TmNum('shape.width', Math.Max(TS^.Nodes[ARow].W - 2 * bw, Double(0.0))),
+        TmNum('shape.height', Math.Max(TS^.Nodes[ARow].H - 2 * bw, Double(0.0)))]);
     end;
   end;
 
@@ -2546,8 +2546,8 @@ begin
           begin
             sx := TS^.Nodes[row].BorderWidth;
             sy := sx;
-            sw := Math.Max(TS^.Nodes[row].W - 2 * sx, Double(0));
-            sh := Math.Max(TS^.Nodes[row].H - 2 * sx, Double(0));
+            sw := Math.Max(TS^.Nodes[row].W - 2 * sx, Double(0.0));
+            sh := Math.Max(TS^.Nodes[row].H - 2 * sx, Double(0.0));
           end;
           Words(el, TS^, row);
           if A^.Labels[row][0] <> nil then el.Style.Alpha := A^.Labels[row][0].Num('style.opacity');

@@ -630,7 +630,7 @@ begin
     lo := 0;
     hi := 0;
   end;
-  if ASpec.HasMin then lo := ASpec.Min_ else lo := Min(lo, Double(0));
+  if ASpec.HasMin then lo := ASpec.Min_ else lo := Min(lo, Double(0.0));
   if ASpec.HasMax then hi := ASpec.Max_;
 
   order := TyFunnelOrder(AStore, ADim, ASpec.Sort);
@@ -731,7 +731,7 @@ begin
     { the band's own opacity [R2-I1: itemStyle.opacity was not read] }
     if (ALayout.Items[i].RawIndex >= 0) and (ALayout.Items[i].RawIndex <= High(AVisual.Alphas))
       and not IsNan(AVisual.Alphas[ALayout.Items[i].RawIndex]) then
-      el.Style.Alpha := Min(Double(1), Max(Double(0), AVisual.Alphas[ALayout.Items[i].RawIndex]));
+      el.Style.Alpha := Min(Double(1.0), Max(Double(0.0), AVisual.Alphas[ALayout.Items[i].RawIndex]));
     el.Z := AVisual.Z;
     el.Z2 := AVisual.Z2;
     el.Silent := False;
@@ -843,14 +843,14 @@ begin
       Result.LineShow := d.AsBoolean;
     d := line.Find('length');
     if (d <> nil) and (d.JSONType = jtNumber) then
-      Result.LineLengthLogical := Max(Double(0), Min(Double(4096), d.AsFloat));
+      Result.LineLengthLogical := Max(Double(0.0), Min(Double(4096.0), d.AsFloat));
     d := line.Find('lineStyle');
     if d is TJSONObject then
     begin
       ls := TJSONObject(d);
       d := ls.Find('width');
       if (d <> nil) and (d.JSONType = jtNumber) then
-        Result.LineWidthLogical := Max(Double(0), Min(Double(64), d.AsFloat));
+        Result.LineWidthLogical := Max(Double(0.0), Min(Double(64.0), d.AsFloat));
     end;
   end;
 

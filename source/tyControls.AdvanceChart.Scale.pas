@@ -2240,7 +2240,7 @@ begin
     renormalising: 2^53 is an exact Double, and so is its power of two.) }
   up := WideBit(q, sh - 1) and (lower or Odd(mant));
   if up then Inc(mant);
-  Result := Ldexp(Double(mant), sh - s);
+  Result := Ldexp(TyIntToDouble(mant), sh - s);
 end;
 
 { x = m * 2^e for a finite, non-negative x: m under 2^53, e from -1074. }
@@ -2999,7 +2999,7 @@ begin
     default; 2.5 is three. }
   if IsNan(ARaw) or (ARaw = 0) then ARaw := ADefault;
   if IsInfinite(ARaw) then ARaw := ADefault;
-  ARaw := TyJsRound(Math.Max(ARaw, Double(1)));
+  ARaw := TyJsRound(Math.Max(ARaw, Double(1.0)));
   if ARaw > High(Integer) then Exit(High(Integer));
   Result := Trunc(ARaw);
 end;
@@ -3064,7 +3064,7 @@ var
 
   procedure Inc_;
   begin
-    if AIn.IsLog then iv := iv * Math.Max(AIn.Base, Double(2))
+    if AIn.IsLog then iv := iv * Math.Max(AIn.Base, Double(2.0))
     else iv := TyIncreaseInterval(iv);
     p := TyIntervalPrecision(iv);
   end;
@@ -3230,7 +3230,7 @@ begin
     begin
       span := e1 - e0;
       if AIn.IsLog then
-        iv := Math.Max(TyJsPow10(TyQuantityExponent(span)), Double(1))
+        iv := Math.Max(TyJsPow10(TyQuantityExponent(span)), Double(1.0))
       else
         iv := TyNiceMin(span / seg);
       p := TyIntervalPrecision(iv);
@@ -3452,7 +3452,7 @@ begin
       split is ten here, upstream's, though the option's own default of five
       almost always arrives first. }
     split := TyValidSplitNumber(ASplitNumber, 10);
-    iv := Math.Max(TyJsPow10(TyQuantityExponent(span)), Double(1));
+    iv := Math.Max(TyJsPow10(TyQuantityExponent(span)), Double(1.0));
     err := split / span * iv;
     if err <= 0.5 then iv := iv * 10;
   end

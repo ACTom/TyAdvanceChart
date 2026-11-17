@@ -862,7 +862,7 @@ begin
   if ASpanLessThanOne then Exit(0);
   mask := MaskFP;
   try
-    maxH := Math.Max(ALineHeight, Double(7));
+    maxH := Math.Max(ALineHeight, Double(7.0));
     if IsNan(ALineHeight) then maxH := NaN;
     dh := maxH / Abs(AUnitSpan);
     { 0/0 is NaN, 1/0 is Infinity }
@@ -870,7 +870,7 @@ begin
     { Math.floor: an infinity, and a number past the integers, is itself }
     if IsInfinite(dh) or (Abs(dh) >= 4503599627370496.0) then Result := dh
     else Result := Floor64(dh);
-    Result := Math.Max(Double(0), Result);
+    Result := Math.Max(Double(0.0), Result);
   finally
     UnmaskFP(mask);
   end;
@@ -1238,7 +1238,7 @@ begin
       arc.CX := P.CX;
       arc.CY := P.CY;
       { ensure circle radius >= 0 }
-      arc.R := Math.Max(marks[i].Coord, Double(0));
+      arc.R := Math.Max(marks[i].Coord, Double(0.0));
       arc.StartAngle := -a0 * Radian;
       arc.EndAngle := -a1 * Radian;
       arc.Clockwise := P.AngleInverse;
@@ -1546,7 +1546,7 @@ begin
   if (AAxis = nil) or not (AAxis.Scale is TTyOrdinalScale) then Exit;
   w := AAxis.BandWidth;
   if IsNan(w) or IsInfinite(w) then Exit;
-  Result := Math.Max(Double(1), w);
+  Result := Math.Max(Double(1.0), w);
 end;
 
 function TyPolarPointerShape(APolar: TTyPolar; AAxis: TTyAxis; ACoord,
