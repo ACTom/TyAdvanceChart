@@ -1427,402 +1427,511 @@ type float
 bits 3FE0000000000000
 ~ asjson 5.0000000000000000E-001
 ~ asstring 5.0000000000000000E-001
+~ roundtrip same
 == jsonnum 2
 input 1.5
 type float
 bits 3FF8000000000000
 ~ asjson 1.5000000000000000E+000
 ~ asstring 1.5000000000000000E+000
+~ roundtrip same
 == jsonnum 3
 input -2.25
 type float
 bits C002000000000000
 ~ asjson -2.2500000000000000E+000
 ~ asstring -2.2500000000000000E+000
+~ roundtrip same
 == jsonnum 4
 input 1e3
 type float
 bits 408F400000000000
 ~ asjson 1.0000000000000000E+003
 ~ asstring 1.0000000000000000E+003
+~ roundtrip same
 == jsonnum 5
 input 1E+2
 type float
 bits 4059000000000000
 ~ asjson 1.0000000000000000E+002
 ~ asstring 1.0000000000000000E+002
+~ roundtrip same
 == jsonnum 6
 input 0.1
 type float
 bits 3FB999999999999A
 ~ asjson 1.0000000000000001E-001
 ~ asstring 1.0000000000000001E-001
+~ roundtrip same
 == jsonnum 7
 input 3.14
 type float
 bits 40091EB851EB851F
 ~ asjson 3.1400000000000001E+000
 ~ asstring 3.1400000000000001E+000
+~ roundtrip same
 == jsonnum 8
 input -0.0
 type float
 bits 8000000000000000
 ~ asjson -0.0000000000000000E+000
 ~ asstring -0.0000000000000000E+000
+~ roundtrip same
 == jsonnum 9
 input 1e0
 type float
 bits 3FF0000000000000
 ~ asjson 1.0000000000000000E+000
 ~ asstring 1.0000000000000000E+000
+~ roundtrip same
 == jsonnum 10
-~ input 1e999
+input 1e999
 ~ type float
 ~ bits 7FF0000000000000
 ~ asjson \u0020                  +Inf
 ~ asstring \u0020                  +Inf
+~ roundtrip changed
 == jsonnum 11
-~ input -1e999
+input -1e999
 ~ type float
 ~ bits FFF0000000000000
 ~ asjson \u0020                  -Inf
 ~ asstring \u0020                  -Inf
+~ roundtrip changed
 == jsonnum 12
-~ input 1e-999
-~ type float
+input 1e-999
+type float
 ~ bits 0000000000000000
 ~ asjson 0.0000000000000000E+000
 ~ asstring 0.0000000000000000E+000
+~ roundtrip same
 == jsonnum 13
-~ input 5e-324
-~ type float
+input 5e-324
+type float
 ~ bits 0000000000000001
 ~ asjson 4.9406564584124654E-324
 ~ asstring 4.9406564584124654E-324
+~ roundtrip same
 == jsonnum 14
-~ input 1.7976931348623157e308
-~ type float
+input 1.7976931348623157e308
+type float
 ~ bits 7FEFFFFFFFFFFFFF
 ~ asjson 1.7976931348623157E+308
 ~ asstring 1.7976931348623157E+308
+~ roundtrip same
 == jsonnum 15
-~ input 0.1e-5
-~ type float
+input 0.1e-5
+type float
 ~ bits 3EB0C6F7A0B5ED8D
 ~ asjson 9.9999999999999995E-007
 ~ asstring 9.9999999999999995E-007
+~ roundtrip same
 == jsonnum 16
-~ input 123456789012345678
-~ type int64
+input 123456789012345678
+type int64
 ~ bits 437B69B4BA630F35
 ~ asjson 123456789012345678
 ~ asstring 123456789012345678
+~ roundtrip same
 == jsonnum 17
-~ input 0.30000000000000004
-~ type float
+input 0.30000000000000004
+type float
 ~ bits 3FD3333333333334
 ~ asjson 3.0000000000000004E-001
 ~ asstring 3.0000000000000004E-001
+~ roundtrip same
 == jsonnum 18
-~ input 9007199254740993
-~ type int64
+input 9007199254740993
+type int64
 ~ bits 4340000000000000
 ~ asjson 9007199254740993
 ~ asstring 9007199254740993
+~ roundtrip same
 == jsonnum 19
-~ input 1.0000000000000002
-~ type float
+input 1.0000000000000002
+type float
 ~ bits 3FF0000000000001
 ~ asjson 1.0000000000000002E+000
 ~ asstring 1.0000000000000002E+000
+~ roundtrip same
 == jsonnum 20
-~ input 2.2250738585072014e-308
-~ type float
+input 2.2250738585072014e-308
+type float
 ~ bits 0010000000000000
 ~ asjson 2.2250738585072014E-308
 ~ asstring 2.2250738585072014E-308
+~ roundtrip same
 == jsonnum 21
-~ input 4.35
-~ type float
+input 4.35
+type float
 ~ bits 4011666666666666
 ~ asjson 4.3499999999999996E+000
 ~ asstring 4.3499999999999996E+000
+~ roundtrip same
 == jsonnum 22
-~ input 1e21
-~ type float
+input 1e21
+type float
 ~ bits 444B1AE4D6E2EF50
 ~ asjson 1.0000000000000000E+021
 ~ asstring 1.0000000000000000E+021
+~ roundtrip same
 == jsonnum 23
-~ input 1e22
-~ type float
+input 1e22
+type float
 ~ bits 4480F0CF064DD592
 ~ asjson 1.0000000000000000E+022
 ~ asstring 1.0000000000000000E+022
+~ roundtrip same
 == jsonnum 24
-~ input 1e23
-~ type float
+input 1e23
+type float
 ~ bits 44B52D02C7E14AF6
 ~ asjson 9.9999999999999992E+022
 ~ asstring 9.9999999999999992E+022
+~ roundtrip same
 == jsonnum 25
-~ input TJSONFloatNumber.Create(1/3)
-~ type float
+input TJSONFloatNumber.Create(1/3)
+type float
 ~ bits 3FD5555555555555
 ~ asjson 3.3333333333333331E-001
 ~ asstring 3.3333333333333331E-001
+~ roundtrip same
 == jsonnum 26
-~ input TJSONFloatNumber.Create(NaN)
-~ type float
+input TJSONFloatNumber.Create(NaN)
+type float
 ~ bits FFF8000000000000
 ~ asjson \u0020                   Nan
 ~ asstring \u0020                   Nan
+~ roundtrip changed
 == jsonnum 27
-~ input TJSONFloatNumber.Create(Infinity)
+input TJSONFloatNumber.Create(Infinity)
+type float
+~ bits 7FF0000000000000
+~ asjson \u0020                  +Inf
+~ asstring \u0020                  +Inf
+~ roundtrip changed
+== jsonnum 28
+input 0.6
+type float
+~ bits 3FE3333333333333
+~ asjson 5.9999999999999998E-001
+~ asstring 5.9999999999999998E-001
+~ roundtrip same
+== jsonnum 29
+input 0.3
+type float
+~ bits 3FD3333333333333
+~ asjson 2.9999999999999999E-001
+~ asstring 2.9999999999999999E-001
+~ roundtrip same
+== jsonnum 30
+input 144.79460245155357
+type float
+~ bits 4062196D621ED7CF
+~ asjson 1.4479460245155357E+002
+~ asstring 1.4479460245155357E+002
+~ roundtrip same
+== jsonnum 31
+input 0.8
+type float
+~ bits 3FE999999999999A
+~ asjson 8.0000000000000004E-001
+~ asstring 8.0000000000000004E-001
+~ roundtrip same
+== jsonnum 32
+input 7.557373003909573
+type float
+~ bits 401E3ABFFD1DDC0E
+~ asjson 7.5573730039095732E+000
+~ asstring 7.5573730039095732E+000
+~ roundtrip same
+== jsonnum 33
+input -8.901463875624668
+type float
+~ bits C021CD8CAC50AAAE
+~ asjson -8.9014638756246676E+000
+~ asstring -8.9014638756246676E+000
+~ roundtrip same
+== jsonnum 34
+input 1.13
+type float
+~ bits 3FF2147AE147AE14
+~ asjson 1.1299999999999999E+000
+~ asstring 1.1299999999999999E+000
+~ roundtrip same
+== jsonnum 35
+input 0.5
+type float
+~ bits 3FE0000000000000
+~ asjson 5.0000000000000000E-001
+~ asstring 5.0000000000000000E-001
+~ roundtrip same
+== jsonnum 36
+input 8.3
+type float
+~ bits 402099999999999A
+~ asjson 8.3000000000000007E+000
+~ asstring 8.3000000000000007E+000
+~ roundtrip same
+== jsonnum 37
+input -0.07
+type float
+~ bits BFB1EB851EB851EC
+~ asjson -7.0000000000000007E-002
+~ asstring -7.0000000000000007E-002
+~ roundtrip same
+== jsonnum 38
+input 1.2
+type float
+~ bits 3FF3333333333333
+~ asjson 1.2000000000000000E+000
+~ asstring 1.2000000000000000E+000
+~ roundtrip same
+== jsonnum 39
+input 2.4
+type float
+~ bits 4003333333333333
+~ asjson 2.3999999999999999E+000
+~ asstring 2.3999999999999999E+000
+~ roundtrip same
+== jsonnum 40
+input 917.54
+type float
+~ bits 408CAC51EB851EB8
+~ asjson 9.1753999999999996E+002
+~ asstring 9.1753999999999996E+002
+~ roundtrip same
+== jsonnum 41
+input 44.63431373
+type float
+~ bits 40465131313AE07C
+~ asjson 4.4634313730000002E+001
+~ asstring 4.4634313730000002E+001
+~ roundtrip same
+== jsonnum 42
+input 45.12972
+type float
+~ bits 4046909AAA3AD18D
+~ asjson 4.5129719999999999E+001
+~ asstring 4.5129719999999999E+001
+~ roundtrip same
+== jsonnum 43
+input 39.54
+type float
+~ bits 4043C51EB851EB85
+~ asjson 3.9539999999999999E+001
+~ asstring 3.9539999999999999E+001
+~ roundtrip same
+== jsonnum 44
+input 44.61
+type float
+~ bits 40464E147AE147AE
+~ asjson 4.4609999999999999E+001
+~ asstring 4.4609999999999999E+001
+~ roundtrip same
+== jsonnum 45
+input 43.36
+type float
+~ bits 4045AE147AE147AE
+~ asjson 4.3359999999999999E+001
+~ asstring 4.3359999999999999E+001
+~ roundtrip same
+== jsonnum 46
+input 40.91
+type float
+~ bits 4044747AE147AE14
+~ asjson 4.0909999999999997E+001
+~ asstring 4.0909999999999997E+001
+~ roundtrip same
+== jsonnum 47
+input 36.58
+type float
+~ bits 40424A3D70A3D70A
+~ asjson 3.6579999999999998E+001
+~ asstring 3.6579999999999998E+001
+~ roundtrip same
+== jsonnum 48
+input 24.384
+type float
+~ bits 4038624DD2F1A9FC
+~ asjson 2.4384000000000000E+001
+~ asstring 2.4384000000000000E+001
+~ roundtrip same
+== jsonnum 49
+input 37.67568
+type float
+~ bits 4042D67CAEA747D8
+~ asjson 3.7675680000000000E+001
+~ asstring 3.7675680000000000E+001
+~ roundtrip same
+== jsonnum 50
+input 25.8
+type float
+~ bits 4039CCCCCCCCCCCD
+~ asjson 2.5800000000000001E+001
+~ asstring 2.5800000000000001E+001
+~ roundtrip same
+== jsonnum 51
+input 42.97564103
+type float
+~ bits 40457CE1CE263E2D
+~ asjson 4.2975641029999998E+001
+~ asstring 4.2975641029999998E+001
+~ roundtrip same
+== jsonnum 52
+input 48.6
+type float
+~ bits 40484CCCCCCCCCCD
+~ asjson 4.8600000000000001E+001
+~ asstring 4.8600000000000001E+001
+~ roundtrip same
+== jsonnum 53
+input 37.41086957
+type float
+~ bits 4042B4975FC3092A
+~ asjson 3.7410869570000003E+001
+~ asstring 3.7410869570000003E+001
+~ roundtrip same
+== jsonnum 54
+input 29.93047652
+type float
+~ bits 403DEE33B58F188C
+~ asjson 2.9930476519999999E+001
+~ asstring 2.9930476519999999E+001
+~ roundtrip same
+== jsonnum 55
+input 44.75
+type float
+~ bits 4046600000000000
+~ asjson 4.4750000000000000E+001
+~ asstring 4.4750000000000000E+001
+~ roundtrip same
+== jsonnum 56
+input 45.21
+type float
+~ bits 40469AE147AE147B
+~ asjson 4.5210000000000001E+001
+~ asstring 4.5210000000000001E+001
+~ roundtrip same
+== jsonnum 57
+input 70.9124
+type float
+~ bits 4051BA64C2F837B5
+~ asjson 7.0912400000000005E+001
+~ asstring 7.0912400000000005E+001
+~ roundtrip same
+== jsonnum 58
+input 71.3262
+type float
+~ bits 4051D4E075F6FD22
+~ asjson 7.1326200000000000E+001
+~ asstring 7.1326200000000000E+001
+~ roundtrip same
+== jsonnum 59
+input 72.6
+type float
+~ bits 4052266666666666
+~ asjson 7.2599999999999994E+001
+~ asstring 7.2599999999999994E+001
+~ roundtrip same
+== jsonnum 60
+input 71.3
+type float
+~ bits 4051D33333333333
+~ asjson 7.1299999999999997E+001
+~ asstring 7.1299999999999997E+001
+~ roundtrip same
+== jsonnum 61
+input 71.7
+type float
+~ bits 4051ECCCCCCCCCCD
+~ asjson 7.1700000000000003E+001
+~ asstring 7.1700000000000003E+001
+~ roundtrip same
+== jsonnum 62
+input 55.21862745
+type float
+~ bits 404B9BFBFBF9E102
+~ asjson 5.5218627450000000E+001
+~ asstring 5.5218627450000000E+001
+~ roundtrip same
+== jsonnum 63
+input 73.1
+type float
+~ bits 4052466666666666
+~ asjson 7.3099999999999994E+001
+~ asstring 7.3099999999999994E+001
+~ roundtrip same
+== jsonnum 64
+input 60.51078431
+type float
+~ bits 404E416161596145
+~ asjson 6.0510784309999998E+001
+~ asstring 6.0510784309999998E+001
+~ roundtrip same
+== jsonnum 65
+input 64.998
+type float
+~ bits 40503FDF3B645A1D
+~ asjson 6.4998000000000005E+001
+~ asstring 6.4998000000000005E+001
+~ roundtrip same
+== jsonnum 66
+input 66.336
+type float
+~ bits 405095810624DD2F
+~ asjson 6.6335999999999999E+001
+~ asstring 6.6335999999999999E+001
+~ roundtrip same
+== jsonnum 67
+input 69.134
+type float
+~ bits 4051489374BC6A7F
+~ asjson 6.9134000000000000E+001
+~ asstring 6.9134000000000000E+001
+~ roundtrip same
+== jsonnum 68
+input 1e309
 ~ type float
 ~ bits 7FF0000000000000
 ~ asjson \u0020                  +Inf
 ~ asstring \u0020                  +Inf
-== jsonnum 28
-~ input 0.6
+~ roundtrip changed
+== jsonnum 69
+input 2e308
 ~ type float
-~ bits 3FE3333333333333
-~ asjson 5.9999999999999998E-001
-~ asstring 5.9999999999999998E-001
-== jsonnum 29
-~ input 0.3
+~ bits 7FF0000000000000
+~ asjson \u0020                  +Inf
+~ asstring \u0020                  +Inf
+~ roundtrip changed
+== jsonnum 70
+input 1e400
 ~ type float
-~ bits 3FD3333333333333
-~ asjson 2.9999999999999999E-001
-~ asstring 2.9999999999999999E-001
-== jsonnum 30
-~ input 144.79460245155357
+~ bits 7FF0000000000000
+~ asjson \u0020                  +Inf
+~ asstring \u0020                  +Inf
+~ roundtrip changed
+== jsonnum 71
+input -1e400
 ~ type float
-~ bits 4062196D621ED7CF
-~ asjson 1.4479460245155357E+002
-~ asstring 1.4479460245155357E+002
-== jsonnum 31
-~ input 0.8
+~ bits FFF0000000000000
+~ asjson \u0020                  -Inf
+~ asstring \u0020                  -Inf
+~ roundtrip changed
+== jsonnum 72
+input 1.8e308
 ~ type float
-~ bits 3FE999999999999A
-~ asjson 8.0000000000000004E-001
-~ asstring 8.0000000000000004E-001
-== jsonnum 32
-~ input 7.557373003909573
+~ bits 7FF0000000000000
+~ asjson \u0020                  +Inf
+~ asstring \u0020                  +Inf
+~ roundtrip changed
+== jsonnum 73
+input 1e4000
 ~ type float
-~ bits 401E3ABFFD1DDC0E
-~ asjson 7.5573730039095732E+000
-~ asstring 7.5573730039095732E+000
-== jsonnum 33
-~ input -8.901463875624668
-~ type float
-~ bits C021CD8CAC50AAAE
-~ asjson -8.9014638756246676E+000
-~ asstring -8.9014638756246676E+000
-== jsonnum 34
-~ input 1.13
-~ type float
-~ bits 3FF2147AE147AE14
-~ asjson 1.1299999999999999E+000
-~ asstring 1.1299999999999999E+000
-== jsonnum 35
-~ input 0.5
-~ type float
-~ bits 3FE0000000000000
-~ asjson 5.0000000000000000E-001
-~ asstring 5.0000000000000000E-001
-== jsonnum 36
-~ input 8.3
-~ type float
-~ bits 402099999999999A
-~ asjson 8.3000000000000007E+000
-~ asstring 8.3000000000000007E+000
-== jsonnum 37
-~ input -0.07
-~ type float
-~ bits BFB1EB851EB851EC
-~ asjson -7.0000000000000007E-002
-~ asstring -7.0000000000000007E-002
-== jsonnum 38
-~ input 1.2
-~ type float
-~ bits 3FF3333333333333
-~ asjson 1.2000000000000000E+000
-~ asstring 1.2000000000000000E+000
-== jsonnum 39
-~ input 2.4
-~ type float
-~ bits 4003333333333333
-~ asjson 2.3999999999999999E+000
-~ asstring 2.3999999999999999E+000
-== jsonnum 40
-~ input 917.54
-~ type float
-~ bits 408CAC51EB851EB8
-~ asjson 9.1753999999999996E+002
-~ asstring 9.1753999999999996E+002
-== jsonnum 41
-~ input 44.63431373
-~ type float
-~ bits 40465131313AE07C
-~ asjson 4.4634313730000002E+001
-~ asstring 4.4634313730000002E+001
-== jsonnum 42
-~ input 45.12972
-~ type float
-~ bits 4046909AAA3AD18D
-~ asjson 4.5129719999999999E+001
-~ asstring 4.5129719999999999E+001
-== jsonnum 43
-~ input 39.54
-~ type float
-~ bits 4043C51EB851EB85
-~ asjson 3.9539999999999999E+001
-~ asstring 3.9539999999999999E+001
-== jsonnum 44
-~ input 44.61
-~ type float
-~ bits 40464E147AE147AE
-~ asjson 4.4609999999999999E+001
-~ asstring 4.4609999999999999E+001
-== jsonnum 45
-~ input 43.36
-~ type float
-~ bits 4045AE147AE147AE
-~ asjson 4.3359999999999999E+001
-~ asstring 4.3359999999999999E+001
-== jsonnum 46
-~ input 40.91
-~ type float
-~ bits 4044747AE147AE14
-~ asjson 4.0909999999999997E+001
-~ asstring 4.0909999999999997E+001
-== jsonnum 47
-~ input 36.58
-~ type float
-~ bits 40424A3D70A3D70A
-~ asjson 3.6579999999999998E+001
-~ asstring 3.6579999999999998E+001
-== jsonnum 48
-~ input 24.384
-~ type float
-~ bits 4038624DD2F1A9FC
-~ asjson 2.4384000000000000E+001
-~ asstring 2.4384000000000000E+001
-== jsonnum 49
-~ input 37.67568
-~ type float
-~ bits 4042D67CAEA747D8
-~ asjson 3.7675680000000000E+001
-~ asstring 3.7675680000000000E+001
-== jsonnum 50
-~ input 25.8
-~ type float
-~ bits 4039CCCCCCCCCCCD
-~ asjson 2.5800000000000001E+001
-~ asstring 2.5800000000000001E+001
-== jsonnum 51
-~ input 42.97564103
-~ type float
-~ bits 40457CE1CE263E2D
-~ asjson 4.2975641029999998E+001
-~ asstring 4.2975641029999998E+001
-== jsonnum 52
-~ input 48.6
-~ type float
-~ bits 40484CCCCCCCCCCD
-~ asjson 4.8600000000000001E+001
-~ asstring 4.8600000000000001E+001
-== jsonnum 53
-~ input 37.41086957
-~ type float
-~ bits 4042B4975FC3092A
-~ asjson 3.7410869570000003E+001
-~ asstring 3.7410869570000003E+001
-== jsonnum 54
-~ input 29.93047652
-~ type float
-~ bits 403DEE33B58F188C
-~ asjson 2.9930476519999999E+001
-~ asstring 2.9930476519999999E+001
-== jsonnum 55
-~ input 44.75
-~ type float
-~ bits 4046600000000000
-~ asjson 4.4750000000000000E+001
-~ asstring 4.4750000000000000E+001
-== jsonnum 56
-~ input 45.21
-~ type float
-~ bits 40469AE147AE147B
-~ asjson 4.5210000000000001E+001
-~ asstring 4.5210000000000001E+001
-== jsonnum 57
-~ input 70.9124
-~ type float
-~ bits 4051BA64C2F837B5
-~ asjson 7.0912400000000005E+001
-~ asstring 7.0912400000000005E+001
-== jsonnum 58
-~ input 71.3262
-~ type float
-~ bits 4051D4E075F6FD22
-~ asjson 7.1326200000000000E+001
-~ asstring 7.1326200000000000E+001
-== jsonnum 59
-~ input 72.6
-~ type float
-~ bits 4052266666666666
-~ asjson 7.2599999999999994E+001
-~ asstring 7.2599999999999994E+001
-== jsonnum 60
-~ input 71.3
-~ type float
-~ bits 4051D33333333333
-~ asjson 7.1299999999999997E+001
-~ asstring 7.1299999999999997E+001
-== jsonnum 61
-~ input 71.7
-~ type float
-~ bits 4051ECCCCCCCCCCD
-~ asjson 7.1700000000000003E+001
-~ asstring 7.1700000000000003E+001
-== jsonnum 62
-~ input 55.21862745
-~ type float
-~ bits 404B9BFBFBF9E102
-~ asjson 5.5218627450000000E+001
-~ asstring 5.5218627450000000E+001
-== jsonnum 63
-~ input 73.1
-~ type float
-~ bits 4052466666666666
-~ asjson 7.3099999999999994E+001
-~ asstring 7.3099999999999994E+001
-== jsonnum 64
-~ input 60.51078431
-~ type float
-~ bits 404E416161596145
-~ asjson 6.0510784309999998E+001
-~ asstring 6.0510784309999998E+001
-== jsonnum 65
-~ input 64.998
-~ type float
-~ bits 40503FDF3B645A1D
-~ asjson 6.4998000000000005E+001
-~ asstring 6.4998000000000005E+001
-== jsonnum 66
-~ input 66.336
-~ type float
-~ bits 405095810624DD2F
-~ asjson 6.6335999999999999E+001
-~ asstring 6.6335999999999999E+001
-== jsonnum 67
-~ input 69.134
-~ type float
-~ bits 4051489374BC6A7F
-~ asjson 6.9134000000000000E+001
-~ asstring 6.9134000000000000E+001
+~ bits 7FF0000000000000
+~ asjson \u0020                  +Inf
+~ asstring \u0020                  +Inf
+~ roundtrip changed
 == xml 1
 0 9 #document
 1 1 svg

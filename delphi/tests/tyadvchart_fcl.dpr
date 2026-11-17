@@ -1,7 +1,8 @@
 { The FCL transcript: what the FCL units the chart uses give for a fixed set of inputs, one line per result.
   Built and run by scripts/delphi-probe.py --fcl with FPC (FPC's own units) and with dcc32 and dcc64 (the
   ports in delphi/fcl); every compiler must print delphi/tests/expected/fcl.txt, the lines that start with
-  '~ ' excepted for dcc (they are informational: the probe counts them when they differ).
+  '~ ' excepted for dcc (they are informational: those that differ must be the ones pinned per compiler
+  in delphi/tests/expected/fcl.dcc32.txt and fcl.dcc64.txt).
 
   The format:
   - every input prints a line '== <section> <number>', then its result lines;

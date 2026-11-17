@@ -28,10 +28,16 @@ are printed too.
                  by line with delphi/tests/expected/fcl.txt (trailing carriage returns dropped first).
                  The program runs with delphi/tests as its working directory (it reads files by paths
                  relative to it). FPC must give every line. dcc must give as many lines, and every line that does not
-                 start with '~ '; a '~ ' line (informational) that differs is only counted. Prints one
-                 line per compiler, and the first 10 differences of a compiler that fails; compiles no
-                 chart unit on its own and prints no unit summary.
---write-expected with --fcl: writes FPC's output to delphi/tests/expected/fcl.txt; runs no dcc.
+                 start with '~ '; the '~ ' lines (informational) that differ are pinned per compiler: they
+                 must be exactly the lines of delphi/tests/expected/fcl.<compiler>.txt, written one per line
+                 as '<line number><tab><the line dcc printed>' (a differing line that is not there fails,
+                 and so does one there that no longer differs or now differs otherwise). Prints one line
+                 per compiler, and the first 10 differences of a compiler that fails; compiles no chart
+                 unit on its own and prints no unit summary.
+--write-expected with --fcl: builds and runs the program with all three compilers; when every compared
+                 line of dcc32 and dcc64 equals FPC's, writes FPC's output to delphi/tests/expected/fcl.txt
+                 and each dcc's differing informational lines to fcl.dcc32.txt and fcl.dcc64.txt; else
+                 prints the differences and writes nothing.
 --fpc PATH       FPC's command-line compiler for --fcl (default: DEFAULT_FPC, FPC 3.2.2 of the
                  Lazarus installation).
 When delphi/fcl exists it is on dcc's unit and include paths, after source/ and before the --standins folder.
@@ -65,6 +71,7 @@ VALUES_DPR = os.path.join(ROOT, 'delphi', 'tests', 'tyadvchart_values.dpr')
 FCL_DIR = os.path.join(ROOT, 'delphi', 'fcl')
 FCL_DPR = os.path.join(ROOT, 'delphi', 'tests', 'tyadvchart_fcl.dpr')
 FCL_EXPECTED = os.path.join(ROOT, 'delphi', 'tests', 'expected', 'fcl.txt')
+FCL_PINNED = os.path.join(ROOT, 'delphi', 'tests', 'expected', 'fcl.%s.txt')  # % the dcc compiler
 FCL_END = 'FCL TRANSCRIPT END'
 DEFAULT_FPC = r'C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe'
 TIMEOUT = 120
@@ -183,35 +190,64 @@ def fcl_transcript(compiler, exe, tmp):
 
 
 def compare_transcript(compiler, got, expected):
-    """Returns (differences, number of informational lines that differ). For FPC every line counts."""
+    """Returns (differences, the informational lines that differ as '<line number>\t<line got>'). For FPC
+    every line counts."""
     diffs = []
-    info = 0
+    info = []
     if len(got) != len(expected):
         diffs.append('%d lines, expected %d' % (len(got), len(expected)))
     for i in range(min(len(got), len(expected))):
         if got[i] == expected[i]:
             continue
         if compiler != 'fpc' and expected[i].startswith('~ '):
-            info += 1
+            info.append('%d\t%s' % (i + 1, got[i]))
             continue
         diffs.append('line %d: expected [%s], got [%s]' % (i + 1, expected[i], got[i]))
     return diffs, info
 
 
+def read_lines(path):
+    """The lines of a UTF-8 file, trailing carriage returns dropped, without a last empty line."""
+    with open(path, encoding='utf-8', newline='') as f:
+        lines = [l.rstrip('\r') for l in f.read().split('\n')]
+    if lines and lines[-1] == '':
+        lines = lines[:-1]
+    return lines
+
+
+def write_lines(path, lines):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(''.join(l + '\n' for l in lines))
+
+
+def compare_pinned(info, pinned):
+    """The differences between the informational lines that differ (INFO) and the pinned ones."""
+    got, want = set(info), set(pinned)
+    diffs = []
+    for entry in sorted(got ^ want, key=lambda e: (int(e.split('\t', 1)[0]), e in got)):
+        n, text = entry.split('\t', 1)
+        if entry in want:
+            diffs.append('line %s: pinned [%s], not printed' % (n, text))
+        else:
+            diffs.append('line %s: differs and is not pinned: [%s]' % (n, text))
+    return diffs
+
+
 def main_fcl(args, exes, tmp):
     """--fcl; returns the number of errors."""
     errors = 0
-    compilers = ['fpc'] if args.write_expected else ['fpc'] + COMPILERS
     expected = None
+    pinned = {}
     if not args.write_expected:
-        if not os.path.isfile(FCL_EXPECTED):
-            print('no expected transcript: ' + FCL_EXPECTED + ' (write it with --fcl --write-expected)')
-            return 1
-        with open(FCL_EXPECTED, encoding='utf-8', newline='') as f:
-            expected = [l.rstrip('\r') for l in f.read().split('\n')]
-        if expected and expected[-1] == '':
-            expected = expected[:-1]
-    for c in compilers:
+        for path in [FCL_EXPECTED] + [FCL_PINNED % c for c in COMPILERS]:
+            if not os.path.isfile(path):
+                print('no expected transcript: ' + path + ' (write it with --fcl --write-expected)')
+                return 1
+        expected = read_lines(FCL_EXPECTED)
+        pinned = {c: read_lines(FCL_PINNED % c) for c in COMPILERS}
+    written = {}  # with --write-expected: what to write, per compiler
+    for c in ['fpc'] + COMPILERS:
         d = os.path.join(tmp, 'fcl-' + c)
         os.mkdir(d)
         lines, errs = fcl_transcript(c, exes[c], d)
@@ -221,11 +257,14 @@ def main_fcl(args, exes, tmp):
             for e in errs:
                 print('    ' + e)
             continue
-        if args.write_expected:
-            os.makedirs(os.path.dirname(FCL_EXPECTED), exist_ok=True)
-            with open(FCL_EXPECTED, 'w', encoding='utf-8', newline='\n') as f:
-                f.write('\n'.join(lines) + '\n')
-            print('%-9s %-6s wrote %s (%d lines)' % ('fcl', c, os.path.relpath(FCL_EXPECTED, ROOT), len(lines)))
+        if args.write_expected and c == 'fpc':
+            expected = lines
+            written[c] = lines
+            print('%-9s %-6s %d lines' % ('fcl', c, len(lines)))
+            continue
+        if expected is None:
+            errors += 1
+            print('%-9s %-6s not compared: FPC gave no transcript' % ('fcl', c))
             continue
         diffs, info = compare_transcript(c, lines, expected)
         if diffs:
@@ -233,8 +272,36 @@ def main_fcl(args, exes, tmp):
             print('%-9s %-6s TRANSCRIPT DIFFERS (%d differences)' % ('fcl', c, len(diffs)))
             for dline in diffs[:10]:
                 print('    ' + dline)
+            continue
+        if c == 'fpc':
+            print('%-9s %-6s TRANSCRIPT OK (%d lines, 0 informational lines differ)' % ('fcl', c, len(lines)))
+            continue
+        if args.write_expected:
+            written[c] = info
+            print('%-9s %-6s compared lines OK (%d lines, %d informational lines differ)'
+                  % ('fcl', c, len(lines), len(info)))
+            continue
+        diffs = compare_pinned(info, pinned[c])
+        if diffs:
+            errors += 1
+            print('%-9s %-6s PINNED LINES DIFFER (%d differences from %s)'
+                  % ('fcl', c, len(diffs), os.path.relpath(FCL_PINNED % c, ROOT)))
+            for dline in diffs[:10]:
+                print('    ' + dline)
         else:
-            print('%-9s %-6s TRANSCRIPT OK (%d lines, %d informational lines differ)' % ('fcl', c, len(lines), info))
+            print('%-9s %-6s TRANSCRIPT OK (%d lines, %d informational lines differ, pinned)'
+                  % ('fcl', c, len(lines), len(info)))
+    if args.write_expected:
+        if errors:
+            print('nothing written')
+            return errors
+        write_lines(FCL_EXPECTED, written['fpc'])
+        print('%-9s %-6s wrote %s (%d lines)' % ('fcl', 'fpc', os.path.relpath(FCL_EXPECTED, ROOT),
+                                                len(written['fpc'])))
+        for c in COMPILERS:
+            write_lines(FCL_PINNED % c, written[c])
+            print('%-9s %-6s wrote %s (%d lines)' % ('fcl', c, os.path.relpath(FCL_PINNED % c, ROOT),
+                                                    len(written[c])))
     return errors
 
 
@@ -249,7 +316,8 @@ def main():
                     help='build and run delphi/tests/tyadvchart_fcl.dpr with FPC, dcc32 and dcc64; '
                          'compare with delphi/tests/expected/fcl.txt')
     ap.add_argument('--write-expected', action='store_true',
-                    help="with --fcl: write FPC's output to delphi/tests/expected/fcl.txt")
+                    help="with --fcl: write FPC's output to delphi/tests/expected/fcl.txt and the informational "
+                         "lines dcc32 and dcc64 print differently to fcl.dcc32.txt and fcl.dcc64.txt")
     ap.add_argument('--fpc', default=DEFAULT_FPC, help="FPC's command-line compiler (default: %(default)s)")
     args = ap.parse_args()
     if args.write_expected and not args.fcl:
@@ -264,7 +332,7 @@ def main():
 
     exes = {c: os.path.join(args.bin, c + '.exe') for c in COMPILERS}
     missing = [e for e in exes.values() if not os.path.isfile(e)]
-    if missing and not args.write_expected:
+    if missing:
         print('Delphi compilers not found: ' + ', '.join(missing))
         print('Give the bin directory of a Delphi installation with --bin.')
         return 2

@@ -1,0 +1,92 @@
+221	~ name lengths 300
+224	~ asjson { "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk" : 1 }
+227	~ parsed
+228	~ count 2
+229	~ name lengths 300 300
+230	~ find key 1 1
+231	~ find key 2 2
+232	~ asjson { "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkakkkkkkkkkkkkkkkkkkkk" : 1, "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkbkkkkkkkkkkkkkkkkkkkk" : 2 }
+1272	~ value \uD83D
+1273	~ asjson "\uD83D"
+1274	~ tojson \uD83D
+1275	~ tojson strict \uD83D
+1276	~ fromjson \uD83D
+1280	~ value \uDE00
+1281	~ asjson "\uDE00"
+1282	~ tojson \uDE00
+1283	~ tojson strict \uDE00
+1284	~ fromjson \uDE00
+1288	~ value \uD83Dx
+1289	~ asjson "\uD83Dx"
+1290	~ tojson \uD83Dx
+1291	~ tojson strict \uD83Dx
+1292	~ fromjson \uD83Dx
+1296	~ value \u00F1\uD83D\uDE00
+1297	~ asjson "\u00F1\uD83D\uDE00"
+1298	~ tojson \u00F1\uD83D\uDE00
+1299	~ tojson strict \u00F1\uD83D\uDE00
+1300	~ fromjson \u00F1\uD83D\uDE00
+1304	~ value \u4E2D\uD83D\uDE00
+1305	~ asjson "\u4E2D\uD83D\uDE00"
+1306	~ tojson \u4E2D\uD83D\uDE00
+1307	~ tojson strict \u4E2D\uD83D\uDE00
+1308	~ fromjson \u4E2D\uD83D\uDE00
+1312	~ value \u4E2D\u6587\uD83D\uDE00
+1313	~ asjson "\u4E2D\u6587\uD83D\uDE00"
+1314	~ tojson \u4E2D\u6587\uD83D\uDE00
+1315	~ tojson strict \u4E2D\u6587\uD83D\uDE00
+1316	~ fromjson \u4E2D\u6587\uD83D\uDE00
+1324	~ fromjson A\u56FD\u00E9
+1401	~ value A\uFFFDB
+1403	~ value A\uFFFD
+1415	~ fromjson ab
+1423	~ fromjson ab
+1477	~ asjson 0.0000000000000000E+000
+1478	~ asstring 0.0000000000000000E+000
+1479	~ roundtrip changed
+1489	~ raises EJSONParser
+1490	~ bits -
+1491	~ asjson -
+1492	~ asstring -
+1493	~ roundtrip -
+1496	~ raises EJSONParser
+1497	~ bits -
+1498	~ asjson -
+1499	~ asstring -
+1500	~ roundtrip -
+1526	~ asjson 9.9999999999999996E-007
+1527	~ asstring 9.9999999999999996E-007
+1596	~ asjson 3.3333333333333332E-001
+1597	~ asstring 3.3333333333333332E-001
+1778	~ asjson 4.2975641029999999E+001
+1779	~ asstring 4.2975641029999999E+001
+1895	~ raises EJSONParser
+1896	~ bits -
+1897	~ asjson -
+1898	~ asstring -
+1899	~ roundtrip -
+1902	~ raises EJSONParser
+1903	~ bits -
+1904	~ asjson -
+1905	~ asstring -
+1906	~ roundtrip -
+1909	~ raises EJSONParser
+1910	~ bits -
+1911	~ asjson -
+1912	~ asstring -
+1913	~ roundtrip -
+1916	~ raises EJSONParser
+1917	~ bits -
+1918	~ asjson -
+1919	~ asstring -
+1920	~ roundtrip -
+1923	~ raises EJSONParser
+1924	~ bits -
+1925	~ asjson -
+1926	~ asstring -
+1927	~ roundtrip -
+1930	~ raises EJSONParser
+1931	~ bits -
+1932	~ asjson -
+1933	~ asstring -
+1934	~ roundtrip -
