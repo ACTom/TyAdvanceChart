@@ -31,6 +31,7 @@ type
     procedure TestFroundIsMathFround;
     procedure TestPowAndLogAreV8sToTheBit;
     procedure TestPowFollowsV8NotTheTextbook;
+    procedure TestSar32;
   end;
 
 implementation
@@ -394,6 +395,16 @@ begin
       LowerCase(IntToHex(q, 16)));
   end;
   AssertTrue('and a gap stays one', IsNan(TyJsFround(NaN)));
+end;
+
+procedure TAdvChartJsMathTest.TestSar32;
+begin
+  AssertEquals(1, TySar32(5, 2));
+  AssertEquals(-2, TySar32(-5, 2));
+  AssertEquals(-1, TySar32(-1, 31));
+  AssertEquals(-1073741824, TySar32(Low(Integer), 1));
+  AssertEquals(0, TySar32(High(Integer), 31));
+  AssertEquals(-7, TySar32(-7, 0));
 end;
 
 initialization

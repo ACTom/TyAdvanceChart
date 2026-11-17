@@ -350,24 +350,51 @@ end;
 { ==================== the layout ==================== }
 
 type
-  TCmpFn = function(A, B: Integer): Double is nested;
+  TTySankeyCmp = function(A, B: Integer; ACtx: Pointer): Double;
 
 { insertion sort: moves only on > 0 -- NaN and ties stay put, as a stable
   sort with this comparator leaves them }
-procedure StableSort(var A: TTyIntegerArray; ACmp: TCmpFn);
+procedure StableSort(var A: TTyIntegerArray; ACmp: TTySankeyCmp; ACtx: Pointer);
 var i, j, v: Integer;
 begin
   for i := 1 to High(A) do
   begin
     v := A[i];
     j := i - 1;
-    while (j >= 0) and (ACmp(A[j], v) > 0) do
+    while (j >= 0) and (ACmp(A[j], v, ACtx) > 0) do
     begin
       A[j + 1] := A[j];
       Dec(j);
     end;
     A[j + 1] := v;
   end;
+end;
+
+{ posd along the column: the layout's GetPos, which its comparators share }
+function SankeyPosOf(const S: TTySankeySolved; ANode: Integer): Double;
+begin
+  if S.Vertical then Result := S.Nodes[ANode].X else Result := S.Nodes[ANode].Y;
+end;
+
+{ the layout's comparators; ACtx is the solved record, or for SankeyCmpKey
+  the column keys }
+function SankeyCmpPos(A, B: Integer; ACtx: Pointer): Double;
+begin
+  Result := SankeyPosOf(TTySankeySolved(ACtx^), A) - SankeyPosOf(TTySankeySolved(ACtx^), B);
+end;
+function SankeyCmpKey(A, B: Integer; ACtx: Pointer): Double;
+begin
+  Result := TTyDoubleArray(ACtx^)[A] - TTyDoubleArray(ACtx^)[B];
+end;
+function SankeyCmpOut(A, B: Integer; ACtx: Pointer): Double;
+begin
+  Result := SankeyPosOf(TTySankeySolved(ACtx^), TTySankeySolved(ACtx^).Edges[A].Target) -
+    SankeyPosOf(TTySankeySolved(ACtx^), TTySankeySolved(ACtx^).Edges[B].Target);
+end;
+function SankeyCmpIn(A, B: Integer; ACtx: Pointer): Double;
+begin
+  Result := SankeyPosOf(TTySankeySolved(ACtx^), TTySankeySolved(ACtx^).Edges[A].Source) -
+    SankeyPosOf(TTySankeySolved(ACtx^), TTySankeySolved(ACtx^).Edges[B].Source);
 end;
 
 function TySankeySolve(AOption: TTyChartOption; ASeriesIndex: Integer;
@@ -408,7 +435,7 @@ var
   { posd along the column, the size from the value, the breadth }
   function GetPos(ANode: Integer): Double;
   begin
-    if S^.Vertical then Result := S^.Nodes[ANode].X else Result := S^.Nodes[ANode].Y;
+    Result := SankeyPosOf(S^, ANode);
   end;
   procedure SetPos(ANode: Integer; AV: Double);
   begin
@@ -460,29 +487,12 @@ var
     end;
   end;
 
-  function CmpPos(A, B: Integer): Double;
-  begin
-    Result := GetPos(A) - GetPos(B);
-  end;
-  function CmpKey(A, B: Integer): Double;
-  begin
-    Result := colKeys[A] - colKeys[B];
-  end;
-  function CmpOut(A, B: Integer): Double;
-  begin
-    Result := GetPos(S^.Edges[A].Target) - GetPos(S^.Edges[B].Target);
-  end;
-  function CmpIn(A, B: Integer): Double;
-  begin
-    Result := GetPos(S^.Edges[A].Source) - GetPos(S^.Edges[B].Source);
-  end;
-
   procedure ResolveCollisions;
   var c, q, cnt, nd: Integer; y0, dy: Double;
   begin
     for c := 0 to High(cols) do
     begin
-      StableSort(cols[c], @CmpPos);
+      StableSort(cols[c], @SankeyCmpPos, S);
       y0 := 0;
       nd := -1;
       cnt := Length(cols[c]);
@@ -874,7 +884,7 @@ begin
     end;
     SetLength(order, Length(colKeys));
     for i := 0 to High(order) do order[i] := i;
-    StableSort(order, @CmpKey);
+    StableSort(order, @SankeyCmpKey, @colKeys);
     { the columns in their keys' order }
     SetLength(sorted, Length(order));
     for i := 0 to High(order) do sorted[i] := cols[order[i]];
@@ -916,8 +926,8 @@ begin
     { ---- computeEdgeDepths ---- }
     for i := 0 to n - 1 do
     begin
-      StableSort(Result.Nodes[i].OutE, @CmpOut);
-      StableSort(Result.Nodes[i].InE, @CmpIn);
+      StableSort(Result.Nodes[i].OutE, @SankeyCmpOut, S);
+      StableSort(Result.Nodes[i].InE, @SankeyCmpIn, S);
     end;
     for i := 0 to n - 1 do
     begin

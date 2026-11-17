@@ -14,12 +14,12 @@ const
   ExpNestedBraceComments = 0;
   ExpObjFpcMode = 114;
   ExpFpcTypeNames = 0;
-  ExpStringCaseLabels = 22;
+  ExpStringCaseLabels = 0;
   ExpCompoundAssignments = 0;
-  ExpFpcOnlyKeywords = 5;
+  ExpFpcOnlyKeywords = 4;
   ExpBarePushPop = 0;
   ExpConditionalSymbols = 0;
-  ExpFpcOnlyNames = 5;
+  ExpFpcOnlyNames = 0;
 
 type
   TPascalScanTest = class(TTestCase)

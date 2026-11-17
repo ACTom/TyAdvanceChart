@@ -53,6 +53,8 @@ function TyJsFround(AX: Double): Double;
   axis' mapping end, every pixel taken back to a value on one. }
 function TyJsLog(AX: Double): Double;
 function TyJsPow(AX, AY: Double): Double;
+{ JavaScript's >>: the signed right shift. }
+function TySar32(AValue: Integer; AShift: Byte): Integer; inline;
 
 implementation
 
@@ -87,6 +89,11 @@ const
     $403DD85A, $403F6A7A, $40407E4C, $4041475C, $4042106C, $4042D97C,
     $4043A28C, $40446B9C, $404534AC, $4045FDBB, $4046C6CB, $40478FDB,
     $404858EB, $404921FB);
+
+function TySar32(AValue: Integer; AShift: Byte): Integer;
+begin
+  {$IFDEF FPC}Result := SarLongint(AValue, AShift);{$ELSE}if AValue >= 0 then Result := AValue shr AShift else Result := not ((not AValue) shr AShift);{$ENDIF}
+end;
 
 function FromBits(AQ: UInt64): Double;
 begin
@@ -299,7 +306,7 @@ begin
   if ix >= $3FE59428 then
   begin
     v := AIY;
-    Exit((1 - (SarLongint(hx, 30) and 2)) * (v - 2.0 * (AX - (w * w / (w + v) - r))));
+    Exit((1 - (TySar32(hx, 30) and 2)) * (v - 2.0 * (AX - (w * w / (w + v) - r))));
   end;
   if AIY = 1 then Exit(w);
   { -1/(x + r), accurately }
@@ -610,7 +617,7 @@ begin
   begin
     if hy < 0 then Exit(-pi_o_2 - tiny) else Exit(pi_o_2 + tiny);
   end;
-  k := SarLongint(iy - ix, 20);
+  k := TySar32(iy - ix, 20);
   if k > 60 then
   begin
     { |y/x| > 2^60 }
@@ -1048,7 +1055,7 @@ begin
   z := 1.0 - (r - z);
   j := HighWord(z);
   j := j + (n shl 20);
-  if SarLongint(j, 20) <= 0 then
+  if TySar32(j, 20) <= 0 then
     z := ScalbN(z, n)                            { subnormal output }
   else
     z := WithHigh(z, j);

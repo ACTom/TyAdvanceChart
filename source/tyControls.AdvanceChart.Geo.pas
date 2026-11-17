@@ -1634,8 +1634,8 @@ begin
     if i + 1 <= n then cy := Ord(u[i + 1]) - 64 else cy := NaN;
     yi := ToInt32(cy);
     { ZigZag }
-    xi := SarLongint(xi, 1) xor (-(xi and 1));
-    yi := SarLongint(yi, 1) xor (-(yi and 1));
+    xi := TySar32(xi, 1) xor (-(xi and 1));
+    yi := TySar32(yi, 1) xor (-(yi and 1));
     { Delta }
     x := xi + prevX;
     y := yi + prevY;

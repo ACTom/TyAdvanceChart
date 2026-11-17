@@ -148,33 +148,31 @@ end;
 
 function TyAriaTypeName(const ASubType: string): string;
 begin
-  case ASubType of
-    'pie': Result := rsTyChartTypePie;
-    'bar': Result := rsTyChartTypeBar;
-    'line': Result := rsTyChartTypeLine;
-    'scatter': Result := rsTyChartTypeScatter;
-    'effectScatter': Result := rsTyChartTypeEffectScatter;
-    'radar': Result := rsTyChartTypeRadar;
-    'tree': Result := rsTyChartTypeTree;
-    'treemap': Result := rsTyChartTypeTreemap;
-    'boxplot': Result := rsTyChartTypeBoxplot;
-    'candlestick': Result := rsTyChartTypeCandlestick;
-    'k': Result := rsTyChartTypeK;
-    'heatmap': Result := rsTyChartTypeHeatmap;
-    'map': Result := rsTyChartTypeMap;
-    'parallel': Result := rsTyChartTypeParallel;
-    'lines': Result := rsTyChartTypeLines;
-    'graph': Result := rsTyChartTypeGraph;
-    'sankey': Result := rsTyChartTypeSankey;
-    'funnel': Result := rsTyChartTypeFunnel;
-    'gauge': Result := rsTyChartTypeGauge;
-    'pictorialBar': Result := rsTyChartTypePictorialBar;
-    'themeRiver': Result := rsTyChartTypeThemeRiver;
-    'sunburst': Result := rsTyChartTypeSunburst;
-    'custom': Result := rsTyChartTypeCustom;
+  if ASubType = 'pie' then Result := rsTyChartTypePie
+  else if ASubType = 'bar' then Result := rsTyChartTypeBar
+  else if ASubType = 'line' then Result := rsTyChartTypeLine
+  else if ASubType = 'scatter' then Result := rsTyChartTypeScatter
+  else if ASubType = 'effectScatter' then Result := rsTyChartTypeEffectScatter
+  else if ASubType = 'radar' then Result := rsTyChartTypeRadar
+  else if ASubType = 'tree' then Result := rsTyChartTypeTree
+  else if ASubType = 'treemap' then Result := rsTyChartTypeTreemap
+  else if ASubType = 'boxplot' then Result := rsTyChartTypeBoxplot
+  else if ASubType = 'candlestick' then Result := rsTyChartTypeCandlestick
+  else if ASubType = 'k' then Result := rsTyChartTypeK
+  else if ASubType = 'heatmap' then Result := rsTyChartTypeHeatmap
+  else if ASubType = 'map' then Result := rsTyChartTypeMap
+  else if ASubType = 'parallel' then Result := rsTyChartTypeParallel
+  else if ASubType = 'lines' then Result := rsTyChartTypeLines
+  else if ASubType = 'graph' then Result := rsTyChartTypeGraph
+  else if ASubType = 'sankey' then Result := rsTyChartTypeSankey
+  else if ASubType = 'funnel' then Result := rsTyChartTypeFunnel
+  else if ASubType = 'gauge' then Result := rsTyChartTypeGauge
+  else if ASubType = 'pictorialBar' then Result := rsTyChartTypePictorialBar
+  else if ASubType = 'themeRiver' then Result := rsTyChartTypeThemeRiver
+  else if ASubType = 'sunburst' then Result := rsTyChartTypeSunburst
+  else if ASubType = 'custom' then Result := rsTyChartTypeCustom
   else
     Result := rsTyChartTypeChart;
-  end;
 end;
 
 function TyAriaLabelKey(AAria: TJSONObject; const APath: array of string): TJSONData;
