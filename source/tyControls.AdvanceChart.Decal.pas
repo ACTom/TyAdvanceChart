@@ -705,6 +705,7 @@ begin
   AScope.Idx := (AScope.Idx + 1) mod ACount;
 end;
 
+initialization
 finalization
   FreeAndNil(GBuiltins);
 

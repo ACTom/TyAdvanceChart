@@ -1605,7 +1605,7 @@ type
       Z2 are never written through it -- SetElement is what re-sorts the
       paint order -- and nothing is written through the shared empty element
       it answers out of range, as Element does. }
-    function Ref(AIndex: Integer): PTyChartElement; inline;
+    function Ref(AIndex: Integer): PTyChartElement; {$IFDEF FPC}inline;{$ENDIF}
     { THE JOURNAL [P2]. A build opens a session (JournalOpen) and closes it
       when it is done (JournalClose); inside it, while Record is on, the
       first SetElement of each index keeps what it overwrote. Writes inside

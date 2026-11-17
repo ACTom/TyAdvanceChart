@@ -4003,6 +4003,7 @@ begin
   end;
 end;
 
+initialization
 finalization
   FreeAndNil(GDecalCache);
   DropHaloOutlines;

@@ -4737,15 +4737,15 @@ const
     Name: string;
     Build: TTyMarkBuilder;
   end = (
-    (Name: 'bar';                       Build: @BuildBars),
-    (Name: 'line';                      Build: @BuildLine),
-    (Name: 'scatter';                   Build: @BuildScatter),
-    (Name: 'candlestick';               Build: @BuildCandlestick),
+    (Name: 'bar';                       Build: BuildBars),
+    (Name: 'line';                      Build: BuildLine),
+    (Name: 'scatter';                   Build: BuildScatter),
+    (Name: 'candlestick';               Build: BuildCandlestick),
     { [Batch 108] }
-    (Name: 'boxplot';                   Build: @BuildBoxplot),
-    (Name: TyPictorialSeriesTypeName;   Build: @BuildPictorialBar),
-    (Name: 'heatmap';                   Build: @BuildHeatmap),
-    (Name: 'effectScatter';             Build: @BuildScatter));
+    (Name: 'boxplot';                   Build: BuildBoxplot),
+    (Name: TyPictorialSeriesTypeName;   Build: BuildPictorialBar),
+    (Name: 'heatmap';                   Build: BuildHeatmap),
+    (Name: 'effectScatter';             Build: BuildScatter));
 
   { AND THE ONES DRAWN SOMEWHERE ELSE. A pie is not on a coordinate system,
     so its geometry is solved in AdvanceChart.Pie and never reaches this unit --
@@ -4773,7 +4773,7 @@ function RendererFor(const AType: string): TTyMarkBuilder;
 var i: Integer;
 begin
   for i := 0 to High(cRenderers) do
-    if cRenderers[i].Name = AType then Exit(cRenderers[i].Build);
+    if cRenderers[i].Name = AType then begin Result := cRenderers[i].Build; Exit; end;
   Result := nil;
 end;
 

@@ -522,11 +522,13 @@ begin
           Result[i].Kind := cckNumber;
           Result[i].Num := AData[i].VInt64^;
         end;
+      {$IFDEF FPC}
       vtQWord:
         begin
           Result[i].Kind := cckNumber;
           Result[i].Num := AData[i].VQWord^;
         end;
+      {$ENDIF}
       vtExtended:
         begin
           Result[i].Kind := cckNumber;
@@ -562,6 +564,13 @@ begin
           Result[i].Kind := cckText;
           Result[i].Text := AData[i].VChar;
         end;
+      {$IFNDEF FPC}
+      vtWideChar:
+        begin
+          Result[i].Kind := cckText;
+          Result[i].Text := AData[i].VWideChar;
+        end;
+      {$ENDIF}
       vtBoolean:
         begin
           Result[i].Kind := cckNumber;
@@ -1111,7 +1120,7 @@ begin
     if Result.Duration > 0 then
     begin
       { [spec 242] config.during, before the option's *Animation }
-      if AEl <> nil then Result.During := AEl.DuringCfg;
+      if AEl <> nil then Result.During := AEl.DuringCfg();
       Result.SetToFinal := True;
       Result.Scope := word;
     end;
@@ -1778,6 +1787,7 @@ begin
   if (i >= 0) and (i <= High(FRaws)) then Result := FRaws[i];
 end;
 
+initialization
 finalization
   FreeAndNil(GRenderItems);
 end.

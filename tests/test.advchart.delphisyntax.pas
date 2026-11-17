@@ -21,6 +21,7 @@ const
   ExpConditionalSymbols = 0;
   ExpFpcOnlyNames = 0;
   ExpFloatCastsOfNonLiterals = 0;
+  ExpFinalizationWithoutInitialization = 0;
   // Load fails when it finds fewer units than this under source/ (114 when the census was written).
   MinSourceUnits = 114;
 
@@ -47,6 +48,7 @@ type
     procedure TestConditionalSymbols;
     procedure TestFpcOnlyNames;
     procedure TestFloatCastOperands;
+    procedure TestFinalizationHasInitialization;
   end;
 
 implementation
@@ -866,6 +868,56 @@ begin
     w.Finds.Check('casts to Double, Single, Extended, Real, Currency, Comp or TDateTime of anything ' +
       'but a float literal (write Double(1.0) for a literal, TyIntToDouble(expr) for an integer ' +
       'expression, and no cast for a value that already is a Double)', ExpFloatCastsOfNonLiterals);
+  finally
+    w.Free;
+  end;
+end;
+
+type
+  { Notes, per file, the line of the first finalization and whether initialization occurs. }
+  TSectionWalker = class(TWordWalker)
+    Current: TSourceFile;
+    FinLine: Integer;
+    HasInit: Boolean;
+    procedure Flush;
+    procedure OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer); override;
+  end;
+
+procedure TSectionWalker.Flush;
+begin
+  if (Current <> nil) and (FinLine <> 0) and not HasInit then
+    Finds.Add(Current, FinLine);
+  Current := nil;
+  FinLine := 0;
+  HasInit := False;
+end;
+
+procedure TSectionWalker.OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer);
+begin
+  if Lower(ExtractFileExt(AFile.Name)) <> '.pas' then
+    Exit;
+  if AFile <> Current then
+  begin
+    Flush;
+    Current := AFile;
+  end;
+  if AWord = 'initialization' then
+    HasInit := True
+  else if (AWord = 'finalization') and (FinLine = 0) then
+    FinLine := LineOf(AFile, AStart);
+end;
+
+procedure TAdvChartDelphiSyntaxTest.TestFinalizationHasInitialization;
+var
+  w: TSectionWalker;
+begin
+  w := TSectionWalker.Create;
+  try
+    w.Walk;
+    w.Flush;
+    w.Finds.Check('units with a finalization section but no initialization section (Delphi ' +
+      'requires one: put an empty initialization on the line before finalization)',
+      ExpFinalizationWithoutInitialization);
   finally
     w.Free;
   end;

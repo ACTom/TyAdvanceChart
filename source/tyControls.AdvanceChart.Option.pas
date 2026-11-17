@@ -1093,7 +1093,7 @@ var
   depth: Integer;
   quoteEsc: Boolean;
 
-  procedure Ws; inline;
+  procedure Ws; {$IFDEF FPC}inline;{$ENDIF}
   begin
     while p^ in [' ', #9, #10, #13] do Inc(p);
   end;

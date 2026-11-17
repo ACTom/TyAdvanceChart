@@ -2962,6 +2962,7 @@ begin
   SetAnimProp(AKey, TyAnimNum(AValue));
 end;
 
+initialization
 finalization
   FlushGrave;
   FreeAndNil(GGrave);

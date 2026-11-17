@@ -1292,6 +1292,7 @@ begin
   Result.BreakEnd := NaN;
 end;
 
+initialization
 finalization
   TyChartClearFormatters;
   TyChartClearPositionHandlers;

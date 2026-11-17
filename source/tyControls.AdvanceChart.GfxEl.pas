@@ -3524,6 +3524,7 @@ begin
   Result := True;
 end;
 
+initialization
 finalization
   FreeAndNil(GDurings);
 

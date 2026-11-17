@@ -2921,7 +2921,7 @@ begin
 end;
 
 { inLineRange }
-function InLine(AP, A0, A1: Double): Boolean;
+function InLineRange(AP, A0, A1: Double): Boolean;
 begin
   Result := Le(A0, AP) and Le(AP, A1);
 end;
@@ -2976,7 +2976,7 @@ begin
           if ALayout.Kind = blkPoint then
           begin
             if AArea.BrushType = btLineX then t := ALayout.X else t := ALayout.Y;
-            Exit(InLine(t, r0, r1));
+            Exit(InLineRange(t, r0, r1));
           end;
           if AArea.BrushType = btLineX then
           begin
@@ -2995,8 +2995,8 @@ begin
             l0 := l1;
             l1 := t;
           end;
-          Result := InLine(l0, r0, r1) or InLine(l1, r0, r1)
-            or InLine(r0, l0, l1) or InLine(r1, l0, l1);
+          Result := InLineRange(l0, r0, r1) or InLineRange(l1, r0, r1)
+            or InLineRange(r0, l0, l1) or InLineRange(r1, l0, l1);
         end;
     end;
   finally

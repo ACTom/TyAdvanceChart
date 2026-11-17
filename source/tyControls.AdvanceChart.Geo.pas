@@ -7046,6 +7046,7 @@ begin
   end;
 end;
 
+initialization
 finalization
   TyChartClearMaps;
   FreeAndNil(GGeoDefaults);

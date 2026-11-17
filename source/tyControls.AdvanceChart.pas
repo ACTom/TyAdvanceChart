@@ -7082,6 +7082,7 @@ end;
 {$I tyControls.AdvanceChart.Control.Brush.inc}
 {$I tyControls.AdvanceChart.Control.Thumbnail.inc}
 
+initialization
 finalization
   FreeAndNil(GTyCharts);
   FreeAndNil(GTyConnected);

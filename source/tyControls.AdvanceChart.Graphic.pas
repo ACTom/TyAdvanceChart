@@ -816,7 +816,7 @@ begin
     begin
       { [spec 242] config.during: the element's userDuring bound, before
         the option's own *Animation is laid over the config }
-      if AEl <> nil then Result.During := AEl.DuringCfg;
+      if AEl <> nil then Result.During := AEl.DuringCfg();
       Result.SetToFinal := True;
       Result.Scope := AType;
     end;
