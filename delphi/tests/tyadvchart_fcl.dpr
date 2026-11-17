@@ -35,7 +35,7 @@ var
   GInfo: Boolean;
 
 { S as UTF-16 code units: $20..$7E except '\' as they are, any other unit as \uXXXX; a blank that is the
-  first or the last unit is written   as well, so that no line depends on blanks at its ends. }
+  first or the last unit is written \u0020 as well, so that no line depends on blanks at its ends. }
 function Esc(const S: string): string;
 var
   u: UnicodeString;
@@ -58,6 +58,7 @@ end;
   they can only be the blank after a label whose value is empty ('key ' + Esc('') is 'key'). }
 procedure Line(const S: string);
 begin
+  { An empty informational line would print '~' without its blank, and so be compared: none is empty. }
   if GInfo then
     Writeln(TrimRight('~ ' + S))
   else

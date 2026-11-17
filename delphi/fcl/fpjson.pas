@@ -28,12 +28,20 @@
     it for an Int64); array of const takes Delphi's kinds of string and character as well;
     AsUnicodeString converts nothing;
   - JSONStringToString walks the string with PChar, not PAnsiChar; \u escapes: each escape is
-    one code unit, appended as it is (an unpaired surrogate is kept, \u0000 is a #0); FPC 3.2.2
-    keeps an escape pending, encodes it to UTF-8 together with the next escape, and appends the
-    pending one a second time, so it damages valid text and drops unpaired surrogates (a
-    deliberate difference: the port does not copy that defect); GetJSON(TStream)
-    without a stream parser handler reads the stream as UTF-8 (and returns nil, as FPC's does);
-    DumpJSON writes UTF-8, as FPC's does, not the bytes of the UTF-16 string;
+    one code unit, appended as it is (an unpaired surrogate is kept; \u0000 is a #0, where FPC's
+    drops it); FPC 3.2.2 keeps an escape pending, encodes it to UTF-8 together with the next
+    escape, and appends the pending one a second time, so it damages valid text and drops
+    unpaired surrogates (a deliberate difference: the port does not copy that defect; its
+    MaybeAppendUnicode and U1 are kept only to stay line-comparable with FPC's);
+  - bytes become text through tyfclutf8's TyFclUtf8Decode only: GetJSON(TStream) without a
+    stream parser handler reads the stream with it (and returns nil, as FPC's does); FPC keeps
+    the raw bytes in its byte string, the port has UTF-16 strings and replaces an invalid
+    sequence by U+FFFD (a deliberate difference: it never raises on invalid bytes);
+    GetJSON(string) without a string parser handler hands the stream handler the text's UTF-8
+    bytes (TStringStream with TEncoding.UTF8; FPC's string already holds them);
+  - DumpJSON writes UTF-8, as FPC's does, not the bytes of the UTF-16 string; an unpaired
+    surrogate the port keeps is written as the encoder's replacement character (EF BF BD),
+    whereas AsJSON keeps the unit;
   - floating-point numbers and text are converted by tyfclnum (TyFclTextToFloat for Val,
     TyFclLocaleTextToFloat for TryStrToFloat, TyFclFloatToText for Str, TyFclFloatToStr for
     FloatToStr);
@@ -667,7 +675,7 @@ Function GetJSONStringParserHandler: TJSONStringParserHandler;
 
 implementation
 
-Uses typinfo, tyfclnum;
+Uses typinfo, tyfclnum, tyfclutf8;
 
 Resourcestring
   SErrCannotConvertFromNull = 'Cannot convert data from Null value';
@@ -805,6 +813,7 @@ Var
   I,J,L,U1,U2 : Integer;
   App : String;
 
+  // Kept to stay line-comparable with FPC; U1 is never non-zero here.
   Procedure MaybeAppendUnicode;
 
   Var
@@ -932,7 +941,7 @@ begin
     JPSH(JSON,UseUTF8,Result)
   else
     begin
-      SS:=TStringStream.Create(JSON);
+      SS:=TStringStream.Create(JSON,TEncoding.UTF8);
     try
       Result:=GetJSON(SS,UseUTF8);
     finally
@@ -959,7 +968,7 @@ begin
     Setlength(B,JSON.Size);
     if Length(B)>0 then
       JSON.ReadBuffer(B[0],Length(B));
-    S:=TEncoding.UTF8.GetString(B);
+    S:=TyFclUtf8Decode(B);
     end;
 end;
 

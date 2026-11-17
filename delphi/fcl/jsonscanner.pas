@@ -16,10 +16,14 @@
   packages/fcl-json/src/jsonscanner.pp. Compiled by Delphi only: Lazarus builds with FPC's own unit.
   Changed, by kind:
   - the source is Delphi's UTF-16 string and the scanner walks it with PChar, not PAnsiChar (Move
-    counts SizeOf(Char)); a stream is read as UTF-8 (a byte order mark is skipped under joBOMCheck,
-    as FPC's does, and is otherwise read as a character, which the scanner rejects as FPC's does
-    its first byte); \u escapes: each escape is one code unit, appended as it is (a valid pair
-    stays a pair, an unpaired surrogate is kept, \u0000 is a #0), and joUTF8 and UseUTF8 change
+    counts SizeOf(Char)); a stream is read as UTF-8 by tyfclutf8's TyFclUtf8Decode (a byte order
+    mark is skipped under joBOMCheck, as FPC's does, and is otherwise read as a character, which
+    the scanner rejects as FPC's does its first byte); FPC keeps the raw bytes in its byte
+    string, the port has UTF-16 strings and replaces an invalid sequence by U+FFFD (a deliberate
+    difference: it never raises on invalid bytes); \u escapes: each escape is one code unit,
+    appended as it is (a valid pair stays a pair, an unpaired surrogate is kept, \u0000 is a #0
+    where FPC's drops it; MaybeAppendUnicode and u1 are kept only to stay line-comparable with
+    FPC's, u1 is never non-zero), and joUTF8 and UseUTF8 change
     nothing; FPC 3.2.2 pairs a pending escape with the next one and encodes the two to UTF-8, so
     it damages a valid pair that follows an odd number of escapes and drops unpaired surrogates
     (a deliberate difference: the port does not copy that defect); the property Strict is written
@@ -140,6 +144,8 @@ const
 
 implementation
 
+uses tyfclutf8;
+
 constructor TJSONScanner.Create(Source : TStream; AUseUTF8 : Boolean);
 
 Var
@@ -181,7 +187,7 @@ begin
   SetLength(B,Source.Size-Source.Position);
   if Length(B)>0 then
     Source.ReadBuffer(B[0],Length(B));
-  S:=TEncoding.UTF8.GetString(B);
+  S:=TyFclUtf8Decode(B);
   Create(S,AOptions)
 end;
 
@@ -275,6 +281,7 @@ var
   Line : String;
   IsStar,EOC: Boolean;
 
+  // Kept to stay line-comparable with FPC; u1 is never non-zero here.
   Procedure MaybeAppendUnicode;
 
   Var
@@ -378,8 +385,8 @@ begin
             I:=Length(S);
             if (SectionLength+I>0) then
               begin
-              // If length=1, we know it was not \uXX, but u1 can be nonzero, and we must first append it.
-              // example: \u00f8\"
+              // FPC's: if length=1, it was not \uXX, but u1 can be nonzero and is appended first
+              // (example: \u00f8\"). Here a \uXX is length 1 too, and u1 is always 0.
               if (I=1) and (u1<>0) then
                 MaybeAppendUnicode;
               SetLength(FCurTokenString, OldLength + SectionLength+i);

@@ -209,6 +209,106 @@ begin
   end;
 end;
 
+{ The code units of S in hexadecimal, for the messages. }
+function UnitsHex(const S: string): string;
+var
+  i: Integer;
+begin
+  Result := '';
+  for i := 1 to Length(S) do
+    Result := Result + ' $' + IntToHex(Ord(S[i]), 4);
+end;
+
+{ Each \u escape is one code unit, in order, in the scanner and in JSONStringToString: the inputs of the
+  FCL transcript's jsonstr 14-20, informational there because FPC 3.2.2 drops unpaired surrogates and
+  pairs a pending escape with the next one. Also \u0000 (FPC's drops it) and DumpJSON of a kept
+  unpaired surrogate. }
+procedure CheckJsonEscapes;
+const
+  cInputs: array[0..6] of string = (
+    '\ud83d', '\ude00', '\ud83dx', '\u00f1\ud83d\ude00', '\u4e2d\ud83d\ude00', '\u4e2d\u6587\ud83d\ude00',
+    '\u0041\u56fd\u00e9');
+  cUnits: array[0..6] of string = (
+    #$D83D, #$DE00, #$D83D'x', #$00F1#$D83D#$DE00, #$4E2D#$D83D#$DE00, #$4E2D#$6587#$D83D#$DE00,
+    'A'#$56FD#$00E9);
+var
+  i: Integer;
+  d: TJSONData;
+  s: string;
+  st: TBytesStream;
+begin
+  for i := Low(cInputs) to High(cInputs) do
+  begin
+    d := GetJSON('"' + cInputs[i] + '"');
+    try
+      s := d.AsString;
+    finally
+      d.Free;
+    end;
+    Check(s = cUnits[i], 'JSON: "' + cInputs[i] + '" reads as' + UnitsHex(cUnits[i]) + ', got' + UnitsHex(s));
+    s := JSONStringToString(cInputs[i]);
+    Check(s = cUnits[i], 'JSON: JSONStringToString(' + cInputs[i] + ') =' + UnitsHex(cUnits[i]) + ', got' + UnitsHex(s));
+  end;
+  Check(Length(JSONStringToString('\u0000')) = 1, 'JSON: Length(JSONStringToString(\u0000)) = 1');
+  Check(JSONStringToString('a\u0000b') = 'a'#0'b', 'JSON: JSONStringToString(a\u0000b) = a #0 b');
+  { DumpJSON writes a kept unpaired surrogate as the replacement character's UTF-8 bytes. }
+  d := TJSONString.Create('a' + #$D83D);
+  st := TBytesStream.Create;
+  try
+    d.DumpJSON(st);
+    Check((st.Size = 6) and (st.Bytes[0] = $22) and (st.Bytes[1] = $61) and (st.Bytes[2] = $EF)
+      and (st.Bytes[3] = $BF) and (st.Bytes[4] = $BD) and (st.Bytes[5] = $22),
+      'JSON: DumpJSON of a + lone $D83D writes 22 61 EF BF BD 22');
+  finally
+    st.Free;
+    d.Free;
+  end;
+end;
+
+{ A stream with invalid UTF-8 parses: an invalid sequence reads as U+FFFD (FPC's keeps the bytes). }
+procedure CheckJsonInvalidBytes;
+const
+  cBytes1: array[0..4] of Byte = ($22, $41, $FF, $42, $22);
+  cBytes2: array[0..4] of Byte = ($22, $41, $E5, $9B, $22);
+var
+  b: TBytes;
+  st: TBytesStream;
+  p: TJSONParser;
+  d: TJSONData;
+  s: string;
+  k: Integer;
+begin
+  for k := 1 to 2 do
+  begin
+    SetLength(b, 5);
+    if k = 1 then
+      Move(cBytes1[0], b[0], 5)
+    else
+      Move(cBytes2[0], b[0], 5);
+    st := TBytesStream.Create(b);
+    try
+      p := TJSONParser.Create(st, [joUTF8]);
+      try
+        d := p.Parse;
+      finally
+        p.Free;
+      end;
+    finally
+      st.Free;
+    end;
+    try
+      Check(d.JSONType = jtString, 'JSON: invalid UTF-8 in a stream still gives a string');
+      s := d.AsString;
+    finally
+      d.Free;
+    end;
+    if k = 1 then
+      Check(s = 'A'#$FFFD'B', 'JSON: the bytes 22 41 FF 42 22 read as $0041 $FFFD $0042, got' + UnitsHex(s))
+    else
+      Check(s = 'A'#$FFFD, 'JSON: the bytes 22 41 E5 9B 22 read as $0041 $FFFD (the quote survives), got' + UnitsHex(s));
+  end;
+end;
+
 { delphi/fcl's JSON units keep strings as UTF-16: an escaped surrogate pair is the two code units, a
   non-ASCII character needs no escape, and a stream of UTF-8 bytes reads as the same text. }
 procedure CheckJsonStrings;
@@ -228,28 +328,6 @@ begin
   finally
     d.Free;
   end;
-  { Each \u escape is one code unit, where FPC 3.2.2 pairs a pending escape with the next one. }
-  d := GetJSON('"\u00f1\ud83d\ude00"');
-  try
-    s := d.AsString;
-    Check((Length(s) = 3) and (Ord(s[1]) = $00F1) and (Ord(s[2]) = $D83D) and (Ord(s[3]) = $DE00),
-      'JSON: "\u00f1\ud83d\ude00" reads as $00F1 $D83D $DE00');
-  finally
-    d.Free;
-  end;
-  d := GetJSON('"\ud83d"');
-  try
-    s := d.AsString;
-    Check((Length(s) = 1) and (Ord(s[1]) = $D83D), 'JSON: "\ud83d" reads as $D83D (an unpaired surrogate is kept)');
-  finally
-    d.Free;
-  end;
-  s := JSONStringToString('\u0041\u56fd\u00e9');
-  Check((Length(s) = 3) and (s[1] = 'A') and (Ord(s[2]) = $56FD) and (Ord(s[3]) = $00E9),
-    'JSON: JSONStringToString(\u0041\u56fd\u00e9) = A $56FD $00E9');
-  s := JSONStringToString('\u4e2d\u6587\ud83d\ude00');
-  Check((Length(s) = 4) and (Ord(s[1]) = $4E2D) and (Ord(s[2]) = $6587) and (Ord(s[3]) = $D83D)
-    and (Ord(s[4]) = $DE00), 'JSON: JSONStringToString(\u4e2d\u6587\ud83d\ude00) = $4E2D $6587 $D83D $DE00');
   s := 'a' + #$56FD + 'b';
   Check(StringToJSONString(s) = s, 'JSON: StringToJSONString(a + U+56FD + b) gives it back as it is');
   d := GetJSON(cText);
@@ -316,6 +394,8 @@ begin
   CheckByteEscapeRun;
   CheckJsonLongKeys;
   CheckJsonStrings;
+  CheckJsonEscapes;
+  CheckJsonInvalidBytes;
   CheckJsonStringLocaleFloat;
   Writeln('DELPHI VALUES OK');
 end.

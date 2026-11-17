@@ -1378,6 +1378,29 @@ tojson strict \u4E2D\u6587 caf\u00E9 \u00F1
 input DumpJSON {"\u540D":["caf\u00E9",1,"\u005Cu00f1x\u005Cud83d\u005Cude00"],"a\u005C"b":{"\u2028":null}}
 bytes 49
 hex 7B22E5908D223A5B22636166C3A9222C312C22C3B178F09F9880225D2C22615C2262223A7B22E280A8223A6E756C6C7D7D
+== jsonstr 29
+input "x\u005Cu56FD"
+string x\u56FD
+asjson "x\u56FD"
+formatjson
+| "x\u56FD"
+tojson x\u56FD
+tojson strict x\u56FD
+fromjson x\u56FD
+== jsonstr 30
+input GetJSON(text), no string parser handler "\u4E2D\u6587 caf\u00E9 \u00F1"
+string \u4E2D\u6587 caf\u00E9 \u00F1
+asjson "\u4E2D\u6587 caf\u00E9 \u00F1"
+formatjson
+| "\u4E2D\u6587 caf\u00E9 \u00F1"
+tojson \u4E2D\u6587 caf\u00E9 \u00F1
+tojson strict \u4E2D\u6587 caf\u00E9 \u00F1
+== jsonstr 31
+~ input TJSONParser(TStream, [joUTF8]) on invalid UTF-8 bytes
+~ bytes 2241FF4222
+~ value A?B
+~ bytes 2241E59B22
+~ value A\u015B
 == jsonnum 1
 input 0.5
 type float

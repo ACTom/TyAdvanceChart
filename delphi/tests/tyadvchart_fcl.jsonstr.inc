@@ -26,7 +26,12 @@
                with a byte order mark (with and without joBOMCheck), GetJSON(TStream), and GetJSON(TStream)
                with no stream parser handler (FPC's reads the stream and returns nil)
     9  27      GetJSON(text, False)
-    -  28      the bytes TJSONData.DumpJSON writes for a tree with non-ASCII names and strings *)
+    -  28      the bytes TJSONData.DumpJSON writes for a tree with non-ASCII names and strings
+    -  29      a single \u escape with upper-case digits, where FPC's JSONStringToString is right
+    -  30      GetJSON(text) with no string parser handler: the text goes to the stream handler as
+               UTF-8 bytes
+    -  31      invalid UTF-8 bytes in a stream (informational, always the same five lines): FPC keeps
+               the raw bytes in its string; the port replaces an invalid sequence by U+FFFD *)
 
 const
   { group 3: "<U+4E2D U+6587> caf<U+00E9> <U+00F1>" }
@@ -61,6 +66,16 @@ begin
   if Length(ABytes) > 0 then
     Result.WriteBuffer(ABytes[0], Length(ABytes));
   Result.Position := 0;
+end;
+
+{ The bytes written in AHex, two hexadecimal digits each. }
+function JsonStrHexBytes(const AHex: string): TBytes;
+var
+  i: Integer;
+begin
+  SetLength(Result, Length(AHex) div 2);
+  for i := 0 to Length(Result) - 1 do
+    Result[i] := StrToInt('$' + Copy(AHex, 2 * i + 1, 2));
 end;
 
 { The text between the quotes of a JSON string: one leading and one trailing quote dropped. }
@@ -351,6 +366,69 @@ begin
   end;
 end;
 
+{ GetJSON(string) while the string parser handler is unset. }
+procedure JsonStrNoStringHandlerCase(const AText: string);
+var
+  d: TJSONData;
+  old: TJSONStringParserHandler;
+begin
+  NextCase;
+  Line('input GetJSON(text), no string parser handler ' + Esc(AText));
+  old := SetJSONStringParserHandler(nil);
+  try
+    try
+      d := GetJSON(AText);
+      try
+        JsonStrTree(d);
+      finally
+        d.Free;
+      end;
+    except
+      on E: Exception do Raised(E);
+    end;
+  finally
+    SetJSONStringParserHandler(old);
+  end;
+end;
+
+{ Invalid UTF-8 in a stream: informational, always the same five lines. }
+procedure JsonStrInvalidBytesCase(const AHex1, AHex2: string);
+var
+  hex: array[0..1] of string;
+  i: Integer;
+  st: TMemoryStream;
+  p: TJSONParser;
+  d: TJSONData;
+begin
+  NextCase;
+  GInfo := True;
+  Line('input TJSONParser(TStream, [joUTF8]) on invalid UTF-8 bytes');
+  hex[0] := AHex1;
+  hex[1] := AHex2;
+  for i := 0 to 1 do
+  begin
+    Line('bytes ' + hex[i]);
+    st := JsonStrStream(JsonStrHexBytes(hex[i]));
+    try
+      d := nil;
+      p := TJSONParser.Create(st, [joUTF8]);
+      try
+        try
+          d := p.Parse;
+          Line('value ' + Esc(d.AsString));
+        except
+          on E: Exception do Raised(E);
+        end;
+      finally
+        d.Free;
+        p.Free;
+      end;
+    finally
+      st.Free;
+    end;
+  end;
+end;
+
 procedure SectionJsonStr;
 begin
   BeginSection('jsonstr');
@@ -394,4 +472,10 @@ begin
   JsonStrNoUtf8Case(cJsonStrText3);
   { DumpJSON }
   JsonStrDumpCase('{"'#$E5#$90#$8D'":["caf'#$C3#$A9'",1,"\u00f1x\ud83d\ude00"],"a\"b":{"'#$E2#$80#$A8'":null}}');
+  { a single escape, upper-case digits }
+  JsonStrCase('"x\u56FD"');
+  { no string parser handler }
+  JsonStrNoStringHandlerCase(cJsonStrText3);
+  { invalid UTF-8: informational }
+  JsonStrInvalidBytesCase('2241FF4222', '2241E59B22');
 end;
