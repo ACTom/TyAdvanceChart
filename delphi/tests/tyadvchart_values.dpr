@@ -8,6 +8,7 @@ program tyadvchart_values;
 uses
   SysUtils,
   tyControls.AdvanceChart.JsMath,
+  tyControls.AdvanceChart.NativeStr,
   tyControls.AdvanceChart.Types;
 
 procedure Check(ACond: Boolean; const AWhat: string);
@@ -59,10 +60,63 @@ begin
   Check(TyBoolText(False, 'c', '') = '', 'TyBoolText(False, ''c'', '''') = ''''');
 end;
 
+{ The same checks as tests/test.advchart.nativestr.pas, in UTF-16: a BMP character is one unit, a surrogate
+  pair two. }
+procedure CheckNativeStr;
+const
+  cGuo = #$56FD;
+  cEAcute = #$00E9;
+  cGrin = #$D83D#$DE00;
+var
+  u: UnicodeString;
+begin
+  Check(Length(TyJsUnits('a' + cGuo + cEAcute)) = 3, 'Length(TyJsUnits(a + U+56FD + U+00E9)) = 3');
+  Check(Length(TyJsUnits(cGrin)) = 2, 'Length(TyJsUnits(U+1F600)) = 2');
+  Check(Length(TyJsUnits('')) = 0, 'Length(TyJsUnits('''')) = 0');
+  Check(Ord(TyJsUnits(cGuo)[1]) = $56FD, 'TyJsUnits(U+56FD)[1] = $56FD');
+  u := TyJsUnits(cGrin);
+  Check((Ord(u[1]) = $D83D) and (Ord(u[2]) = $DE00), 'TyJsUnits(U+1F600) = $D83D $DE00');
+
+  Check(TyFromJsUnits(TyJsUnits('')) = '', 'round trip of ''''');
+  Check(TyFromJsUnits(TyJsUnits('abc')) = 'abc', 'round trip of abc');
+  Check(TyFromJsUnits(TyJsUnits('a' + cGuo + cEAcute)) = 'a' + cGuo + cEAcute, 'round trip of a + U+56FD + U+00E9');
+  Check(TyFromJsUnits(TyJsUnits(cGrin + 'x')) = cGrin + 'x', 'round trip of U+1F600 + x');
+
+  Check(TyCodePointStr($41) = 'A', 'TyCodePointStr($41) = A');
+  Check(TyCodePointStr($E9) = cEAcute, 'TyCodePointStr($E9) = U+00E9');
+  Check(TyCodePointStr($56FD) = cGuo, 'TyCodePointStr($56FD) = U+56FD');
+  Check(TyCodePointStr($1F600) = cGrin, 'TyCodePointStr($1F600) = $D83D $DE00');
+  Check(TyCodePointStr($7F) = #$7F, 'TyCodePointStr($7F) = $7F');
+  Check(TyCodePointStr($80) = #$0080, 'TyCodePointStr($80) = $0080');
+  Check(TyCodePointStr($7FF) = #$07FF, 'TyCodePointStr($7FF) = $07FF');
+  Check(TyCodePointStr($800) = #$0800, 'TyCodePointStr($800) = $0800');
+  Check(TyCodePointStr($FFFF) = #$FFFF, 'TyCodePointStr($FFFF) = $FFFF');
+  Check(TyCodePointStr($10000) = #$D800#$DC00, 'TyCodePointStr($10000) = $D800 $DC00');
+  Check(TyCodePointStr($10FFFF) = #$DBFF#$DFFF, 'TyCodePointStr($10FFFF) = $DBFF $DFFF');
+
+  Check(TyFirstCharLen('') = 0, 'TyFirstCharLen('''') = 0');
+  Check(TyFirstCharLen('abc') = 1, 'TyFirstCharLen(abc) = 1');
+  Check(TyFirstCharLen(cGuo + 'a') = Length(cGuo), 'TyFirstCharLen(U+56FD + a) = Length(U+56FD)');
+  Check(TyFirstCharLen(cGrin + 'a') = Length(cGrin), 'TyFirstCharLen(U+1F600 + a) = Length(U+1F600)');
+  Check(TyFirstCharLen(cGuo) = 1, 'TyFirstCharLen(U+56FD) = 1');
+  Check(TyFirstCharLen(cGrin) = 2, 'TyFirstCharLen(U+1F600) = 2');
+  Check(TyFirstCharLen('a' + cGuo) = 1, 'TyFirstCharLen(a + U+56FD) = 1');
+
+  Check(TyLastCharStart('') = 0, 'TyLastCharStart('''') = 0');
+  Check(TyLastCharStart('abc') = 3, 'TyLastCharStart(abc) = 3');
+  Check(TyLastCharStart('a' + cGuo) = 2, 'TyLastCharStart(a + U+56FD) = 2');
+  Check(TyLastCharStart('a' + cGrin) = 2, 'TyLastCharStart(a + U+1F600) = 2');
+  Check(TyLastCharStart(cGuo) = 1, 'TyLastCharStart(U+56FD) = 1');
+  Check(TyLastCharStart(cGrin) = 1, 'TyLastCharStart(U+1F600) = 1');
+  Check(TyLastCharStart(cGuo + 'a') = 2, 'TyLastCharStart(U+56FD + a) = 2');
+  Check(TyLastCharStart(cGrin + 'a') = 3, 'TyLastCharStart(U+1F600 + a) = 3');
+end;
+
 begin
   CheckSar32;
   CheckIntToDouble;
   CheckFloorCeil64;
   CheckBoolText;
+  CheckNativeStr;
   Writeln('DELPHI VALUES OK');
 end.

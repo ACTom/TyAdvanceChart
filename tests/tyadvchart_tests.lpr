@@ -22,7 +22,7 @@ uses
   test.advchart.pictorial, test.advchart.graph, test.advchart.graphforce,
   test.advchart.graphlegend, test.advchart.graphcartesian, test.advchart.valueaxis,
   test.advchart.labeltext, test.advchart.seriestext, test.advchart.bargeometry,
-  test.advchart.gridbounds, test.advchart.axisnames, test.advchart.jsmath,
+  test.advchart.gridbounds, test.advchart.axisnames, test.advchart.jsmath, test.advchart.nativestr,
   test.advchart.labelthinning, test.advchart.containshape, test.advchart.coordaffine,
   test.advchart.categoryminmax, test.advchart.graphroam, test.advchart.graphfocus,
   test.advchart.insidelabel, test.advchart.scalealign, test.advchart.rawvalue,

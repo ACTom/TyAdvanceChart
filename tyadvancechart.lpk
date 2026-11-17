@@ -54,6 +54,10 @@ Homepage: https://github.com/ACTom/TyAdvanceChart"/>
         <UnitName Value="tyControls.AdvanceChart.JsRegExp"/>
       </Item>
       <Item>
+        <Filename Value="source/tyControls.AdvanceChart.NativeStr.pas"/>
+        <UnitName Value="tyControls.AdvanceChart.NativeStr"/>
+      </Item>
+      <Item>
         <Filename Value="source/tyControls.AdvanceChart.AxisLabels.pas"/>
         <UnitName Value="tyControls.AdvanceChart.AxisLabels"/>
       </Item>

@@ -39,7 +39,7 @@ SRC = os.path.join(ROOT, 'source')
 DEFAULT_BIN = r'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin'
 PREFIX = 'tyControls.AdvanceChart.'
 
-UNITS = ['Types', 'StrConsts', 'JsMath', 'JsRegExp', 'Jitter', 'Locate', 'GeoFix', 'Connect', 'Catalog']
+UNITS = ['Types', 'StrConsts', 'JsMath', 'JsRegExp', 'Jitter', 'Locate', 'GeoFix', 'Connect', 'Catalog', 'NativeStr']
 COMPILERS = ['dcc32', 'dcc64']
 # --all leaves out the control unit itself (PREFIX without the dot) and these, which need the LCL
 EXCLUDED = ['Render', 'Images', 'DirtyRect', 'ToolboxDlg', 'KeyNav']
