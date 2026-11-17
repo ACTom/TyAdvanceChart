@@ -20,7 +20,9 @@ const
   ExpBarePushPop = 0;
   ExpConditionalSymbols = 0;
   ExpFpcOnlyNames = 0;
-  ExpIntegerCastToFloat = 0;
+  ExpFloatCastsOfNonLiterals = 0;
+  // Load fails when it finds fewer units than this under source/ (114 when the census was written).
+  MinSourceUnits = 114;
 
 type
   TPascalScanTest = class(TTestCase)
@@ -44,7 +46,7 @@ type
     procedure TestBarePushPop;
     procedure TestConditionalSymbols;
     procedure TestFpcOnlyNames;
-    procedure TestIntegerCastToFloat;
+    procedure TestFloatCastOperands;
   end;
 
 implementation
@@ -177,19 +179,24 @@ begin
   SetLength(Result, k);
 end;
 
+{ Reads every .pas and .inc file under source/ into Files. The list is built aside and becomes
+  Files only when it is complete and holds at least MinSourceUnits units: with every expected
+  count at 0, an empty or partial list would let the tests pass on nothing. }
 procedure Load;
 var
+  list: TList;
   names: TStringList;
   sr: TSearchRec;
   dir: string;
   pat: array[0..1] of string = ('*.pas', '*.inc');
-  i, p, n, k: Integer;
+  i, p, n, k, units: Integer;
   f: TSourceFile;
 begin
   if Files <> nil then
     Exit;
-  Files := TList.Create;
   dir := ExpandFileName(ExtractFilePath(ParamStr(0)) + '..' + PathDelim + 'source') + PathDelim;
+  units := 0;
+  list := TList.Create;
   names := TStringList.Create;
   try
     for k := 0 to 1 do
@@ -221,13 +228,27 @@ begin
           Inc(n);
           f.LineStarts[n] := p + 1;
         end;
-      Files.Add(f);
+      list.Add(f);
     end;
-  finally
+    for i := 0 to names.Count - 1 do
+      if Lower(ExtractFileExt(names[i])) = '.pas' then
+        Inc(units);
+  except
+    for i := 0 to list.Count - 1 do
+      TSourceFile(list[i]).Free;
+    list.Free;
     names.Free;
+    raise;
   end;
-  if Files.Count = 0 then
-    TTestCase.Fail('no source files found next to the tests');
+  names.Free;
+  if units < MinSourceUnits then
+  begin
+    for i := 0 to list.Count - 1 do
+      TSourceFile(list[i]).Free;
+    list.Free;
+    TTestCase.Fail(Format('found %d units in %s, expected at least %d', [units, dir, MinSourceUnits]));
+  end;
+  Files := list;
 end;
 
 function FileAt(AIndex: Integer): TSourceFile;
@@ -285,7 +306,8 @@ type
     First: TStringList;
     constructor Create;
     destructor Destroy; override;
-    procedure Add(AFile: TSourceFile; ALine: Integer);
+    // AWhy, if given, follows the place in the failure message, for a test that checks several rules
+    procedure Add(AFile: TSourceFile; ALine: Integer; const AWhy: string = '');
     procedure Check(const AWhat: string; AExpected: Integer);
   end;
 
@@ -301,11 +323,14 @@ begin
   inherited Destroy;
 end;
 
-procedure TFinds.Add(AFile: TSourceFile; ALine: Integer);
+procedure TFinds.Add(AFile: TSourceFile; ALine: Integer; const AWhy: string);
 begin
   Inc(Count);
   if First.Count < 5 then
-    First.Add(AFile.Name + ':' + IntToStr(ALine));
+    if AWhy = '' then
+      First.Add(AFile.Name + ':' + IntToStr(ALine))
+    else
+      First.Add(AFile.Name + ':' + IntToStr(ALine) + ' (' + AWhy + ')');
 end;
 
 procedure TFinds.Check(const AWhat: string; AExpected: Integer);
@@ -467,7 +492,7 @@ var
   finds: TFinds;
   i, k: Integer;
   f: TSourceFile;
-  first: Boolean;
+  first, isShared: Boolean;
 begin
   Load;
   finds := TFinds.Create;
@@ -476,10 +501,12 @@ begin
     begin
       f := FileAt(i);
       first := True;
+      isShared := Lower(f.Name) = 'tycontrols.advancechart.compiler.inc';
       for k := 0 to High(f.Segs) do
         if f.Segs[k].Kind = pskDirective then
         begin
-          if DirectiveText(f, f.Segs[k]) = '{$modeobjfpc}' then
+          // {$mode ...} or {$modeswitch ...}: the mode is set in the shared include only
+          if not isShared and (Copy(DirectiveText(f, f.Segs[k]), 1, 6) = '{$mode') then
             finds.Add(f, f.Segs[k].Line);
           // a unit whose first directive is not the shared include counts as well
           if first and (Lower(ExtractFileExt(f.Name)) = '.pas') and
@@ -490,7 +517,8 @@ begin
       if first and (Lower(ExtractFileExt(f.Name)) = '.pas') then
         finds.Add(f, 1);
     end;
-    finds.Check('{$mode objfpc} and units whose first directive is not the shared include', ExpObjFpcMode);
+    finds.Check('{$mode} or {$modeswitch} outside tyControls.AdvanceChart.Compiler.inc, and units ' +
+      'whose first directive is not {$I tyControls.AdvanceChart.Compiler.inc}', ExpObjFpcMode);
   finally
     finds.Free;
   end;
@@ -615,11 +643,23 @@ begin
 end;
 
 procedure TAdvChartDelphiSyntaxTest.TestBarePushPop;
+{ Besides a bare push or pop: ChecksOff and ChecksBack must alternate in each file, starting with
+  ChecksOff and ending with ChecksBack. A nested pair would switch the checks back on inside the
+  outer region. }
+const
+  IncOff = 'tycontrols.advancechart.checksoff.inc}';
+  IncBack = 'tycontrols.advancechart.checksback.inc}';
 var
   finds: TFinds;
-  i, k: Integer;
+  i, k, openLine: Integer;
   f: TSourceFile;
   d: string;
+
+  function Includes(const AName: string): Boolean;
+  begin
+    Result := (d = '{$i' + AName) or (d = '{$include' + AName);
+  end;
+
 begin
   Load;
   finds := TFinds.Create;
@@ -627,18 +667,71 @@ begin
     for i := 0 to Files.Count - 1 do
     begin
       f := FileAt(i);
+      openLine := 0;   // the line of the ChecksOff not yet closed, 0 for none
       for k := 0 to High(f.Segs) do
         if f.Segs[k].Kind = pskDirective then
         begin
           d := DirectiveText(f, f.Segs[k]);
           if ((d = '{$push}') or (d = '{$pop}')) and not LineHasIfdefFpc(f, f.Segs[k].Line) then
-            finds.Add(f, f.Segs[k].Line);
+            finds.Add(f, f.Segs[k].Line, 'bare push/pop')
+          else if Includes(IncOff) then
+          begin
+            if openLine <> 0 then
+              finds.Add(f, f.Segs[k].Line, 'ChecksOff while the one on line ' + IntToStr(openLine) +
+                ' is open');
+            openLine := f.Segs[k].Line;
+          end
+          else if Includes(IncBack) then
+          begin
+            if openLine = 0 then
+              finds.Add(f, f.Segs[k].Line, 'ChecksBack without an open ChecksOff');
+            openLine := 0;
+          end;
         end;
+      if openLine <> 0 then
+        finds.Add(f, openLine, 'ChecksOff not closed by a ChecksBack');
     end;
-    finds.Check('{$push} / {$pop} outside {$IFDEF FPC}', ExpBarePushPop);
+    finds.Check('{$push} / {$pop} outside {$IFDEF FPC}, and ChecksOff.inc / ChecksBack.inc ' +
+      'that do not alternate (each ChecksOff closed by a ChecksBack before the next)', ExpBarePushPop);
   finally
     finds.Free;
   end;
+end;
+
+{ True when the directive AText (with its braces) is IF, IFDEF, IFNDEF or ELSEIF and names, as a
+  whole word anywhere after the keyword, WINDOWS or CPUX86_64. }
+function NamesFpcOnlySymbol(const AText: string): Boolean;
+var
+  t, w: string;
+  i, j, n: Integer;
+  kw: Boolean;
+begin
+  Result := False;
+  t := Lower(AText);
+  n := Length(t);
+  i := 3;   // after '{$'
+  kw := True;
+  while i <= n do
+    if IsIdentChar(t[i]) then
+    begin
+      j := i;
+      while (j <= n) and IsIdentChar(t[j]) do
+        Inc(j);
+      w := Copy(t, i, j - i);
+      if kw then
+      begin
+        if (w <> 'if') and (w <> 'ifdef') and (w <> 'ifndef') and (w <> 'elseif') then
+          Exit;
+        kw := False;
+      end
+      else if (w = 'windows') or (w = 'cpux86_64') then
+        Exit(True);
+      i := j;
+    end
+    else if kw then
+      Exit
+    else
+      Inc(i);
 end;
 
 procedure TAdvChartDelphiSyntaxTest.TestConditionalSymbols;
@@ -646,7 +739,6 @@ var
   finds: TFinds;
   i, k: Integer;
   f: TSourceFile;
-  d: string;
 begin
   Load;
   finds := TFinds.Create;
@@ -655,15 +747,12 @@ begin
     begin
       f := FileAt(i);
       for k := 0 to High(f.Segs) do
-        if f.Segs[k].Kind = pskDirective then
-        begin
-          d := DirectiveText(f, f.Segs[k]);
-          if (d = '{$ifdefcpux86_64}') or (d = '{$ifndefcpux86_64}') or
-             (d = '{$ifdefwindows}') or (d = '{$ifndefwindows}') then
-            finds.Add(f, f.Segs[k].Line);
-        end;
+        if (f.Segs[k].Kind = pskDirective) and
+           NamesFpcOnlySymbol(Copy(f.Text, f.Segs[k].Start, f.Segs[k].Len)) then
+          finds.Add(f, f.Segs[k].Line);
     end;
-    finds.Check('{$IFDEF/IFNDEF CPUX86_64 or WINDOWS}', ExpConditionalSymbols);
+    finds.Check('WINDOWS or CPUX86_64 in {$IFDEF}, {$IFNDEF}, {$IF} or {$ELSEIF} (write MSWINDOWS, CPUX64)',
+      ExpConditionalSymbols);
   finally
     finds.Free;
   end;
@@ -675,66 +764,108 @@ begin
     'SarLongint', 'StrToQWord'], True, ExpFpcOnlyNames);
 end;
 
-type
-  { Double, Single, Extended or Real, then ( an optionally signed decimal or $ hex literal ) --
-    white space allowed around each part. }
-  TIntCastCounter = class(TWordWalker)
-    procedure OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer); override;
+{ True when S, trimmed, is a float literal: an optional sign, digits, then a '.' and digits
+  with an optional exponent, or an exponent alone (1e8). }
+function IsFloatLiteral(const S: string): Boolean;
+var
+  t: string;
+  i, n: Integer;
+
+  function Digits: Boolean;
+  var
+    j: Integer;
+  begin
+    j := i;
+    while (i <= n) and (t[i] in ['0'..'9']) do
+      Inc(i);
+    Result := i > j;
   end;
 
-procedure TIntCastCounter.OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer);
-var
-  c: string;
-  j, n, d: Integer;
-
-  procedure SkipSpace;
+  function Exponent: Boolean;
   begin
-    while (j <= n) and (c[j] in [' ', #9, #10, #13]) do
-      Inc(j);
+    Result := False;
+    if (i > n) or not (t[i] in ['e', 'E']) then
+      Exit;
+    Inc(i);
+    if (i <= n) and (t[i] in ['+', '-']) then
+      Inc(i);
+    Result := Digits;
   end;
 
 begin
-  if (AWord <> 'double') and (AWord <> 'single') and (AWord <> 'extended') and (AWord <> 'real') then
+  t := Trim(S);
+  n := Length(t);
+  i := 1;
+  if (i <= n) and (t[i] in ['+', '-']) then
+    Inc(i);
+  Result := False;
+  if not Digits then
+    Exit;
+  if (i <= n) and (t[i] = '.') then
+  begin
+    Inc(i);
+    if not Digits then
+      Exit;
+    if (i <= n) and (t[i] in ['e', 'E']) and not Exponent then
+      Exit;
+  end
+  else if not Exponent then
+    Exit;
+  Result := i > n;
+end;
+
+type
+  { Double, Single, Extended, Real, Currency, Comp or TDateTime, then ( ... ) up to the matching
+    parenthesis, white space allowed before the '('. Counted unless the operand is a float
+    literal: in FPC's Delphi mode a cast of an integer reinterprets its bits, without an error. }
+  TFloatCastCounter = class(TWordWalker)
+    procedure OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer); override;
+  end;
+
+procedure TFloatCastCounter.OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer);
+var
+  c: string;
+  j, n, open, depth: Integer;
+begin
+  if (AWord <> 'double') and (AWord <> 'single') and (AWord <> 'extended') and (AWord <> 'real') and
+     (AWord <> 'currency') and (AWord <> 'comp') and (AWord <> 'tdatetime') then
     Exit;
   c := AFile.Code;
   n := Length(c);
   j := AEnd;
-  SkipSpace;
+  while (j <= n) and (c[j] in [' ', #9, #10, #13]) do
+    Inc(j);
   if (j > n) or (c[j] <> '(') then
     Exit;
-  Inc(j);
-  SkipSpace;
-  if (j <= n) and (c[j] in ['+', '-']) then
+  open := j;
+  depth := 0;
+  while j <= n do
   begin
+    if c[j] = '(' then
+      Inc(depth)
+    else if c[j] = ')' then
+    begin
+      Dec(depth);
+      if depth = 0 then
+        Break;
+    end;
     Inc(j);
-    SkipSpace;
   end;
-  d := j;
-  if (j <= n) and (c[j] = '$') then
-  begin
-    Inc(j);
-    d := j;
-    while (j <= n) and (c[j] in ['0'..'9', 'A'..'F', 'a'..'f']) do
-      Inc(j);
-  end
-  else
-    while (j <= n) and (c[j] in ['0'..'9']) do
-      Inc(j);
-  if j = d then
-    Exit;
-  SkipSpace;
-  if (j <= n) and (c[j] = ')') then
+  // an operand without its closing parenthesis counts as well
+  if (j > n) or not IsFloatLiteral(Copy(c, open + 1, j - open - 1)) then
     Finds.Add(AFile, LineOf(AFile, AStart));
 end;
 
-procedure TAdvChartDelphiSyntaxTest.TestIntegerCastToFloat;
+procedure TAdvChartDelphiSyntaxTest.TestFloatCastOperands;
 var
-  w: TIntCastCounter;
+  w: TFloatCastCounter;
 begin
-  w := TIntCastCounter.Create;
+  w := TFloatCastCounter.Create;
   try
     w.Walk;
-    w.Finds.Check('Double/Single/Extended/Real of an integer literal', ExpIntegerCastToFloat);
+    w.Finds.Check('casts to Double, Single, Extended, Real, Currency, Comp or TDateTime of anything ' +
+      'but a float literal (write Double(1.0) for a literal, TyIntToDouble(expr) for an integer ' +
+      'expression, and no cast for a value that already is a Double)', ExpFloatCastsOfNonLiterals);
   finally
     w.Free;
   end;
