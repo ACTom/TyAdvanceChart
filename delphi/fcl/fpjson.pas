@@ -15,6 +15,9 @@
 { Ported for Delphi by the TyAdvanceChart project from Free Pascal 3.2.2,
   packages/fcl-json/src/fpjson.pp. Compiled by Delphi only: Lazarus builds with FPC's own unit.
   Changed, by kind:
+  - range and overflow checks are off (the directives $R- and $Q- before the unit clause), as
+    FPC builds its fcl-json, so that a project compiled with them gets FPC's results
+    (TJSONInt64Number of 2^40 gives AsInteger 0, not ERangeError);
   - strings are Delphi's UTF-16 string (TJSONStringType = string, TJSONCharType = Char), and QWord
     is written UInt64;
   - an object's members are kept by TJSONMemberList (in the implementation): in order, by names
@@ -32,7 +35,11 @@
     drops it); FPC 3.2.2 keeps an escape pending, encodes it to UTF-8 together with the next
     escape, and appends the pending one a second time, so it damages valid text and drops
     unpaired surrogates (a deliberate difference: the port does not copy that defect; its
-    MaybeAppendUnicode and U1 are kept only to stay line-comparable with FPC's);
+    MaybeAppendUnicode and U1 are kept only to stay line-comparable with FPC's); an unknown
+    escape drops the character after the '\' (FPC's drops an ASCII one: '"a\q"' gives 'a'), a
+    non-ASCII one too, a surrogate pair as a whole, where FPC's drops only the first byte of the
+    character's UTF-8 and leaves the rest as invalid bytes ('a\' + U+015C gives 'a?' in FPC, 'a'
+    here; a deliberate difference);
   - bytes become text through tyfclutf8's TyFclUtf8Decode only: GetJSON(TStream) without a
     stream parser handler reads the stream with it (and returns nil, as FPC's does); FPC keeps
     the raw bytes in its byte string, the port has UTF-16 strings and replaces an invalid
@@ -45,10 +52,21 @@
   - floating-point numbers and text are converted by tyfclnum (TyFclTextToFloat for Val,
     TyFclLocaleTextToFloat for TryStrToFloat, TyFclFloatToText for Str, TyFclFloatToStr for
     FloatToStr);
+  - a TJSONString's AsInteger, AsInt64, AsQWord and AsBoolean go through Delphi's StrToInt,
+    StrToInt64, StrToUInt64 and StrToBool, and its AsFloat through TyFclTextToFloat, where FPC's
+    conversions are built on Val. The plain shapes agree ('12', ' 12', '12 ', '1.5', '$1F',
+    '0x1F', the empty string; the transcript compares them); others do not: FPC reads '%101' as 5
+    and '&17' as 15, wraps '2147483648' to an Integer (-2147483648), reads a leading tab ('<tab>7'
+    is 7), a trailing line feed (AsFloat of '7<LF>' is 7) and 'e5' (AsFloat 0, AsBoolean False),
+    and raises EInvalidOp for AsBoolean of 'Nan'; the port raises EConvertError for all of these
+    but 'Nan', which is True (a difference not chased yet: number text is a later plan's);
   - the branches for PAS2JS and for other FPC versions are removed, and so is the include of
     fcl-json.inc (its mode switch, a define these units do not test and a warning switch are
     FPC's only).
   The original's licence applies, see the notice above (THIRD-PARTY-NOTICES.md says more). }
+{ Compiled as FPC compiles its own units: without range and overflow checks, whatever the
+  project sets. }
+{$R-}{$Q-}
 unit fpjson;
 
 interface
@@ -860,6 +878,12 @@ begin
                 // with the next one and appends the pending one twice.
                 App:=WideChar(U2);
                 end;
+        else
+          // An unknown escape drops the character after '\', as FPC's drops an ASCII one; a
+          // surrogate pair is one character and goes as a whole.
+          if (I<L) and (Ord(S[I])>=$D800) and (Ord(S[I])<=$DBFF) and (Ord(S[I+1])>=$DC00)
+            and (Ord(S[I+1])<=$DFFF) then
+            Inc(I);
         end;
         if App<>'' then
           begin

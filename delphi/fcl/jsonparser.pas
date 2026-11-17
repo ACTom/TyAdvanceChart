@@ -15,12 +15,18 @@
 { Ported for Delphi by the TyAdvanceChart project from Free Pascal 3.2.2,
   packages/fcl-json/src/jsonparser.pp. Compiled by Delphi only: Lazarus builds with FPC's own unit.
   Changed, by kind:
+  - range and overflow checks are off (the directives $R- and $Q- before the unit clause), as
+    FPC builds its fcl-json, so that a project compiled with them gets FPC's results
+    (TJSONInt64Number of 2^40 gives AsInteger 0, not ERangeError);
   - strings are Delphi's UTF-16 string (TJSONStringType = string, TJSONCharType = Char), and QWord
     is written UInt64;
   - procedure variables are compared through local variables and Assigned;
   - the switch to mode objfpc is gone (FPC's only).
   The original's licence applies, see the notice above (THIRD-PARTY-NOTICES.md says more). }
 {$h+}
+{ Compiled as FPC compiles its own units: without range and overflow checks, whatever the
+  project sets. }
+{$R-}{$Q-}
 unit jsonparser;
 
 interface

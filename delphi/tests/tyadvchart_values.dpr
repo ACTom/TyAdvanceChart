@@ -12,6 +12,7 @@ uses
   fpjson,
   jsonparser,
   jsonscanner,
+  jsonreader,
   DOM,
   XMLRead,
   tyControls.AdvanceChart.Catalog,
@@ -447,6 +448,81 @@ begin
   end;
 end;
 
+{ A JSON text of ALevels nested arrays (AObjects: objects of one member "k") around 1. }
+function JsonNested(ALevels: Integer; AObjects: Boolean): string;
+var
+  i: Integer;
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  try
+    for i := 1 to ALevels do
+      if AObjects then
+        sb.Append('{"k":')
+      else
+        sb.Append('[');
+    sb.Append('1');
+    for i := 1 to ALevels do
+      if AObjects then
+        sb.Append('}')
+      else
+        sb.Append(']');
+    Result := sb.ToString;
+  finally
+    sb.Free;
+  end;
+end;
+
+{ The class of what GetJSON(AText) raises, '' when it parses (the tree is freed). }
+function JsonRaises(const AText: string): string;
+var
+  d: TJSONData;
+begin
+  Result := '';
+  try
+    d := GetJSON(AText);
+    d.Free;
+  except
+    on E: Exception do
+      Result := E.ClassName;
+  end;
+end;
+
+{ The JSON port on hostile and odd input: nesting is capped at 1000 levels with the reader's own
+  EJSONParser (FPC has no cap; without it a deep text can end a Delphi program); range and overflow
+  checks are off in the ported units, as FPC builds them (this program may be built with -$R+ -$Q+);
+  an unknown escape drops the character after the '\', a non-ASCII one as a whole. }
+procedure CheckJsonHostile;
+var
+  d: TJSONData;
+begin
+  Check(JsonRaises(JsonNested(1000, False)) = '', 'JSON: 1000 nested arrays parse and free');
+  Check(JsonRaises(JsonNested(1000, True)) = '', 'JSON: 1000 nested objects parse and free');
+  Check(JsonRaises(JsonNested(1001, False)) = 'EJSONParser', 'JSON: 1001 nested arrays raise EJSONParser');
+  Check(JsonRaises(JsonNested(1001, True)) = 'EJSONParser', 'JSON: 1001 nested objects raise EJSONParser');
+  Check(JsonRaises(JsonNested(100000, False)) = 'EJSONParser',
+    'JSON: 100,000 nested arrays raise EJSONParser');
+  Check(JsonRaises(JsonNested(100000, True)) = 'EJSONParser',
+    'JSON: 100,000 nested objects raise EJSONParser');
+  d := TJSONInt64Number.Create(Int64(1) shl 40);
+  try
+    Check(d.AsInteger = 0, 'JSON: TJSONInt64Number.Create(2^40).AsInteger = 0, as in FPC');
+  finally
+    d.Free;
+  end;
+  d := TJSONFloatNumber.Create(3e9);
+  try
+    Check(d.AsInteger = -1294967296, 'JSON: TJSONFloatNumber.Create(3e9).AsInteger = -1294967296, as in FPC');
+  finally
+    d.Free;
+  end;
+  Check(JSONStringToString('a\qb') = 'ab',
+    'JSON: JSONStringToString(a\qb) = ab (the character after an unknown escape is dropped)');
+  Check(JSONStringToString('a\' + #$015C + 'b') = 'ab', 'JSON: JSONStringToString(a\ + U+015C + b) = ab');
+  Check(JSONStringToString('a\' + #$D83D#$DE00 + 'b') = 'ab',
+    'JSON: JSONStringToString(a\ + U+1F600 + b) = ab (the pair as a whole)');
+end;
+
 { The class of what parsing AText (UTF-8, GeoSvg's options) raises: '' when it parses. }
 function XmlRaises(const AText: string): string;
 var
@@ -790,6 +866,7 @@ begin
   CheckJsonEscapes;
   CheckJsonInvalidBytes;
   CheckJsonStringLocaleFloat;
+  CheckJsonHostile;
   CheckSvgBytes;
   CheckXmlLimits;
   CheckXmlEntities;

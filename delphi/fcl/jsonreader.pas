@@ -15,15 +15,25 @@
 { Ported for Delphi by the TyAdvanceChart project from Free Pascal 3.2.2,
   packages/fcl-json/src/jsonreader.pp. Compiled by Delphi only: Lazarus builds with FPC's own unit.
   Changed, by kind:
+  - range and overflow checks are off (the directives $R- and $Q- before the unit clause), as
+    FPC builds its fcl-json, so that a project compiled with them gets FPC's results
+    (TJSONInt64Number of 2^40 gives AsInteger 0, not ERangeError);
   - strings are Delphi's UTF-16 string (TJSONStringType = string, TJSONCharType = Char), and QWord
     is written UInt64;
   - the scanner's source is a string, so a string token needs no conversion; the default values
     of parameters are not repeated in the implementation; TryStrToQWord is TryStrToUInt64;
   - floating-point numbers are read by tyfclnum's TyFclTextToFloat (for Val);
+  - arrays and objects nest at most 1000 levels (together); deeper raises EJSONParser, as the
+    reader's other syntax errors do (a deliberate limit, FPC has none: the reader and the
+    destructors recurse per level, as FPC's do, and a Delphi program's default stack overflows at
+    depths an FPC program survives; without the cap a deep text can end the process);
   - the branches for PAS2JS and for other FPC versions are removed, and so is the include of
     fcl-json.inc (its mode switch, a define these units do not test and a warning switch are
     FPC's only).
   The original's licence applies, see the notice above (THIRD-PARTY-NOTICES.md says more). }
+{ Compiled as FPC compiles its own units: without range and overflow checks, whatever the
+  project sets. }
+{$R-}{$Q-}
 unit jsonreader;
 
 interface
@@ -38,12 +48,14 @@ Type
   TBaseJSONReader = Class(TObject)
   Private
     FScanner : TJSONScanner;
+    FNesting : Integer; // arrays and objects open
     function GetO(AIndex: TJSONOption): Boolean;
     function GetOptions: TJSONOptions; inline;
     procedure SetO(AIndex: TJSONOption; AValue: Boolean);
     procedure SetOptions(AValue: TJSONOptions);
   Protected
     procedure DoError(const Msg: String);
+    procedure EnterNesting;
     Procedure DoParse(AtCurrent,AllowEOF: Boolean);
     function GetNextToken: TJSONToken;
     function CurrentTokenString: string;
@@ -192,6 +204,12 @@ Resourcestring
   SErrNoScanner = 'No scanner. No source specified ?';
   SErrorAt = 'Error at line %d, Pos %d: ';
   SErrGarbageFound = 'Expected EOF, but got %s';
+  SErrTooDeep = 'Arrays and objects nested deeper than %d levels are not supported by this port';
+
+const
+  // The port's cap on nesting: the reader and the destructors recurse per level (as FPC's do), and
+  // a Delphi program's default stack overflows at depths an FPC program survives.
+  cMaxNesting = 1000;
 
 { TBaseJSONReader }
 
@@ -201,6 +219,7 @@ Procedure TBaseJSONReader.DoExecute;
 begin
   if (FScanner=Nil) then
     DoError(SErrNoScanner);
+  FNesting:=0;
   DoParse(False,True);
   if joStrict in Options then
     begin
@@ -354,6 +373,7 @@ Var
 
 begin
   LastComma:=False;
+  EnterNesting;
   StartObject;
   T:=GetNextToken;
   While T<>tkCurlyBraceClose do
@@ -379,6 +399,7 @@ begin
   If LastComma and ((joStrict in Options) or not (joIgnoreTrailingComma in Options))  then // Test for ,} case
     DoError(SErrUnExpectedToken);
   EndObject;
+  Dec(FNesting);
 end;
 
 // Current token is [, on exit current token is ]
@@ -390,6 +411,7 @@ Var
   S : TJSONOPTions;
 
 begin
+  EnterNesting;
   StartArray;
   LastComma:=False;
   Repeat
@@ -407,6 +429,7 @@ begin
   If LastComma and ((joStrict in S) or not (joIgnoreTrailingComma in S))  then // Test for ,] case
     DoError(SErrUnExpectedToken);
   EndArray;
+  Dec(FNesting);
 end;
 
 // Get next token, discarding whitespace
@@ -416,6 +439,15 @@ begin
   Repeat
     Result:=FScanner.FetchToken;
   Until (Not (Result in [tkComment,tkWhiteSpace]));
+end;
+
+// One more array or object open; raises beyond cMaxNesting (the port's own).
+procedure TBaseJSONReader.EnterNesting;
+
+begin
+  if FNesting>=cMaxNesting then
+    DoError(Format(SErrTooDeep,[cMaxNesting]));
+  Inc(FNesting);
 end;
 
 procedure TBaseJSONReader.DoError(const Msg: String);

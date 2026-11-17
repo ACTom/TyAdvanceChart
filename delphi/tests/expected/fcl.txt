@@ -1401,6 +1401,26 @@ tojson strict \u4E2D\u6587 caf\u00E9 \u00F1
 ~ value A?B
 ~ bytes 2241E59B22
 ~ value A\u015B
+== jsonstr 32
+input "a\u005Cqb"
+raises EScannerError
+fromjson ab
+== jsonstr 33
+~ input "a\u005C\u015Cb"
+~ raises EScannerError
+~ value -
+~ asjson -
+~ tojson -
+~ tojson strict -
+~ fromjson a?b
+== jsonstr 34
+~ input "a\u005C\uD83D\uDE00b"
+~ raises EScannerError
+~ value -
+~ asjson -
+~ tojson -
+~ tojson strict -
+~ fromjson a???b
 == jsonnum 1
 input 0.5
 type float
@@ -2228,5 +2248,1617 @@ text ab
 2 5 u
 2 3 #text b
 == xml 54
+raises EXMLReadError
+== jsonx 1
+input {"\u4E0A":"\u4E00\u9500","\u0122":"\u010A\u015C\u012F\u011F\u0108\u0120\u017D\u0141"}
+object 2
+key \u4E0A
+string \u4E00\u9500
+key \u0122
+string \u010A\u015C\u012F\u011F\u0108\u0120\u017D\u0141
+asjson { "\u4E0A" : "\u4E00\u9500", "\u0122" : "\u010A\u015C\u012F\u011F\u0108\u0120\u017D\u0141" }
+formatjson
+| {
+| \u0020 "\u4E0A" : "\u4E00\u9500",
+| \u0020 "\u0122" : "\u010A\u015C\u012F\u011F\u0108\u0120\u017D\u0141"
+| }
+checks object 2
+find first "\u4E00\u9500"
+indexofname first 0
+indexofname last 1
+find missing nil
+indexofname missing -1
+names[0] \u4E0A
+clone same
+delete(0) count 1
+delete(0) names[0] \u0122
+extract last "\u010A\u015C\u012F\u011F\u0108\u0120\u017D\u0141" count 1
+extract missing nil
+extract(0) "\u4E00\u9500" count 0 {}
+== jsonx 2
+input [\u4E0A]
+raises EScannerError
+== jsonx 3
+input [1\u4E0A]
+raises EScannerError
+== jsonx 4
+input [1\u010A]
+raises EScannerError
+== jsonx 5
+input [1\u0120]
+raises EScannerError
+== jsonx 6
+input [1\u017D]
+raises EScannerError
+== jsonx 7
+input [true\u0141]
+raises EScannerError
+== jsonx 8
+input [1,\u01202]
+raises EScannerError
+== jsonx 9
+input {"a\u010Ab":1}
+object 1
+key a\u010Ab
+int 1
+asjson { "a\u010Ab" : 1 }
+formatjson
+| {
+| \u0020 "a\u010Ab" : 1
+| }
+checks object 1
+find first 1
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a\u010Ab
+clone same
+delete(0) count 0
+raises EListError
+extract last 1 count 0
+extract missing nil
+raises EListError
+== jsonx 10
+input /* \u4E0A\u010A\u4E00 */ [1]
+array 1
+int 1
+asjson [1]
+== jsonx 11
+input // \u4E00\u010A [2]\u000A[1]
+array 1
+int 1
+asjson [1]
+== jsonx 12
+input ["\u4E00",\u9500]
+raises EScannerError
+== jsonx 13
+tojson \u4E0A\u4E00\u9500\u0122\u010A\u015C\u012F\u011F\u0108\u0120\u017D\u0141/\u005C"\u005C\u005C\u007F\u0080\u2028
+tojson strict \u4E0A\u4E00\u9500\u0122\u010A\u015C\u012F\u011F\u0108\u0120\u017D\u0141\u005C/\u005C"\u005C\u005C\u007F\u0080\u2028
+== jsonx 14
+fromjson \u4E0A\u000A\u015C\u005C\u0122"\u4E00
+raises EJSON
+raises EJSON
+fromjson
+fromjson 41
+fromjson /\u0008\u000C
+fromjson \u00E9\u4E0A\u4E0A
+== jsonx 15
+input .5
+float 3FE0000000000000
+== jsonx 16
+input -.5
+float BFE0000000000000
+== jsonx 17
+input 5.e3
+float 40B3880000000000
+== jsonx 18
+input 1.e+2
+float 4059000000000000
+== jsonx 19
+input -0
+int 0
+== jsonx 20
+input 007
+int 7
+== jsonx 21
+input 0007.5
+float 401E000000000000
+== jsonx 22
+input 00
+int 0
+== jsonx 23
+input 1E5
+float 40F86A0000000000
+== jsonx 24
+input 1e+5
+float 40F86A0000000000
+== jsonx 25
+input 1e-5
+float 3EE4F8B588E368F1
+== jsonx 26
+input 18446744073709551616
+float 43F0000000000000
+== jsonx 27
+input 184467440737095516150
+float 4424000000000000
+== jsonx 28
+input -9223372036854775808
+int64 -9223372036854775808
+== jsonx 29
+input -9223372036854775809
+float C3E0000000000000
+== jsonx 30
+input 2147483648
+int64 2147483648
+== jsonx 31
+input -2147483647
+int -2147483647
+== jsonx 32
+input -2147483648
+int64 -2147483648
+== jsonx 33
+input 1.0
+float 3FF0000000000000
+== jsonx 34
+input -
+raises EScannerError
+== jsonx 35
+input +1
+raises EScannerError
+== jsonx 36
+input 1e
+raises EScannerError
+== jsonx 37
+input 1e+
+raises EScannerError
+== jsonx 38
+input 0x10
+raises EScannerError
+== jsonx 39
+input 1.
+raises EScannerError
+== jsonx 40
+input -.
+raises EScannerError
+== jsonx 41
+input .
+raises EScannerError
+== jsonx 42
+input 1.5.2
+raises EScannerError
+== jsonx 43
+input 1e5e2
+raises EScannerError
+== jsonx 44
+input - 1
+raises EScannerError
+== jsonx 45
+input 1_000
+raises EScannerError
+== jsonx 46
+input 01
+int 1
+== jsonx 47
+input -01
+int -1
+== jsonx 48
+input 0.0
+float 0000000000000000
+== jsonx 49
+input -0.0e0
+float 8000000000000000
+== jsonx 50
+input NaN
+raises EJSONParser
+== jsonx 51
+input Infinity
+raises EJSONParser
+== jsonx 52
+input -Infinity
+raises EScannerError
+== jsonx 53
+input 4294967295
+int64 4294967295
+== jsonx 54
+input 4294967296
+int64 4294967296
+== jsonx 55
+input 9223372036854775807
+int64 9223372036854775807
+== jsonx 56
+input 09223372036854775808
+qword 9223372036854775808
+== jsonx 57
+input 000000000000000000000000001
+int 1
+== jsonx 58
+input 99999999999999999999
+float 4415AF1D78B58C40
+== jsonx 59
+input 1e2
+float 4059000000000000
+== jsonx 60
+input 100e-2
+float 3FF0000000000000
+== jsonx 61
+input \u002012\u0020
+int 12
+== jsonx 62
+input \u000912\u000D\u000A
+int 12
+== jsonx 63
+input {a:1}
+object 1
+key a
+int 1
+asjson { "a" : 1 }
+formatjson
+| {
+| \u0020 "a" : 1
+| }
+checks object 1
+find first 1
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last 1 count 0
+extract missing nil
+raises EListError
+== jsonx 64
+input {a b:1}
+raises EJSONParser
+== jsonx 65
+input [tRuE,NULL,False]
+array 3
+true
+null
+false
+asjson [true, null, false]
+formatjson
+| [
+| \u0020 true,
+| \u0020 null,
+| \u0020 false
+| ]
+== jsonx 66
+input [truex]
+array 1
+true
+asjson [true]
+formatjson
+| [
+| \u0020 true
+| ]
+== jsonx 67
+input [nul]
+raises EJSONParser
+== jsonx 68
+input {'a':'b'}
+object 1
+key a
+string b
+asjson { "a" : "b" }
+formatjson
+| {
+| \u0020 "a" : "b"
+| }
+checks object 1
+find first "b"
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last "b" count 0
+extract missing nil
+raises EListError
+== jsonx 69
+input [1,,2]
+raises EJSONParser
+== jsonx 70
+input [,]
+raises EJSONParser
+== jsonx 71
+input {,}
+raises EJSONParser
+== jsonx 72
+input {"a":1,,}
+raises EJSONParser
+== jsonx 73
+input [1,]
+raises EJSONParser
+== jsonx 74
+input {"a":1,}
+raises EJSONParser
+== jsonx 75
+input "a" "b"
+string a
+asjson "a"
+formatjson
+| "a"
+== jsonx 76
+input 1 2
+int 1
+asjson 1
+formatjson
+| 1
+== jsonx 77
+input \u0020
+nil
+== jsonx 78
+input [1]//c
+array 1
+int 1
+asjson [1]
+formatjson
+| [
+| \u0020 1
+| ]
+== jsonx 79
+input "a\u0009b"
+string a\u0009b
+asjson "a\u005Ctb"
+formatjson
+| "a\u005Ctb"
+== jsonx 80
+input 'a\u005C'b'
+string a'b
+asjson "a'b"
+formatjson
+| "a'b"
+== jsonx 81
+input "\u005Ca"
+raises EScannerError
+== jsonx 82
+input "\u005CU0041"
+raises EScannerError
+== jsonx 83
+input \uFEFF[1]
+raises EScannerError
+== jsonx 84
+input [1]\u0000[2]
+array 1
+int 1
+asjson [1]
+formatjson
+| [
+| \u0020 1
+| ]
+== jsonx 85
+input {"a":1 "b":2}
+raises EJSONParser
+== jsonx 86
+input {"a" 1}
+raises EJSONParser
+== jsonx 87
+input {1:2}
+raises EScannerError
+== jsonx 88
+input {"a":}
+raises EJSONParser
+== jsonx 89
+input [}
+raises EJSONParser
+== jsonx 90
+input {]
+raises EJSONParser
+== jsonx 91
+input {"a":[1,{"b":2}]
+raises EJSONParser
+== jsonx 92
+input nulll
+null
+asjson null
+formatjson
+| null
+== jsonx 93
+input True
+true
+asjson true
+formatjson
+| true
+== jsonx 94
+input [true false]
+raises EJSONParser
+== jsonx 95
+input {"a":1}{"b":2}
+object 1
+key a
+int 1
+asjson { "a" : 1 }
+formatjson
+| {
+| \u0020 "a" : 1
+| }
+checks object 1
+find first 1
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last 1 count 0
+extract missing nil
+raises EListError
+== jsonx 96
+input [1]]
+array 1
+int 1
+asjson [1]
+formatjson
+| [
+| \u0020 1
+| ]
+== jsonx 97
+input {"a":{"a":{"a":{"a":[[[[{"a":null}]]]]}}}}
+object 1
+key a
+object 1
+key a
+object 1
+key a
+object 1
+key a
+array 1
+array 1
+array 1
+array 1
+object 1
+key a
+null
+asjson { "a" : { "a" : { "a" : { "a" : [[[[{ "a" : null }]]]] } } } }
+formatjson
+| {
+| \u0020 "a" : {
+| \u0020   "a" : {
+| \u0020     "a" : {
+| \u0020       "a" : [
+| \u0020         [
+| \u0020           [
+| \u0020             [
+| \u0020               {
+| \u0020                 "a" : null
+| \u0020               }
+| \u0020             ]
+| \u0020           ]
+| \u0020         ]
+| \u0020       ]
+| \u0020     }
+| \u0020   }
+| \u0020 }
+| }
+checks object 1
+find first { "a" : { "a" : { "a" : [[[[{ "a" : null }]]]] } } }
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last { "a" : { "a" : { "a" : [[[[{ "a" : null }]]]] } } } count 0
+extract missing nil
+raises EListError
+checks object 1
+find first { "a" : { "a" : [[[[{ "a" : null }]]]] } }
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last { "a" : { "a" : [[[[{ "a" : null }]]]] } } count 0
+extract missing nil
+raises EListError
+checks object 1
+find first { "a" : [[[[{ "a" : null }]]]] }
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last { "a" : [[[[{ "a" : null }]]]] } count 0
+extract missing nil
+raises EListError
+checks object 1
+find first [[[[{ "a" : null }]]]]
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last [[[[{ "a" : null }]]]] count 0
+extract missing nil
+raises EListError
+checks object 1
+find first null
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last null count 0
+extract missing nil
+raises EListError
+== jsonx 98
+input undefined
+raises EJSONParser
+== jsonx 99
+input {"a":undefined}
+raises EJSONParser
+== jsonx 100
+input [-]
+raises EScannerError
+== jsonx 101
+input [+1]
+raises EScannerError
+== jsonx 102
+input [.5]
+array 1
+float 5.0000000000000000E-001
+asjson [5.0000000000000000E-001]
+formatjson
+| [
+| \u0020 5.0000000000000000E-001
+| ]
+== jsonx 103
+input {"__proto__":1,"constructor":2}
+object 2
+key __proto__
+int 1
+key constructor
+int 2
+asjson { "__proto__" : 1, "constructor" : 2 }
+formatjson
+| {
+| \u0020 "__proto__" : 1,
+| \u0020 "constructor" : 2
+| }
+checks object 2
+find first 1
+indexofname first 0
+indexofname last 1
+find missing nil
+indexofname missing -1
+names[0] __proto__
+clone same
+delete(0) count 1
+delete(0) names[0] constructor
+extract last 2 count 1
+extract missing nil
+extract(0) 1 count 0 {}
+== jsonx 104
+input {a:1,'b':2,}
+object 2
+key a
+int 1
+key b
+int 2
+asjson { "a" : 1, "b" : 2 }
+== jsonx 105
+input [1,2,,]
+raises EJSONParser
+== jsonx 106
+input [,]
+raises EJSONParser
+== jsonx 107
+input {,}
+raises EJSONParser
+== jsonx 108
+input /**/[1]
+array 1
+int 1
+asjson [1]
+== jsonx 109
+input /*
+raises EAccessViolation
+== jsonx 110
+input /*/
+raises EAccessViolation
+== jsonx 111
+input [1] /* a */ /* b */
+array 1
+int 1
+asjson [1]
+== jsonx 112
+input {"a":/*c*/1}
+object 1
+key a
+int 1
+asjson { "a" : 1 }
+== jsonx 113
+input {/*c*/"a":1}
+object 1
+key a
+int 1
+asjson { "a" : 1 }
+== jsonx 114
+input [/*c*/]
+array 0
+asjson []
+== jsonx 115
+input [1/*c*/,2]
+raises EScannerError
+== jsonx 116
+input {"a"/*c*/:1}
+object 1
+key a
+int 1
+asjson { "a" : 1 }
+== jsonx 117
+input [1] // x
+array 1
+int 1
+asjson [1]
+== jsonx 118
+input // only
+nil
+== jsonx 119
+input /* a\u000D\u000A b */[1]
+array 1
+int 1
+asjson [1]
+== jsonx 120
+input [1] /* a
+array 1
+int 1
+asjson [1]
+== jsonx 121
+input {a:1}
+raises EScannerError
+== jsonx 122
+input {'a':1}
+raises EScannerError
+== jsonx 123
+input [01]
+raises EScannerError
+== jsonx 124
+input [.5]
+raises EScannerError
+== jsonx 125
+input [1.]
+raises EScannerError
+== jsonx 126
+input ["a\u0009b"]
+raises EScannerError
+== jsonx 127
+input [TRUE]
+raises EScannerError
+== jsonx 128
+input [1,]
+raises EJSONParser
+== jsonx 129
+input [1]//c
+raises EScannerError
+== jsonx 130
+input
+nil
+== jsonx 131
+input [1]
+array 1
+int 1
+asjson [1]
+== jsonx 132
+input {"\u4E0A":"\u4E0A"}
+object 1
+key \u4E0A
+string \u4E0A
+asjson { "\u4E0A" : "\u4E0A" }
+== jsonx 133
+findpath a.b[1].c -> "x"
+getpath a.b[1].c -> "x"
+findpath a.b[2][1] -> 3
+getpath a.b[2][1] -> 3
+findpath  -> { "a" : { "b" : [1, { "c" : "x" }, [2, 3]], "\u4E0A" : [5] }, "" : 7, "a.b" : 8, "n" : null }
+getpath  -> { "a" : { "b" : [1, { "c" : "x" }, [2, 3]], "\u4E0A" : [5] }, "" : 7, "a.b" : 8, "n" : null }
+findpath .a -> { "b" : [1, { "c" : "x" }, [2, 3]], "\u4E0A" : [5] }
+getpath .a -> { "b" : [1, { "c" : "x" }, [2, 3]], "\u4E0A" : [5] }
+findpath a..b -> [1, { "c" : "x" }, [2, 3]]
+getpath a..b -> [1, { "c" : "x" }, [2, 3]]
+findpath a[ -> { "b" : [1, { "c" : "x" }, [2, 3]], "\u4E0A" : [5] }
+getpath a[ -> { "b" : [1, { "c" : "x" }, [2, 3]], "\u4E0A" : [5] }
+findpath a.b[x] -> nil
+getpath a.b[x] raises EJSON
+findpath a.b[-1] -> nil
+getpath a.b[-1] raises EJSON
+findpath a.b[99] -> nil
+getpath a.b[99] raises EJSON
+findpath a.z -> nil
+getpath a.z raises EJSON
+findpath a.\u4E0A[0] -> 5
+getpath a.\u4E0A[0] -> 5
+findpath a.b[1] -> { "c" : "x" }
+getpath a.b[1] -> { "c" : "x" }
+findpath a.b.[1] -> nil
+getpath a.b.[1] raises EJSON
+findpath a.b[1]c -> "x"
+getpath a.b[1]c -> "x"
+findpath n.x -> nil
+getpath n.x raises EJSON
+findpath a.b[0].x -> nil
+getpath a.b[0].x raises EJSON
+findpath a.b[ 1 ] -> nil
+getpath a.b[ 1 ] raises EJSON
+findpath A -> nil
+getpath A raises EJSON
+findpath a.b[1].c. -> nil
+getpath a.b[1].c. raises EJSON
+findpath a.b[] -> nil
+getpath a.b[] raises EJSON
+findpath [0] -> { "a" : { "b" : [1, { "c" : "x" }, [2, 3]], "\u4E0A" : [5] }, "" : 7, "a.b" : 8, "n" : null }
+getpath [0] -> { "a" : { "b" : [1, { "c" : "x" }, [2, 3]], "\u4E0A" : [5] }, "" : 7, "a.b" : 8, "n" : null }
+findpath a.b[1 -> nil
+getpath a.b[1 raises EJSON
+findpath a.b[1e0] -> nil
+getpath a.b[1e0] raises EJSON
+findpath a.b[$1] -> { "c" : "x" }
+getpath a.b[$1] -> { "c" : "x" }
+findpath a.b[0x1] -> { "c" : "x" }
+getpath a.b[0x1] -> { "c" : "x" }
+findpath a.b[+1] -> { "c" : "x" }
+getpath a.b[+1] -> { "c" : "x" }
+findpath a.b[ 1] -> { "c" : "x" }
+getpath a.b[ 1] -> { "c" : "x" }
+format default
+formatjson
+| {
+| \u0020 "a" : {
+| \u0020   "b" : [
+| \u0020     1,
+| \u0020     {
+| \u0020       "c" : "x"
+| \u0020     },
+| \u0020     [
+| \u0020       2,
+| \u0020       3
+| \u0020     ]
+| \u0020   ],
+| \u0020   "\u4E0A" : [
+| \u0020     5
+| \u0020   ]
+| \u0020 },
+| \u0020 "" : 7,
+| \u0020 "a.b" : 8,
+| \u0020 "n" : null
+| }
+format singlelinearray
+formatjson
+| {
+| \u0020 "a" : {
+| \u0020   "b" : [1, {
+| \u0020       "c" : "x"
+| \u0020     }, [2, 3]],
+| \u0020   "\u4E0A" : [5]
+| \u0020 },
+| \u0020 "" : 7,
+| \u0020 "a.b" : 8,
+| \u0020 "n" : null
+| }
+format singlelineobject
+formatjson
+| { "a" : { "b" : [
+| \u0020     1,
+| \u0020     { "c" : "x" },
+| \u0020     [
+| \u0020       2,
+| \u0020       3
+| \u0020     ]
+| \u0020   ], "\u4E0A" : [
+| \u0020     5
+| \u0020   ] }, "" : 7, "a.b" : 8, "n" : null }
+format donotquote
+formatjson
+| {
+| \u0020 a : {
+| \u0020   b : [
+| \u0020     1,
+| \u0020     {
+| \u0020       c : "x"
+| \u0020     },
+| \u0020     [
+| \u0020       2,
+| \u0020       3
+| \u0020     ]
+| \u0020   ],
+| \u0020   \u4E0A : [
+| \u0020     5
+| \u0020   ]
+| \u0020 },
+| \u0020  : 7,
+| \u0020 a.b : 8,
+| \u0020 n : null
+| }
+format tabchar
+formatjson
+| {
+| \u0009"a" : {
+| \u0009\u0009"b" : [
+| \u0009\u0009\u00091,
+| \u0009\u0009\u0009{
+| \u0009\u0009\u0009\u0009"c" : "x"
+| \u0009\u0009\u0009},
+| \u0009\u0009\u0009[
+| \u0009\u0009\u0009\u00092,
+| \u0009\u0009\u0009\u00093
+| \u0009\u0009\u0009]
+| \u0009\u0009],
+| \u0009\u0009"\u4E0A" : [
+| \u0009\u0009\u00095
+| \u0009\u0009]
+| \u0009},
+| \u0009"" : 7,
+| \u0009"a.b" : 8,
+| \u0009"n" : null
+| }
+format skipws
+formatjson
+| {
+| \u0020 "a":{
+| \u0020   "b":[
+| \u0020     1,
+| \u0020     {
+| \u0020       "c":"x"
+| \u0020     },
+| \u0020     [
+| \u0020       2,
+| \u0020       3
+| \u0020     ]
+| \u0020   ],
+| \u0020   "\u4E0A":[
+| \u0020     5
+| \u0020   ]
+| \u0020 },
+| \u0020 "":7,
+| \u0020 "a.b":8,
+| \u0020 "n":null
+| }
+format skipws leading
+formatjson
+| {
+| \u0020 "a": {
+| \u0020   "b": [
+| \u0020     1,
+| \u0020     {
+| \u0020       "c": "x"
+| \u0020     },
+| \u0020     [
+| \u0020       2,
+| \u0020       3
+| \u0020     ]
+| \u0020   ],
+| \u0020   "\u4E0A": [
+| \u0020     5
+| \u0020   ]
+| \u0020 },
+| \u0020 "": 7,
+| \u0020 "a.b": 8,
+| \u0020 "n": null
+| }
+format all single skip
+formatjson
+| {"a":{"b":[1,{"c":"x"},[2,3]],"\u4E0A":[5]},"":7,"a.b":8,"n":null}
+format indent 0
+formatjson
+| {
+| "a" : {
+| "b" : [
+| 1,
+| {
+| "c" : "x"
+| },
+| [
+| 2,
+| 3
+| ]
+| ],
+| "\u4E0A" : [
+| 5
+| ]
+| },
+| "" : 7,
+| "a.b" : 8,
+| "n" : null
+| }
+enum key a num 0 value { "b" : [1, { "c" : "x" }, [2, 3]], "\u4E0A" : [5] }
+enum key  num 1 value 7
+enum key a.b num 2 value 8
+enum key n num 3 value null
+enum key 0 num 0 value 1
+enum key 1 num 1 value { "c" : "x" }
+enum key 2 num 2 value [2, 3]
+enum key  num 0 value null
+count of null 0
+items[0] of null nil
+compressed {"a":{"b":[1,{"c":"x"},[2,3]],"\u4E0A":[5]},"":7,"a.b":8,"n":null}
+unquoted { a : { b : [1, { c : "x" }, [2, 3]], \u4E0A : [5] },  : 7, a.b : 8, n : null }
+strictescaping "a\u005C/b"
+raises EJSON
+raises EJSON
+raises EListError
+raises EListError
+raises EListError
+raises EListError
+raises EListError
+extract missing nil
+raises EListError
+delete missing name ok
+indexofname ci 2 -1 3
+get int default 5 7 5
+get str default dflt dflt
+raises EJSON
+strings[a.b] 8
+raises EJSON
+raises EInvalidCast
+nulls True False
+raises EListError
+raises EListError
+raises EListError
+raises EListError
+raises EListError
+raises EListError
+raises EListError
+arr extract foreign nil
+arr remove foreign ok
+arr indexof foreign -1
+arr strings[0] 1
+raises EJSON
+raises EInvalidCast
+after ops { "a" : { "b" : [null, {}, 1, "i", { "c" : "x" }, [2, 3], "s", 5000000000, true, null, []], "\u4E0A" : [5] }, "" : 7, "a.b" : 8, "n" : null }
+after clear {} 0
+after rebuild { "x" : 9, "z" : null, "w" : [1, "ab", "c", true, null], "big" : 5000000000, "b" : true, "y" : 2, "new" : "n", "arr" : [], "obj" : { "k" : "v", "k2" : 5 } }
+name 0 x idx 0
+name 1 z idx 1
+name 2 w idx 2
+name 3 big idx 3
+name 4 b idx 4
+name 5 y idx 5
+name 6 new idx 6
+name 7 arr idx 7
+name 8 obj idx 8
+after grow/delete count 59 bad k99 99 k98 nil
+== jsonx 134
+create { "a" : 1, "bc" : "x", "d" : "y", "e" : true, "f" : null, "g" : 5000000000, "h" : [] }
+raises EJSON
+raises EJSON
+raises EJSON
+raises EJSON
+create array ["a", "bc", 1, true, null, -1294967296, "\u4E0A", "\u4E0A\u4E00"]
+raises EJSON
+raises EAccessViolation
+== jsonx 135
+value 12
+asinteger 12
+asint64 12
+asfloat 4028000000000000
+asboolean true
+== jsonx 136
+value \u002012
+asinteger 12
+asint64 12
+asfloat 4028000000000000
+asboolean true
+== jsonx 137
+value 12\u0020
+raises EConvertError
+raises EConvertError
+asfloat 4028000000000000
+asboolean true
+== jsonx 138
+value 1.5
+raises EConvertError
+raises EConvertError
+asfloat 3FF8000000000000
+asboolean true
+== jsonx 139
+value $1F
+asinteger 31
+asint64 31
+raises EConvertError
+raises EConvertError
+== jsonx 140
+value 0x1F
+asinteger 31
+asint64 31
+raises EConvertError
+raises EConvertError
+== jsonx 141
+value
+raises EConvertError
+raises EConvertError
+raises EConvertError
+raises EConvertError
+== xmlx 1
+raises EXMLReadError
+== xmlx 2
+0 9 #document
+1 7 xml-stylesheet href="a.css"
+1 1 svg
+text
+== xmlx 3
+0 9 #document
+1 1 svg
+text
+== xmlx 4
+0 9 #document
+1 10 svg
+1 1 svg
+@id=L
+@x=0px
+@y=0px
+@width=10px
+@height=10px
+@viewBox=0 0 10 10
+@xmlns=http://www.w3.org/2000/svg
+text
+2 1 g
+@id=a
+text
+3 1 path
+@id=p
+@d=M0,0
+text
+== xmlx 5
+raises EXMLReadError
+== xmlx 6
+raises EXMLReadError
+== xmlx 7
+raises EXMLReadError
+== xmlx 8
+0 9 #document
+1 1 svg
+text
+== xmlx 9
+0 9 #document
+1 1 svg
+text
+1 8 #comment \u0020c\u0020
+== xmlx 10
+0 9 #document
+1 1 svg
+text
+1 7 pi
+== xmlx 11
+raises EXMLReadError
+== xmlx 12
+0 9 #document
+1 1 svg
+@id=x
+@name=y
+text
+== xmlx 13
+0 9 #document
+1 1 svg
+@id=
+text
+== xmlx 14
+0 9 #document
+1 1 svg
+text
+== xmlx 15
+raises EXMLReadError
+== xmlx 16
+raises EXMLReadError
+== xmlx 17
+0 9 #document
+1 1 svg
+@id=x>y
+text
+== xmlx 18
+raises EXMLReadError
+== xmlx 19
+0 9 #document
+1 1 svg
+@id=<&>
+text &lt;
+2 3 #text &lt;
+== xmlx 20
+raises EXMLReadError
+== xmlx 21
+raises EXMLReadError
+== xmlx 22
+raises EXMLReadError
+== xmlx 23
+raises EXMLReadError
+== xmlx 24
+raises EXMLReadError
+== xmlx 25
+raises EXMLReadError
+== xmlx 26
+raises EXMLReadError
+== xmlx 27
+0 9 #document
+1 1 svg
+text AA
+2 3 #text AA
+== xmlx 28
+raises EXMLReadError
+== xmlx 29
+raises EXMLReadError
+== xmlx 30
+raises EXMLReadError
+== xmlx 31
+raises EXMLReadError
+== xmlx 32
+raises EXMLReadError
+== xmlx 33
+raises EXMLReadError
+== xmlx 34
+raises EXMLReadError
+== xmlx 35
+0 9 #document
+1 10 svg
+1 1 svg
+text
+2 1 g
+@id=x
+text
+2 1 g
+@id=x
+text
+== xmlx 36
+raises EXMLReadError
+== xmlx 37
+raises EXMLReadError
+== xmlx 38
+0 9 #document
+1 10 svg
+1 1 svg
+text
+2 1 g
+text
+== xmlx 39
+0 9 #document
+1 10 svg
+1 1 svg
+@id=<
+text <
+2 3 #text <
+== xmlx 40
+raises EXMLReadError
+== xmlx 41
+0 9 #document
+1 10 svg
+1 1 svg
+@id=<&
+text <&
+2 3 #text <&
+== xmlx 42
+0 9 #document
+1 10 svg
+1 1 svg
+text x
+2 3 #text x
+== xmlx 43
+raises EXMLReadError
+== xmlx 44
+0 9 #document
+1 10 svg
+1 1 svg
+text
+2 8 #comment x
+2 5 nbsp
+== xmlx 45
+0 9 #document
+1 10 svg
+1 1 svg
+@id=
+text
+2 5 b
+== xmlx 46
+raises EXMLReadError
+== xmlx 47
+0 9 #document
+1 10 svg
+1 1 svg
+text
+2 5 nbsp
+== xmlx 48
+0 9 #document
+1 10 svg
+1 1 svg
+text
+2 5 nbsp
+== xmlx 49
+0 9 #document
+1 10 svg
+1 1 svg
+@id=\u00A0
+text \u00A0
+2 3 #text \u00A0
+2 5 foo
+== xmlx 50
+raises EXMLReadError
+== xmlx 51
+0 9 #document
+1 10 svg
+1 1 svg
+@id=a"ba'b
+text a"ba'b
+2 3 #text a"ba'b
+== xmlx 52
+raises EXMLReadError
+== xmlx 53
+0 9 #document
+1 10 svg
+1 1 svg
+@id=a b c
+text a\u0009b\u000Ac
+2 3 #text a\u0009b\u000Ac
+== xmlx 54
+0 9 #document
+1 10 svg
+1 1 svg
+@id=a b c|\u0009|\u000A|\u000D
+text a\u0009b\u000Ac|\u000D
+2 3 #text a\u0009b\u000Ac|\u000D
+== xmlx 55
+0 9 #document
+1 10 svg
+1 1 svg
+text v
+2 3 #text v
+== xmlx 56
+0 9 #document
+1 10 svg
+1 1 svg
+text
+== xmlx 57
+0 9 #document
+1 10 svg
+1 1 svg
+text
+== xmlx 58
+0 9 #document
+1 10 svg
+1 1 svg
+text
+== xmlx 59
+raises EXMLReadError
+== xmlx 60
+0 9 #document
+1 10 svg
+1 1 svg
+text b
+2 3 #text b
+== xmlx 61
+0 9 #document
+1 10 other
+1 1 svg
+text
+== xmlx 62
+raises EXMLReadError
+== xmlx 63
+raises EXMLReadError
+== xmlx 64
+raises EXMLReadError
+== xmlx 65
+0 9 #document
+1 1 svg
+text a]]b
+2 4 #cdata-section a]]b
+== xmlx 66
+0 9 #document
+1 1 svg
+text a]]
+2 4 #cdata-section a]]
+== xmlx 67
+raises EXMLReadError
+== xmlx 68
+0 9 #document
+1 1 svg
+text a]>b]]>c]] >d
+2 3 #text a]>b]]>c]] >d
+== xmlx 69
+0 9 #document
+1 1 svg
+text ]]>
+2 3 #text ]]>
+== xmlx 70
+raises EXMLReadError
+== xmlx 71
+0 9 #document
+1 1 svg
+text
+2 8 #comment
+== xmlx 72
+raises EXMLReadError
+== xmlx 73
+0 9 #document
+1 1 svg
+text
+2 8 #comment \u0020a - b\u0020
+== xmlx 74
+0 9 #document
+1 1 svg
+text
+2 7 pi
+2 7 pi data \u0020
+2 7 p-i.x d
+== xmlx 75
+0 9 #document
+1 1 svg
+text
+2 7 pi ?data
+== xmlx 76
+0 9 #document
+1 1 svg
+text ?>
+2 7 pi d
+2 3 #text ?>
+== xmlx 77
+raises EXMLReadError
+== xmlx 78
+0 9 #document
+1 1 a:b
+@xmlns=u
+text
+2 1 e:f
+text
+== xmlx 79
+0 9 #document
+1 1 \u56FE
+@id=1
+text
+== xmlx 80
+raises EXMLReadError
+== xmlx 81
+raises EXMLReadError
+== xmlx 82
+0 9 #document
+1 1 a.b-c_d\u00B71
+@id=1
+text
+== xmlx 83
+raises EXMLReadError
+== xmlx 84
+0 9 #document
+1 1 svg
+@id=a b c  d
+text a\u000Ab\u000Ac
+2 4 #cdata-section a\u000Ab\u000Ac
+2 8 #comment a\u000Ab
+2 7 p a\u000Ab
+== xmlx 85
+raises EXMLReadError
+== xmlx 86
+0 9 #document
+1 1 svg
+text
+== xmlx 87
+raises EXMLReadError
+== xmlx 88
+raises EXMLReadError
+== xmlx 89
+raises EXMLReadError
+== xmlx 90
+0 9 #document
+1 1 svg
+text
+== xmlx 91
+raises EXMLReadError
+== xmlx 92
+0 9 #document
+1 1 svg
+text
+== xmlx 93
+0 9 #document
+1 1 svg
+text
+== xmlx 94
+raises EXMLReadError
+== xmlx 95
+raises EXMLReadError
+== xmlx 96
+raises EXMLReadError
+== xmlx 97
+raises EXMLReadError
+== xmlx 98
+raises EXMLReadError
+== xmlx 99
+raises EXMLReadError
+== xmlx 100
+raises EXMLReadError
+== xmlx 101
+raises EXMLReadError
+== xmlx 102
+0 9 #document
+1 1 svg
+@id=\u56FD
+text
+== xmlx 103
+raises EXMLReadError
+== xmlx 104
+0 9 #document
+1 1 svg
+text
+== xmlx 105
+raises EXMLReadError
+== xmlx 106
+0 9 #document
+1 1 svg
+text
+== xmlx 107
+raises EXMLReadError
+== xmlx 108
+raises EXMLReadError
+== xmlx 109
+raises EXMLReadError
+== xmlx 110
+raises EXMLReadError
+== xmlx 111
+raises EXMLReadError
+== xmlx 112
+raises EXMLReadError
+== xmlx 113
+raises EXMLReadError
+== xmlx 114
+0 9 #document
+1 1 s
+text \uFFFD
+2 3 #text \uFFFD
+== xmlx 115
+0 9 #document
+1 1 s
+text \u0085\u2028
+2 3 #text \u0085\u2028
+== xmlx 116
+0 9 #document
+1 1 s
+text \u007F
+2 3 #text \u007F
+== xmlx 117
+raises EXMLReadError
+== xmlx 118
+raises EXMLReadError
+== xmlx 119
+0 9 #document
+1 1 s
+text \u0080\u00FF\u0085
+2 3 #text \u0080\u00FF\u0085
+== xmlx 120
+0 9 #document
+1 1 s
+text
+== xmlx 121
+0 9 #document
+1 1 svg
+text t\u0020
+2 1 a
+text t
+3 1 b
+text t
+4 1 c
+text t
+5 3 #text t
+2 1 a
+text
+2 1 a
+text
+2 1 a
+text \u0020
+3 3 #text \u0020
+== xmlx 122
+0 9 #document
+1 1 svg
+text acd
+2 3 #text a
+2 1 b
+text
+2 3 #text c
+2 1 b
+text
+2 3 #text d
+== xmlx 123
+0 9 #document
+1 1 svg
+text \u0020 \u0020
+2 3 #text \u0020
+2 1 g
+text \u0020
+3 3 #text \u0020
+2 3 #text \u0020
+== xmlx 124
+0 9 #document
+1 1 svg
+text \u0020.a{fill:red} xyz
+2 1 style
+text \u0020.a{fill:red}\u0020
+3 4 #cdata-section \u0020.a{fill:red}\u0020
+2 1 text
+text xyz
+3 3 #text x
+3 1 tspan
+text y
+4 3 #text y
+3 3 #text z
+== xmlx 125
+0 9 #document
+1 1 svg
+@id=a
+@name=b
+text
+2 1 g
+text
+== xmlx 126
+0 9 #document
+1 1 svg
+@id=1
+text
+== xmlx 127
+raises EXMLReadError
+== xmlx 128
+0 9 #document
+1 1 svg
+@id=2
+text
+== xmlx 129
+raises EXMLReadError
+== xmlx 130
+raises EXMLReadError
+== xmlx 131
+raises EXMLReadError
+== xmlx 132
+raises EXMLReadError
+== xmlx 133
+raises EXMLReadError
+== xmlx 134
+raises EXMLReadError
+== xmlx 135
+raises EXMLReadError
+== xmlx 136
+raises EXMLReadError
+== xmlx 137
+raises EXMLReadError
+== xmlx 138
+raises EXMLReadError
+== xmlx 139
+raises EXMLReadError
+== xmlx 140
+raises EXMLReadError
+== xmlx 141
+raises EXMLReadError
+== xmlx 142
+raises EXMLReadError
+== xmlx 143
+raises EXMLReadError
+== xmlx 144
+raises EXMLReadError
+== xmlx 145
+raises EXMLReadError
+== xmlx 146
+raises EXMLReadError
+== xmlx 147
+raises EXMLReadError
+== xmlx 148
+raises EXMLReadError
+== xmlx 149
+raises EXMLReadError
+== xmlx 150
+raises EXMLReadError
+== xmlx 151
 raises EXMLReadError
 FCL TRANSCRIPT END

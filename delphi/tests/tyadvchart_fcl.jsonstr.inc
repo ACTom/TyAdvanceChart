@@ -31,7 +31,13 @@
     -  30      GetJSON(text) with no string parser handler: the text goes to the stream handler as
                UTF-8 bytes
     -  31      invalid UTF-8 bytes in a stream (informational, always the same five lines): FPC keeps
-               the raw bytes in its string; the port replaces an invalid sequence by U+FFFD *)
+               the raw bytes in its string; the port replaces an invalid sequence by U+FFFD
+    -  32      an unknown escape followed by an ASCII character ("a\qb"): the scanner raises, and
+               JSONStringToString drops the character after the '\' (gives 'ab')
+    -  33-34   informational, the same seven lines: FPC damages a non-ASCII character after an unknown
+               escape (U+015C, U+1F600): its JSONStringToString drops only the first byte of the
+               character's UTF-8 and the rest is invalid ('?'); the port drops the whole character, as
+               FPC drops an ASCII one *)
 
 const
   { group 3: "<U+4E2D U+6587> caf<U+00E9> <U+00F1>" }
@@ -478,4 +484,9 @@ begin
   JsonStrNoStringHandlerCase(cJsonStrText3);
   { invalid UTF-8: informational }
   JsonStrInvalidBytesCase('2241FF4222', '2241E59B22');
+  { an unknown escape: JSONStringToString drops the character after the '\' }
+  JsonStrCase('"a\qb"');
+  { informational: FPC damages a non-ASCII character after an unknown escape }
+  JsonStrInfoCase('"a\'#$C5#$9C'b"');
+  JsonStrInfoCase('"a\'#$F0#$9F#$98#$80'b"');
 end;

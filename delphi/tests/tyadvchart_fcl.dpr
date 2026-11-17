@@ -98,6 +98,8 @@ end;
 {$I tyadvchart_fcl.jsonstr.inc}
 {$I tyadvchart_fcl.jsonnum.inc}
 {$I tyadvchart_fcl.xml.inc}
+{$I tyadvchart_fcl.jsonx.inc}
+{$I tyadvchart_fcl.xmlx.inc}
 
 begin
   {$IFDEF FPC}
@@ -108,5 +110,7 @@ begin
   SectionJsonStr;
   SectionJsonNum;
   SectionXml;
+  SectionJsonX;
+  SectionXmlX;
   Writeln('FCL TRANSCRIPT END');
 end.

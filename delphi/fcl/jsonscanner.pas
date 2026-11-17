@@ -15,6 +15,9 @@
 { Ported for Delphi by the TyAdvanceChart project from Free Pascal 3.2.2,
   packages/fcl-json/src/jsonscanner.pp. Compiled by Delphi only: Lazarus builds with FPC's own unit.
   Changed, by kind:
+  - range and overflow checks are off (the directives $R- and $Q- before the unit clause), as
+    FPC builds its fcl-json, so that a project compiled with them gets FPC's results
+    (TJSONInt64Number of 2^40 gives AsInteger 0, not ERangeError);
   - the source is Delphi's UTF-16 string and the scanner walks it with PChar, not PAnsiChar (Move
     counts SizeOf(Char)); a stream is read as UTF-8 by tyfclutf8's TyFclUtf8Decode (a byte order
     mark is skipped under joBOMCheck, as FPC's does, and is otherwise read as a character, which
@@ -35,6 +38,9 @@
 {$h+}
 { $INLINE ON}
 
+{ Compiled as FPC compiles its own units: without range and overflow checks, whatever the
+  project sets. }
+{$R-}{$Q-}
 unit jsonscanner;
 
 interface
