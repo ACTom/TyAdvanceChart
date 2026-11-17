@@ -3307,10 +3307,10 @@ var
   var
     j, row, par, a, maxRow, k, q, na: Integer;
     nv, ov, le: TTyChartElement;
-    newNode, oldNode, newCurve, oldCurve, newPoly, oldPoly: array of Integer;
-    oldParent: array of Integer;
+    newNode, oldNode, newCurve, oldCurve, newPoly, oldPoly: TTyIntegerArray;
+    oldParent: TTyIntegerArray;
     { [R2-C] new row -> old row, old row -> new row }
-    n2o, o2n: array of Integer;
+    n2o, o2n: TTyIntegerArray;
     fresh: Boolean;
     ox, oy, rx, ry: TTyDoubleArray;
     hasOx, isNew: TTyBoolArray;

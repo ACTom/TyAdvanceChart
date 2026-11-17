@@ -2862,13 +2862,15 @@ begin
     on an edge inside: contain/path.ts windingLine) }
   for j := 0 to High(ASolved.Crumbs) do
   begin
+    { the length before the polygon: the other way round, dcc32 stops here with an
+      internal error (F2084) }
+    n := Length(ASolved.Crumbs[j].Points);
     el := TyChartElement(TyShapePolygon(ASolved.Crumbs[j].Points));
     el.Style.HasFill := True;
     el.Style.FillColor := AInk.CrumbFill;
     el.Z := ASolved.Z;
     el.Z2 := 100000;
     el.Silent := False;
-    n := Length(ASolved.Crumbs[j].Points);
     if n > 2 then
     begin
       SetLength(hit, n + 1);
