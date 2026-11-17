@@ -7,6 +7,7 @@ program tyadvchart_values;
 
 uses
   SysUtils,
+  fpjson,
   tyControls.AdvanceChart.Catalog,
   tyControls.AdvanceChart.JsMath,
   tyControls.AdvanceChart.NativeStr,
@@ -157,6 +158,36 @@ begin
   Check(Ord(TyOptStr[cAt][2]) = $25B6, 'TyOptStr[387][2] = $25B6');
 end;
 
+{ delphi/fcl's fpjson keeps member names of any length (FPC's own keeps 255 bytes of them; the FCL
+  transcript shows it only as informational lines). }
+procedure CheckJsonLongKeys;
+var
+  o: TJSONObject;
+  k300, ka, kb: string;
+begin
+  k300 := StringOfChar('k', 300);
+  ka := StringOfChar('k', 279) + 'a' + StringOfChar('k', 20);
+  kb := StringOfChar('k', 279) + 'b' + StringOfChar('k', 20);
+  o := TJSONObject.Create;
+  try
+    o.Add(k300, 1);
+    Check(o.Find(k300) <> nil, 'JSON: a key of 300 characters is found');
+    Check(Length(o.Names[0]) = 300, 'JSON: Length(Names[0]) = 300');
+  finally
+    o.Free;
+  end;
+  o := TJSONObject.Create;
+  try
+    o.Add(ka, 1);
+    o.Add(kb, 2);
+    Check(o.Count = 2, 'JSON: two keys that differ at the 280th character are two members');
+    Check((o.Find(ka) <> nil) and (o.Find(ka).AsInteger = 1), 'JSON: the first of them has the value 1');
+    Check((o.Find(kb) <> nil) and (o.Find(kb).AsInteger = 2), 'JSON: the second of them has the value 2');
+  finally
+    o.Free;
+  end;
+end;
+
 begin
   CheckSar32;
   CheckIntToDouble;
@@ -164,5 +195,6 @@ begin
   CheckBoolText;
   CheckNativeStr;
   CheckByteEscapeRun;
+  CheckJsonLongKeys;
   Writeln('DELPHI VALUES OK');
 end.

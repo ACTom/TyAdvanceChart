@@ -391,6 +391,28 @@ limitations under the License.
 
 ---
 
+## Free Pascal's fcl-json — `delphi/fcl/`
+
+Upstream: <https://www.freepascal.org> · Free Pascal 3.2.2, `packages/fcl-json/src/`
+(fpjson, jsonscanner, jsonreader, jsonparser). Copyright (c) 2007 by Michael Van Canneyt and the
+Free Pascal development team.
+
+`delphi/fcl/fpjson.pas`, `jsonscanner.pas`, `jsonreader.pas` and `jsonparser.pas` are these four
+units of Free Pascal's fcl-json, ported for Delphi: the chart reads, builds and writes its options
+with them. Each file keeps the original's header and lists, below it, the kinds of change the port
+made. They are used on the Delphi side only: a Lazarus build uses Free Pascal's own units, and
+`delphi/` is on none of the Lazarus packages' paths.
+
+Free Pascal's packages are under the GNU Lesser General Public License with the static linking
+exception (Free Pascal's `COPYING.FPC`), the same terms as this project's own: the text of the
+exception is the one in `COPYING.modifiedLGPL.txt`, and the licence is `COPYING.LGPL.txt`.
+
+**You ship this if you build `TTyAdvanceChart` with Delphi.** As with the chart itself, the
+exception lets you link it into a program under terms of your choice; changes to these units stay
+under the same licence.
+
+---
+
 ## d3-geo — `examples/advchart/ualbersusa.pas`
 
 The demo's Albers USA projection (map-usa-projection) is a Pascal transcription of

@@ -1,0 +1,1084 @@
+== selftest 1
+a\u005Cb
+== selftest 2
+\u56FD
+== selftest 3
+\uD83D\uDE00
+== selftest 4
+\u0009
+== json 1
+input {}
+object 0
+asjson {}
+formatjson
+| {}
+checks object 0
+find missing nil
+indexofname missing -1
+raises EListError
+clone same
+raises EListError
+raises EListError
+extract missing nil
+raises EListError
+== json 2
+input []
+array 0
+asjson []
+formatjson
+| [
+| ]
+== json 3
+input null
+null
+asjson null
+formatjson
+| null
+== json 4
+input true
+true
+asjson true
+formatjson
+| true
+== json 5
+input "x"
+string x
+asjson "x"
+formatjson
+| "x"
+== json 6
+input 0
+int 0
+asjson 0
+formatjson
+| 0
+== json 7
+input {"a":1,"b":[1,2,{"c":null}],"d":{"e":"f"}}
+object 3
+key a
+int 1
+key b
+array 3
+int 1
+int 2
+object 1
+key c
+null
+key d
+object 1
+key e
+string f
+asjson { "a" : 1, "b" : [1, 2, { "c" : null }], "d" : { "e" : "f" } }
+formatjson
+| {
+|   "a" : 1,
+|   "b" : [
+|     1,
+|     2,
+|     {
+|       "c" : null
+|     }
+|   ],
+|   "d" : {
+|     "e" : "f"
+|   }
+| }
+checks object 3
+find first 1
+indexofname first 0
+indexofname last 2
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 2
+delete(0) names[0] b
+extract last { "e" : "f" } count 2
+extract missing nil
+extract(0) 1 count 1 { "b" : [1, 2, { "c" : null }] }
+checks object 1
+find first null
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] c
+clone same
+delete(0) count 0
+raises EListError
+extract last null count 0
+extract missing nil
+raises EListError
+checks object 1
+find first "f"
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] e
+clone same
+delete(0) count 0
+raises EListError
+extract last "f" count 0
+extract missing nil
+raises EListError
+== json 8
+input {"z":1,"a":2,"m":3}
+object 3
+key z
+int 1
+key a
+int 2
+key m
+int 3
+asjson { "z" : 1, "a" : 2, "m" : 3 }
+formatjson
+| {
+|   "z" : 1,
+|   "a" : 2,
+|   "m" : 3
+| }
+checks object 3
+find first 1
+indexofname first 0
+indexofname last 2
+find missing nil
+indexofname missing -1
+names[0] z
+clone same
+delete(0) count 2
+delete(0) names[0] a
+extract last 3 count 2
+extract missing nil
+extract(0) 1 count 1 { "a" : 2 }
+== json 9
+input {"\u9500\u91CF":[5,20],"\u540D\u79F0":"\u886C\u886B"}
+object 2
+key \u9500\u91CF
+array 2
+int 5
+int 20
+key \u540D\u79F0
+string \u886C\u886B
+asjson { "\u9500\u91CF" : [5, 20], "\u540D\u79F0" : "\u886C\u886B" }
+formatjson
+| {
+|   "\u9500\u91CF" : [
+|     5,
+|     20
+|   ],
+|   "\u540D\u79F0" : "\u886C\u886B"
+| }
+checks object 2
+find first [5, 20]
+indexofname first 0
+indexofname last 1
+find missing nil
+indexofname missing -1
+names[0] \u9500\u91CF
+clone same
+delete(0) count 1
+delete(0) names[0] \u540D\u79F0
+extract last "\u886C\u886B" count 1
+extract missing nil
+extract(0) [5, 20] count 0 {}
+== json 10
+input {"":1," ":2,"a\u005C"b":3}
+object 3
+key 
+int 1
+key  
+int 2
+key a"b
+int 3
+asjson { "" : 1, " " : 2, "a\u005C"b" : 3 }
+formatjson
+| {
+|   "" : 1,
+|   " " : 2,
+|   "a\u005C"b" : 3
+| }
+checks object 3
+find first 1
+indexofname first 0
+indexofname last 2
+find missing nil
+indexofname missing -1
+names[0] 
+clone same
+delete(0) count 2
+delete(0) names[0]  
+extract last 3 count 2
+extract missing nil
+extract(0) 1 count 1 { " " : 2 }
+== json 11
+input {"a":1,"a":2}
+raises EJSON
+== json 12
+~ input {"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk":1}
+~ parsed
+~ count 1
+~ name lengths 255
+~ find key 1 1
+~ find key 2 nil
+~ asjson { "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk" : 1 }
+== json 13
+~ input {"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkakkkkkkkkkkkkkkkkkkkk":1,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkbkkkkkkkkkkkkkkkkkkkk":2}
+~ raises EJSON
+~ count -
+~ name lengths -
+~ find key 1 -
+~ find key 2 -
+~ asjson -
+== json 14
+input 2147483647
+int 2147483647
+asjson 2147483647
+formatjson
+| 2147483647
+== json 15
+input 2147483648
+int64 2147483648
+asjson 2147483648
+formatjson
+| 2147483648
+== json 16
+input -2147483649
+int64 -2147483649
+asjson -2147483649
+formatjson
+| -2147483649
+== json 17
+input 9223372036854775807
+int64 9223372036854775807
+asjson 9223372036854775807
+formatjson
+| 9223372036854775807
+== json 18
+input 9223372036854775808
+qword 9223372036854775808
+asjson 9223372036854775808
+formatjson
+| 9223372036854775808
+== json 19
+input 18446744073709551615
+qword 18446744073709551615
+asjson 18446744073709551615
+formatjson
+| 18446744073709551615
+== json 20
+input -0
+int 0
+asjson 0
+formatjson
+| 0
+== json 21
+input 007
+int 7
+asjson 7
+formatjson
+| 7
+== json 22
+input {
+raises EJSONParser
+== json 23
+input [1,]
+raises EJSONParser
+== json 24
+input {"a"}
+raises EJSONParser
+== json 25
+input {'a':1}
+object 1
+key a
+int 1
+asjson { "a" : 1 }
+formatjson
+| {
+|   "a" : 1
+| }
+checks object 1
+find first 1
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last 1 count 0
+extract missing nil
+raises EListError
+== json 26
+input tru
+raises EJSONParser
+== json 27
+input 
+nil
+== json 28
+input {"a":1}x
+object 1
+key a
+int 1
+asjson { "a" : 1 }
+formatjson
+| {
+|   "a" : 1
+| }
+checks object 1
+find first 1
+indexofname first 0
+indexofname last 0
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 0
+raises EListError
+extract last 1 count 0
+extract missing nil
+raises EListError
+== json 29
+input [1 2]
+raises EJSONParser
+== json 30
+input [1,2,] // c
+array 2
+int 1
+int 2
+asjson [1, 2]
+formatjson
+| [
+|   1,
+|   2
+| ]
+== json 31
+input {"a":1,/* c */"b":2,}
+object 2
+key a
+int 1
+key b
+int 2
+asjson { "a" : 1, "b" : 2 }
+formatjson
+| {
+|   "a" : 1,
+|   "b" : 2
+| }
+checks object 2
+find first 1
+indexofname first 0
+indexofname last 1
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 1
+delete(0) names[0] b
+extract last 2 count 1
+extract missing nil
+extract(0) 1 count 0 {}
+== json 32
+input [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 1
+array 0
+asjson [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+formatjson
+| [
+|   [
+|     [
+|       [
+|         [
+|           [
+|             [
+|               [
+|                 [
+|                   [
+|                     [
+|                       [
+|                         [
+|                           [
+|                             [
+|                               [
+|                                 [
+|                                   [
+|                                     [
+|                                       [
+|                                         [
+|                                           [
+|                                             [
+|                                               [
+|                                                 [
+|                                                   [
+|                                                     [
+|                                                       [
+|                                                         [
+|                                                           [
+|                                                             [
+|                                                               [
+|                                                                 [
+|                                                                   [
+|                                                                     [
+|                                                                       [
+|                                                                         [
+|                                                                           [
+|                                                                             [
+|                                                                               [
+|                                                                                 [
+|                                                                                   [
+|                                                                                     [
+|                                                                                       [
+|                                                                                         [
+|                                                                                           [
+|                                                                                             [
+|                                                                                               [
+|                                                                                                 [
+|                                                                                                   [
+|                                                                                                     [
+|                                                                                                       [
+|                                                                                                         [
+|                                                                                                           [
+|                                                                                                             [
+|                                                                                                               [
+|                                                                                                                 [
+|                                                                                                                   [
+|                                                                                                                     [
+|                                                                                                                       [
+|                                                                                                                         [
+|                                                                                                                           [
+|                                                                                                                             [
+|                                                                                                                               [
+|                                                                                                                                 [
+|                                                                                                                                   [
+|                                                                                                                                     [
+|                                                                                                                                       [
+|                                                                                                                                         [
+|                                                                                                                                           [
+|                                                                                                                                             [
+|                                                                                                                                               [
+|                                                                                                                                                 [
+|                                                                                                                                                   [
+|                                                                                                                                                     [
+|                                                                                                                                                       [
+|                                                                                                                                                         [
+|                                                                                                                                                           [
+|                                                                                                                                                             [
+|                                                                                                                                                               [
+|                                                                                                                                                                 [
+|                                                                                                                                                                   [
+|                                                                                                                                                                     [
+|                                                                                                                                                                       [
+|                                                                                                                                                                         [
+|                                                                                                                                                                           [
+|                                                                                                                                                                             [
+|                                                                                                                                                                               [
+|                                                                                                                                                                                 [
+|                                                                                                                                                                                   [
+|                                                                                                                                                                                     [
+|                                                                                                                                                                                       [
+|                                                                                                                                                                                         [
+|                                                                                                                                                                                           [
+|                                                                                                                                                                                             [
+|                                                                                                                                                                                               [
+|                                                                                                                                                                                                 [
+|                                                                                                                                                                                                   [
+|                                                                                                                                                                                                     [
+|                                                                                                                                                                                                       [
+|                                                                                                                                                                                                         [
+|                                                                                                                                                                                                           [
+|                                                                                                                                                                                                             [
+|                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                                                                                                                                                 [
+|                                                                                                                                                                                                                                                                                                                                                                                                   [
+|                                                                                                                                                                                                                                                                                                                                                                                                     [
+|                                                                                                                                                                                                                                                                                                                                                                                                       [
+|                                                                                                                                                                                                                                                                                                                                                                                                         [
+|                                                                                                                                                                                                                                                                                                                                                                                                           [
+|                                                                                                                                                                                                                                                                                                                                                                                                             [
+|                                                                                                                                                                                                                                                                                                                                                                                                               [
+|                                                                                                                                                                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                                 ]
+|                                                                                                                                                                                                               ]
+|                                                                                                                                                                                                             ]
+|                                                                                                                                                                                                           ]
+|                                                                                                                                                                                                         ]
+|                                                                                                                                                                                                       ]
+|                                                                                                                                                                                                     ]
+|                                                                                                                                                                                                   ]
+|                                                                                                                                                                                                 ]
+|                                                                                                                                                                                               ]
+|                                                                                                                                                                                             ]
+|                                                                                                                                                                                           ]
+|                                                                                                                                                                                         ]
+|                                                                                                                                                                                       ]
+|                                                                                                                                                                                     ]
+|                                                                                                                                                                                   ]
+|                                                                                                                                                                                 ]
+|                                                                                                                                                                               ]
+|                                                                                                                                                                             ]
+|                                                                                                                                                                           ]
+|                                                                                                                                                                         ]
+|                                                                                                                                                                       ]
+|                                                                                                                                                                     ]
+|                                                                                                                                                                   ]
+|                                                                                                                                                                 ]
+|                                                                                                                                                               ]
+|                                                                                                                                                             ]
+|                                                                                                                                                           ]
+|                                                                                                                                                         ]
+|                                                                                                                                                       ]
+|                                                                                                                                                     ]
+|                                                                                                                                                   ]
+|                                                                                                                                                 ]
+|                                                                                                                                               ]
+|                                                                                                                                             ]
+|                                                                                                                                           ]
+|                                                                                                                                         ]
+|                                                                                                                                       ]
+|                                                                                                                                     ]
+|                                                                                                                                   ]
+|                                                                                                                                 ]
+|                                                                                                                               ]
+|                                                                                                                             ]
+|                                                                                                                           ]
+|                                                                                                                         ]
+|                                                                                                                       ]
+|                                                                                                                     ]
+|                                                                                                                   ]
+|                                                                                                                 ]
+|                                                                                                               ]
+|                                                                                                             ]
+|                                                                                                           ]
+|                                                                                                         ]
+|                                                                                                       ]
+|                                                                                                     ]
+|                                                                                                   ]
+|                                                                                                 ]
+|                                                                                               ]
+|                                                                                             ]
+|                                                                                           ]
+|                                                                                         ]
+|                                                                                       ]
+|                                                                                     ]
+|                                                                                   ]
+|                                                                                 ]
+|                                                                               ]
+|                                                                             ]
+|                                                                           ]
+|                                                                         ]
+|                                                                       ]
+|                                                                     ]
+|                                                                   ]
+|                                                                 ]
+|                                                               ]
+|                                                             ]
+|                                                           ]
+|                                                         ]
+|                                                       ]
+|                                                     ]
+|                                                   ]
+|                                                 ]
+|                                               ]
+|                                             ]
+|                                           ]
+|                                         ]
+|                                       ]
+|                                     ]
+|                                   ]
+|                                 ]
+|                               ]
+|                             ]
+|                           ]
+|                         ]
+|                       ]
+|                     ]
+|                   ]
+|                 ]
+|               ]
+|             ]
+|           ]
+|         ]
+|       ]
+|     ]
+|   ]
+| ]
+== json 33
+input TJSONObject.Create([a, 1, b, x]), Add, Remove
+object 2
+key a
+int 1
+key b
+string x
+add count 7
+raises EJSON
+after duplicate count 7
+remove b count 6
+object 6
+key a
+int 1
+key c
+array 3
+int 1
+string two
+true
+key d
+true
+key e
+string str
+key f
+int64 5000000000
+key n
+null
+asjson { "a" : 1, "c" : [1, "two", true], "d" : true, "e" : "str", "f" : 5000000000, "n" : null }
+formatjson
+| {
+|   "a" : 1,
+|   "c" : [
+|     1,
+|     "two",
+|     true
+|   ],
+|   "d" : true,
+|   "e" : "str",
+|   "f" : 5000000000,
+|   "n" : null
+| }
+checks object 6
+find first 1
+indexofname first 0
+indexofname last 5
+find missing nil
+indexofname missing -1
+names[0] a
+clone same
+delete(0) count 5
+delete(0) names[0] c
+extract last null count 5
+extract missing nil
+extract(0) 1 count 4 { "c" : [1, "two", true], "d" : true, "e" : "str", "f" : 5000000000 }
+== json 34
+input TJSONArray: Insert, Add, Move, Remove, Extract, Delete, Sort
+array 7
+string b1
+string a1
+string b2
+string a2
+string a3
+string b3
+string c1
+insert ["z0", "b1", "y0", "a1", "b2", "a2", "a3", "b3", "c1", "x0"]
+move(0, 3) ["b1", "y0", "a1", "z0", "b2", "a2", "a3", "b3", "c1", "x0"]
+move(5, 1) ["b1", "a2", "y0", "a1", "z0", "b2", "a3", "b3", "c1", "x0"]
+remove items[1] ["b1", "y0", "a1", "z0", "b2", "a3", "b3", "c1", "x0"]
+extract(0) "b1" ["y0", "a1", "z0", "b2", "a3", "b3", "c1", "x0"]
+extract(last item) "x0" ["y0", "a1", "z0", "b2", "a3", "b3", "c1"]
+delete(0) ["a1", "z0", "b2", "a3", "b3", "c1"]
+sort ["a3", "a1", "b3", "b2", "c1", "z0"]
+sort again ["a1", "a9", "a3", "a0", "b9", "b2", "b3", "b0", "c1", "z0"]
+array 10
+string a1
+string a9
+string a3
+string a0
+string b9
+string b2
+string b3
+string b0
+string c1
+string z0
+asjson ["a1", "a9", "a3", "a0", "b9", "b2", "b3", "b0", "c1", "z0"]
+formatjson
+| [
+|   "a1",
+|   "a9",
+|   "a3",
+|   "a0",
+|   "b9",
+|   "b2",
+|   "b3",
+|   "b0",
+|   "c1",
+|   "z0"
+| ]
+FCL TRANSCRIPT END

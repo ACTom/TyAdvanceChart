@@ -4,6 +4,7 @@
 
     python scripts/delphi-probe.py [--bin <Delphi bin directory>] [--verbose]
                                    [--standins DIR --all] [--values]
+    python scripts/delphi-probe.py --fcl [--write-expected] [--fpc PATH] [--bin <Delphi bin directory>]
 
 Windows only: it runs dcc32.exe and dcc64.exe from a Delphi installation. Nothing is written
 into the repository; the compiled units go to a temporary directory that is removed at the end.
@@ -22,10 +23,21 @@ are printed too.
                  failed because of a unit it uses; its line says which file.
 --values         builds delphi/tests/tyadvchart_values.dpr with both compilers, runs it, and requires
                  exit code 0 and DELPHI VALUES OK as the last output line.
+--fcl            builds delphi/tests/tyadvchart_fcl.dpr with FPC (FPC's own FCL units; unit path source/ only)
+                 and with dcc32 and dcc64 (the ports in delphi/fcl), runs each, and compares its output line
+                 by line with delphi/tests/expected/fcl.txt (trailing carriage returns dropped first).
+                 FPC must give every line. dcc must give as many lines, and every line that does not
+                 start with '~ '; a '~ ' line (informational) that differs is only counted. Prints one
+                 line per compiler, and the first 10 differences of a compiler that fails; compiles no
+                 chart unit on its own and prints no unit summary.
+--write-expected with --fcl: writes FPC's output to delphi/tests/expected/fcl.txt; runs no dcc.
+--fpc PATH       FPC's command-line compiler for --fcl (default: DEFAULT_FPC, FPC 3.2.2 of the
+                 Lazarus installation).
+When delphi/fcl exists it is on dcc's unit and include paths, after source/ and before the --standins folder.
 Every dcc call and every run of the values program has a timeout (TIMEOUT seconds); a timeout is an error.
 
 Exit code: 0 no errors, 1 at least one error or no unit compiled with a compiler, 2 the compilers
-were not found.
+(or, for --fcl, FPC) were not found.
 The list of units grows with the later plans (every unit added reaches only units already listed
 or the RTL).
 """
@@ -48,6 +60,11 @@ COMPILERS = ['dcc32', 'dcc64']
 # --all leaves out the control unit itself (PREFIX without the dot) and these, which need the LCL
 EXCLUDED = ['Render', 'Images', 'DirtyRect', 'ToolboxDlg', 'KeyNav']
 VALUES_DPR = os.path.join(ROOT, 'delphi', 'tests', 'tyadvchart_values.dpr')
+FCL_DIR = os.path.join(ROOT, 'delphi', 'fcl')
+FCL_DPR = os.path.join(ROOT, 'delphi', 'tests', 'tyadvchart_fcl.dpr')
+FCL_EXPECTED = os.path.join(ROOT, 'delphi', 'tests', 'expected', 'fcl.txt')
+FCL_END = 'FCL TRANSCRIPT END'
+DEFAULT_FPC = r'C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe'
 TIMEOUT = 120
 
 MSG_RE = re.compile(r'\b([EWFH])(\d{4})\b')
@@ -60,7 +77,7 @@ def all_units():
 
 
 def dcc_args(tmp, standins):
-    extra = [standins] if standins else []
+    extra = ([FCL_DIR] if os.path.isdir(FCL_DIR) else []) + ([standins] if standins else [])
     return ['-Q', '-NSSystem;Winapi', '--codepage:65001', '-U' + ';'.join([SRC, tmp] + extra),
             '-I' + ';'.join([SRC] + extra), '-NU' + tmp, '-E' + tmp]
 
@@ -129,6 +146,95 @@ def run_values(exe, tmp):
     return []
 
 
+def run_program(exe, cwd):
+    """Runs a built program; returns (exit code, output lines without their carriage returns), or (None, [why])."""
+    try:
+        p = subprocess.run([exe], cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return None, ['timeout after %d seconds' % TIMEOUT]
+    except OSError as e:
+        return None, ['cannot run %s: %s' % (exe, e)]
+    lines = [l.rstrip('\r') for l in p.stdout.decode('utf-8', 'replace').split('\n')]
+    if lines and lines[-1] == '':
+        lines = lines[:-1]
+    return p.returncode, lines
+
+
+def fcl_transcript(compiler, exe, tmp):
+    """Builds and runs the transcript program; returns (output lines, errors)."""
+    if compiler == 'fpc':
+        cmd = [exe, '-B', '-Fu' + SRC, '-Fi' + SRC, '-FU' + tmp, '-FE' + tmp, FCL_DPR]
+        rc, out = run_dcc(cmd, os.path.dirname(FCL_DPR))
+        errs = [l.strip() for l in out if re.search(r'\b(Error|Fatal):', l)]
+    else:
+        rc, out = run_dcc([exe] + dcc_args(tmp, None) + ['-B', FCL_DPR], os.path.dirname(FCL_DPR))
+        errs = [l.strip() for l in out if MSG_RE.search(l) and MSG_RE.search(l).group(1) in 'EF']
+    if rc != 0:
+        return None, ['transcript program does not compile: ' + (errs[0] if errs else ' | '.join(out[-3:]))]
+    rc, lines = run_program(os.path.join(tmp, 'tyadvchart_fcl.exe'), tmp)
+    if rc is None:
+        return None, ['transcript program: ' + lines[0]]
+    if rc != 0 or not lines or lines[-1] != FCL_END:
+        return None, ['transcript program: exit code %d, last lines: %s' % (rc, ' | '.join(lines[-5:]))]
+    return lines, []
+
+
+def compare_transcript(compiler, got, expected):
+    """Returns (differences, number of informational lines that differ). For FPC every line counts."""
+    diffs = []
+    info = 0
+    if len(got) != len(expected):
+        diffs.append('%d lines, expected %d' % (len(got), len(expected)))
+    for i in range(min(len(got), len(expected))):
+        if got[i] == expected[i]:
+            continue
+        if compiler != 'fpc' and expected[i].startswith('~ '):
+            info += 1
+            continue
+        diffs.append('line %d: expected [%s], got [%s]' % (i + 1, expected[i], got[i]))
+    return diffs, info
+
+
+def main_fcl(args, exes, tmp):
+    """--fcl; returns the number of errors."""
+    errors = 0
+    compilers = ['fpc'] if args.write_expected else ['fpc'] + COMPILERS
+    expected = None
+    if not args.write_expected:
+        if not os.path.isfile(FCL_EXPECTED):
+            print('no expected transcript: ' + FCL_EXPECTED + ' (write it with --fcl --write-expected)')
+            return 1
+        with open(FCL_EXPECTED, encoding='utf-8', newline='') as f:
+            expected = [l.rstrip('\r') for l in f.read().split('\n')]
+        if expected and expected[-1] == '':
+            expected = expected[:-1]
+    for c in compilers:
+        d = os.path.join(tmp, 'fcl-' + c)
+        os.mkdir(d)
+        lines, errs = fcl_transcript(c, exes[c], d)
+        if errs:
+            errors += len(errs)
+            print('%-9s %-6s errors %d' % ('fcl', c, len(errs)))
+            for e in errs:
+                print('    ' + e)
+            continue
+        if args.write_expected:
+            os.makedirs(os.path.dirname(FCL_EXPECTED), exist_ok=True)
+            with open(FCL_EXPECTED, 'w', encoding='utf-8', newline='\n') as f:
+                f.write('\n'.join(lines) + '\n')
+            print('%-9s %-6s wrote %s (%d lines)' % ('fcl', c, os.path.relpath(FCL_EXPECTED, ROOT), len(lines)))
+            continue
+        diffs, info = compare_transcript(c, lines, expected)
+        if diffs:
+            errors += 1
+            print('%-9s %-6s TRANSCRIPT DIFFERS (%d differences)' % ('fcl', c, len(diffs)))
+            for dline in diffs[:10]:
+                print('    ' + dline)
+        else:
+            print('%-9s %-6s TRANSCRIPT OK (%d lines, %d informational lines differ)' % ('fcl', c, len(lines), info))
+    return errors
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--bin', default=DEFAULT_BIN, help='Delphi bin directory (default: %(default)s)')
@@ -136,7 +242,17 @@ def main():
     ap.add_argument('--standins', help='folder of compile-only stand-ins, added to the unit and include paths')
     ap.add_argument('--all', action='store_true', help='compile every neutral unit (needs --standins)')
     ap.add_argument('--values', action='store_true', help='build and run delphi/tests/tyadvchart_values.dpr')
+    ap.add_argument('--fcl', action='store_true',
+                    help='build and run delphi/tests/tyadvchart_fcl.dpr with FPC, dcc32 and dcc64; '
+                         'compare with delphi/tests/expected/fcl.txt')
+    ap.add_argument('--write-expected', action='store_true',
+                    help="with --fcl: write FPC's output to delphi/tests/expected/fcl.txt")
+    ap.add_argument('--fpc', default=DEFAULT_FPC, help="FPC's command-line compiler (default: %(default)s)")
     args = ap.parse_args()
+    if args.write_expected and not args.fcl:
+        ap.error('--write-expected needs --fcl')
+    if args.fcl and (args.all or args.values or args.standins):
+        ap.error('--fcl does not go with --all, --values or --standins')
     if args.all and not args.standins:
         ap.error('--all needs --standins')
     if args.standins and not os.path.isdir(args.standins):
@@ -145,10 +261,26 @@ def main():
 
     exes = {c: os.path.join(args.bin, c + '.exe') for c in COMPILERS}
     missing = [e for e in exes.values() if not os.path.isfile(e)]
-    if missing:
+    if missing and not args.write_expected:
         print('Delphi compilers not found: ' + ', '.join(missing))
         print('Give the bin directory of a Delphi installation with --bin.')
         return 2
+    if args.fcl:
+        if not os.path.isfile(args.fpc):
+            print('FPC not found: ' + args.fpc)
+            print('Give its command-line compiler with --fpc.')
+            return 2
+        exes['fpc'] = args.fpc
+        tmp = tempfile.mkdtemp(prefix='delphi-probe-')
+        try:
+            errors = main_fcl(args, exes, tmp)
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+        if errors:
+            print('PROBE FAILED (%d errors)' % errors)
+            return 1
+        print('PROBE OK')
+        return 0
 
     tmp = tempfile.mkdtemp(prefix='delphi-probe-')
     tmps = {c: os.path.join(tmp, c) for c in COMPILERS}  # the units of both compilers are .dcu files
