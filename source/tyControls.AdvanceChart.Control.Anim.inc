@@ -233,7 +233,7 @@ var
   oldKeys, newKeys, oldAx, newAx, nowAxes: TTyStringArray;
   kept: TStringList;
   oldIdx, oldMap: TFPHashList;
-  oldList: TFPList;
+  oldList: TTyList;
   i, k: Integer;
   p, q: TTyChartAnimProxy;
   props, from: TTyAnimProps;
@@ -244,14 +244,14 @@ begin
   if FAnim = nil then Exit;
   if FAxisList = nil then
   begin
-    FAxisList := TFPList.Create;
+    FAxisList := TTyList.Create;
     FAxisProxies := TFPHashList.Create;
   end;
   oldEls := AxisAnimElementsOf(AOldBuild, FLastPPI, oldKeys, oldAx);
   newEls := AxisAnimElementsOf(ANewBuild, FLastPPI, newKeys, newAx);
   oldList := FAxisList;
   oldMap := FAxisProxies;
-  FAxisList := TFPList.Create;
+  FAxisList := TTyList.Create;
   FAxisProxies := TFPHashList.Create;
   oldIdx := TFPHashList.Create;
   { WHICH AXIS VIEWS ARE KEPT [Batch 99]: prepareView's '_ec_' + model id +
@@ -1780,7 +1780,7 @@ begin
   Result.AdoptPause(FPauseClock);
 end;
 
-function TTyCustomAdvanceChart.AnimDrivers: TFPList;
+function TTyCustomAdvanceChart.AnimDrivers: TTyList;
 
   procedure Put(A: TTyAnimation);
   begin
@@ -1788,7 +1788,7 @@ function TTyCustomAdvanceChart.AnimDrivers: TFPList;
   end;
 
 begin
-  Result := TFPList.Create;
+  Result := TTyList.Create;
   Put(FAnim);
   Put(FPtrAnim);
   Put(FLegAnim);
@@ -1801,7 +1801,7 @@ end;
 
 procedure TTyCustomAdvanceChart.AnimFlushOthers(AOwn: TTyAnimation);
 var
-  list: TFPList;
+  list: TTyList;
   i: Integer;
   now_: Double;
 begin
@@ -1819,7 +1819,7 @@ end;
 
 procedure TTyCustomAdvanceChart.AnimPause;
 var
-  list: TFPList;
+  list: TTyList;
   i: Integer;
   now_: Double;
 begin
@@ -1837,7 +1837,7 @@ end;
 
 procedure TTyCustomAdvanceChart.AnimResume;
 var
-  list: TFPList;
+  list: TTyList;
   i: Integer;
   now_: Double;
 begin
@@ -2708,7 +2708,7 @@ begin
         props[High(props)] := TyAnimProp('label.y', TyAnimNum(ly));
       end;
     end;
-    if FPtrProxies = nil then FPtrProxies := TFPList.Create;
+    if FPtrProxies = nil then FPtrProxies := TTyList.Create;
     if FPtrAnim = nil then FPtrAnim := NewAnimDriver;
     p := nil;
     for k := 0 to FPtrProxies.Count - 1 do

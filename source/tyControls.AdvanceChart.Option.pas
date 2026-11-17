@@ -1254,7 +1254,7 @@ var
     begin
       SetString(s, start, p - start);
       { ParseNumber, as it is }
-      if TryStrToQWord(s, qw) then
+      if TryStrToUInt64(s, qw) then
       begin
         if qw > UInt64(High(Int64)) then AValue := CreateJSON(qw)
         else if qw > MaxInt then AValue := CreateJSON(Int64(qw))

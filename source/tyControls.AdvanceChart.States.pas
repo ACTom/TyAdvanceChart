@@ -1845,7 +1845,7 @@ begin
       begin
         if i > 0 then Result := Result + ',';
         Result := Result + '"' + StringToJSONString(AModel.MapKeys[i]) + '":'
-          + BoolToStr(AModel.MapVals[i], 'true', 'false');
+          + TyBoolText(AModel.MapVals[i], 'true', 'false');
       end;
       Result := Result + '}';
     end;

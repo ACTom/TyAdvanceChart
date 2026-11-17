@@ -411,13 +411,13 @@ end;
 function JFloor(A: Double): Double;
 begin
   if IsNan(A) or IsInfinite(A) or (Abs(A) >= 4503599627370496.0) then Exit(A);
-  Result := Floor64(A);
+  Result := TyFloor64(A);
 end;
 
 function JCeil(A: Double): Double;
 begin
   if IsNan(A) or IsInfinite(A) or (Abs(A) >= 4503599627370496.0) then Exit(A);
-  Result := Ceil64(A);
+  Result := TyCeil64(A);
 end;
 
 { ==================== TTyParallel ==================== }

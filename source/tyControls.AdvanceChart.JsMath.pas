@@ -55,6 +55,9 @@ function TyJsLog(AX: Double): Double;
 function TyJsPow(AX, AY: Double): Double;
 { JavaScript's >>: the signed right shift. AShift must be 0..31. }
 function TySar32(AValue: Integer; AShift: Byte): Integer; inline;
+{ Rounded down and up to an Int64: FPC's Floor64 and Ceil64. }
+function TyFloor64(const AValue: Double): Int64; inline;
+function TyCeil64(const AValue: Double): Int64; inline;
 
 implementation
 
@@ -93,6 +96,22 @@ const
 function TySar32(AValue: Integer; AShift: Byte): Integer;
 begin
   {$IFDEF FPC}Result := SarLongint(AValue, AShift);{$ELSE}if AValue >= 0 then Result := AValue shr AShift else Result := not ((not AValue) shr AShift);{$ENDIF}
+end;
+
+function TyFloor64(const AValue: Double): Int64;
+begin
+  {$IFDEF FPC}Result := Floor64(AValue);{$ELSE}
+  Result := Trunc(AValue);
+  if Frac(AValue) < 0 then Dec(Result);
+  {$ENDIF}
+end;
+
+function TyCeil64(const AValue: Double): Int64;
+begin
+  {$IFDEF FPC}Result := Ceil64(AValue);{$ELSE}
+  Result := Trunc(AValue);
+  if Frac(AValue) > 0 then Inc(Result);
+  {$ENDIF}
 end;
 
 function FromBits(AQ: UInt64): Double;

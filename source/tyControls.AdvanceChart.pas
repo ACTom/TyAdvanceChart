@@ -2298,7 +2298,7 @@ type
       pointer moving never takes the series out of the static layer; one
       proxy per axis (its role the axis' key) }
     FPtrAnim: TTyAnimation;
-    FPtrProxies: TFPList;
+    FPtrProxies: TTyList;
     FAnimWindow: Boolean;
     { THE RENDER BEFORE AN UPDATE [Batch 90]: what the last list held and
       its series' keys, taken when a new option is laid out and kept until
@@ -2381,7 +2381,7 @@ type
       group, by 'xAxis0/anid', on the series' driver; made by a full update's
       arming, dropped with every other proxy }
     FAxisProxies: TFPHashList;
-    FAxisList: TFPList;
+    FAxisList: TTyList;
     { THE SERIES WHOSE MODEL replaceMerge MADE BRAND NEW since the old keys
       were taken: upstream's __requireNewView, a new view whatever the id
       [Batch 97]. Consumed by the update that pairs the views. }
@@ -2606,7 +2606,7 @@ type
     procedure LineHistRoll;
     function LineHistInit(const AViewKey: string): Boolean;
     { every driver of the chart, the nil ones left out }
-    function AnimDrivers: TFPList;
+    function AnimDrivers: TTyList;
     { a flush while paused steps every driver, as upstream's one animation
       steps every clip [F3b] }
     procedure AnimFlushOthers(AOwn: TTyAnimation);
@@ -6559,7 +6559,7 @@ const
 
 var
   { instances: every chart, in creation order }
-  GTyCharts: TFPList = nil;
+  GTyCharts: TTyList = nil;
   { connectedGroups: a group's name, connected when its object is set }
   GTyConnected: TStringList = nil;
   { groupIdBase: +new Date() when first asked, then one up per new group }

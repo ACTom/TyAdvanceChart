@@ -922,7 +922,7 @@ end;
 
 function TTyCustomAdvanceChart.BrushClock: Double;
 begin
-  if IsNan(FBrushNow) then Result := GetTickCount64 else Result := FBrushNow;
+  if IsNan(FBrushNow) then Result := TThread.GetTickCount64 else Result := FBrushNow;
 end;
 
 { brushVisual's dispatch of brushSelect: through the throttle the first
@@ -2822,7 +2822,7 @@ end;
 
 function TTyCustomAdvanceChart.ParExpClock: Double;
 begin
-  if IsNan(FParExpNow) then Result := GetTickCount64 else Result := FParExpNow;
+  if IsNan(FParExpNow) then Result := TThread.GetTickCount64 else Result := FParExpNow;
 end;
 
 procedure TTyCustomAdvanceChart.ParallelExpandTick(ANow: Double);

@@ -661,7 +661,7 @@ end;
 
 function TTyCustomAdvanceChart.DzClock: Double;
 begin
-  if IsNan(FDzNow) then Result := GetTickCount64 else Result := FDzNow;
+  if IsNan(FDzNow) then Result := TThread.GetTickCount64 else Result := FDzNow;
 end;
 
 function TTyCustomAdvanceChart.DzGridRect(AGrid: Integer): TTyXYWH;

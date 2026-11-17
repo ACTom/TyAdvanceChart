@@ -108,7 +108,7 @@ type
       its free) }
     Leaving, Gone: Boolean;
     { where a gone element is put to be freed (the view's list) }
-    GoneList: TFPList;
+    GoneList: TTyList;
     { the global transform (updateTransform); HasTransform False is null }
     HasTransform: Boolean;
     Transform: TTyMat2D;
@@ -144,7 +144,7 @@ type
       userDuring): a handler reference ('@Name'), '' none }
     UserDuring: string;
     { the bound duringCall scopes this element made (owned, freed with it) }
-    DuringScopes: TFPList;
+    DuringScopes: TTyList;
     { [spec 242] el.setClipPath: a path element (owned; nil none) whose
       transform is its own under this element's }
     ClipPath: TTyGfxEl;
@@ -860,7 +860,7 @@ var
 begin
   Result := nil;
   if UserDuring = '' then Exit;
-  if DuringScopes = nil then DuringScopes := TFPList.Create
+  if DuringScopes = nil then DuringScopes := TTyList.Create
   else if AnimatorCount = 0 then
   begin
     { nothing runs that could still call the old ones }

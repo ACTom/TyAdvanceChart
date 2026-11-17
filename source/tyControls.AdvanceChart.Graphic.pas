@@ -86,7 +86,7 @@ type
     FMap: TStringList;
     FLast: TTyGfxModel;
     FHasLast: Boolean;
-    FGone: TFPList;
+    FGone: TTyList;
     FAnimation: TTyAnimation;
     FAnim: TTyGfxAnimSettings;
     FError: string;
@@ -739,7 +739,7 @@ begin
   FRoot := TTyGfxEl.Create(gkGroup, 'group');
   FMap := TStringList.Create;
   FMap.CaseSensitive := True;
-  FGone := TFPList.Create;
+  FGone := TTyList.Create;
 end;
 
 destructor TTyGfxView.Destroy;

@@ -8,10 +8,10 @@ unit tyControls.AdvanceChart.Types;
   tolerance this layer promises is half a pixel on any extent. Rounding to device
   integers is the PAINTER's job, at the last moment.
 
-  This unit is PURE: SysUtils and Math only. No Controls, no Graphics, no LCL, no
+  This unit is PURE: SysUtils, Classes and Math only. No Controls, no Graphics, no LCL, no
   BGRA, no handle. Everything below is headless-testable by construction. }
 interface
-uses SysUtils, Math;
+uses SysUtils, Classes, Math;
 
 type
   TTyDoubleArray = array of Double;
@@ -132,6 +132,7 @@ type
   TTyLabelOverflow = (loNone, loTruncate, loBreak);
 
   TTyStringArray = {$IFDEF FPC}TStringArray{$ELSE}TArray<string>{$ENDIF};
+  TTyList = {$IFDEF FPC}TFPList{$ELSE}TList{$ENDIF};
   TTyBoolArray = array of Boolean;
   TTyIntegerArray = array of Integer;
 
@@ -217,6 +218,9 @@ function TyInvalidRectF: TTyRectF;
   when it has 8 bytes and rejects when it has 4. An unsigned 64-bit value above High(Int64) must not be passed:
   it would be read as negative. }
 function TyIntToDouble(const AValue: Int64): Double; inline;
+
+{ ATrue when AValue is True, else AFalse: what FPC's BoolToStr with three arguments gives. }
+function TyBoolText(AValue: Boolean; const ATrue, AFalse: string): string; inline;
 
 implementation
 
@@ -400,6 +404,11 @@ end;
 function TyIntToDouble(const AValue: Int64): Double;
 begin
   Result := AValue;
+end;
+
+function TyBoolText(AValue: Boolean; const ATrue, AFalse: string): string;
+begin
+  if AValue then Result := ATrue else Result := AFalse;
 end;
 
 end.

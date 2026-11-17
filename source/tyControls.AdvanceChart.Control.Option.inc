@@ -84,7 +84,7 @@ begin
   Inc(GTyChartSeq);
   FInstanceNo := GTyChartSeq;
   FPressEl := -1;
-  if GTyCharts = nil then GTyCharts := TFPList.Create;
+  if GTyCharts = nil then GTyCharts := TTyList.Create;
   GTyCharts.Add(Self);
 end;
 

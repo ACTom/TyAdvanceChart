@@ -339,7 +339,7 @@ type
   TTyCustomView = class
   private
     FRoot: TTyGfxEl;
-    FDetached, FGone: TFPList;
+    FDetached, FGone: TTyList;
     FHasData: Boolean;
     FIds: TTyStringArray;
     FRaws: TTyIntegerArray;
@@ -932,8 +932,8 @@ constructor TTyCustomView.Create;
 begin
   inherited Create;
   FRoot := TTyGfxEl.Create(gkGroup, 'group');
-  FDetached := TFPList.Create;
-  FGone := TFPList.Create;
+  FDetached := TTyList.Create;
+  FGone := TTyList.Create;
   FZ := 2;
   FZLevel := 0;
 end;

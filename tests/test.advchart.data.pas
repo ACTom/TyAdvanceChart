@@ -50,6 +50,7 @@ type
     procedure TestTimeRejectsTrailingJunk;
     procedure TestTimeNumberIsAlreadyEpochMs;
     procedure TestTimeRoundTripsThroughTDateTime;
+    procedure TestLocalTimeOffsetMinutesIsTheRtls;
     { ---- schema ---- }
     procedure TestDimensionsAreNamedAndTyped;
     procedure TestUnknownDimensionAnswersSafely;
@@ -353,6 +354,12 @@ var dt: TDateTime;
 begin
   dt := EncodeDate(2024, 3, 5) + EncodeTime(6, 7, 8, 125);
   AssertEquals(dt, TyMsToDateTime(TyDateTimeToMs(dt)), 1 / 86400000.0);
+end;
+
+procedure TAdvChartDataTest.TestLocalTimeOffsetMinutesIsTheRtls;
+begin
+  { UTC minus local, in minutes, today's: on FPC exactly GetLocalTimeOffset }
+  AssertEquals(GetLocalTimeOffset, TyLocalTimeOffsetMinutes);
 end;
 
 { ============================ schema ============================ }

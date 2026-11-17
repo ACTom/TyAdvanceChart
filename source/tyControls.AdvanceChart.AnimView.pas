@@ -691,9 +691,9 @@ type
 
   TTyChartAnimSet = class
   private
-    FItems: TFPList;
+    FItems: TTyList;
     FIndex: TFPHashList;
-    FGhosts: TFPList;
+    FGhosts: TTyList;
     FAnimation: TTyAnimation;
     { the updates armed so far: a style transition's stamp [Batch 136] }
     FPass: Integer;
@@ -1319,7 +1319,7 @@ end;
 function TyDataDiff(const AOld, ANew: TTyStringArray): TTyDataDiffCmdArray;
 var
   map: TFPHashList;
-  lists: TFPList;
+  lists: TTyList;
   i, j, n: Integer;
   l: TList;
   key: ShortString;
@@ -1354,7 +1354,7 @@ begin
   Result := nil;
   n := 0;
   map := TFPHashList.Create;
-  lists := TFPList.Create;
+  lists := TTyList.Create;
   try
     { the new rows by key, in order: a key held twice is a list }
     for i := 0 to High(ANew) do
@@ -1465,9 +1465,9 @@ constructor TTyChartAnimSet.Create(AAnimation: TTyAnimation);
 begin
   inherited Create;
   FAnimation := AAnimation;
-  FItems := TFPList.Create;
+  FItems := TTyList.Create;
   FIndex := TFPHashList.Create;
-  FGhosts := TFPList.Create;
+  FGhosts := TTyList.Create;
   FLsdSeries := -1;
 end;
 
@@ -3000,7 +3000,7 @@ end;
 procedure TTyChartAnimSet.ArmUpdate(AList: TTyPaintList;
   const ASeries: TTyChartAnimSeriesArray; const APrev: TTyChartAnimPrev);
 var
-  oldItems: TFPList;
+  oldItems: TTyList;
   oldIndex: TFPHashList;
   prevIdx: TFPHashList;
   utIdx: TFPHashList;
@@ -5543,7 +5543,7 @@ begin
   FLsdSeries := -1;
   oldItems := FItems;
   oldIndex := FIndex;
-  FItems := TFPList.Create;
+  FItems := TTyList.Create;
   FIndex := TFPHashList.Create;
   prevIdx := TFPHashList.Create;
   utIdx := TFPHashList.Create;

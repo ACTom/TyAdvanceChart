@@ -122,7 +122,7 @@ procedure TyDzApplyOverlay(var ASpec: TTyDataZoomSpec; AOverlay: TJSONObject;
 implementation
 
 uses tyControls.AdvanceChart.Scale, tyControls.AdvanceChart.Data,
-     tyControls.AdvanceChart.Stack, tyControls.AdvanceChart.Complete;
+     tyControls.AdvanceChart.Stack, tyControls.AdvanceChart.Complete, tyControls.AdvanceChart.JsMath;
 
 { ---- small things ---- }
 
@@ -892,8 +892,8 @@ begin
       if ordOrTime and not IsNan(Result.Value[idx]) and not IsInfinite(Result.Value[idx]) then
       begin
         { Int64: a time is milliseconds, past what an Integer holds }
-        if idx = 0 then Result.Value[idx] := Ceil64(Result.Value[idx])
-        else Result.Value[idx] := Floor64(Result.Value[idx]);
+        if idx = 0 then Result.Value[idx] := TyCeil64(Result.Value[idx])
+        else Result.Value[idx] := TyFloor64(Result.Value[idx]);
       end;
     end;
   end;

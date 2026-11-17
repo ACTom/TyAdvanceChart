@@ -241,7 +241,7 @@ type
     FErrors: array of string;
     { per dataset: 0 not looked at, 1 being resolved, 2 resolved }
     FState: array of Byte;
-    FOwned: TFPList;
+    FOwned: TTyList;
     { THE Math.random the transforms draw from [Batch 134]: FRandom when
       nobody lent one, reseeded with TyJitterSeed on every reset }
     FRandom: Cardinal;
@@ -861,7 +861,7 @@ end;
 constructor TTyDatasetCache.Create;
 begin
   inherited Create;
-  FOwned := TFPList.Create;
+  FOwned := TTyList.Create;
   FRandom := TyJitterSeed;
 end;
 

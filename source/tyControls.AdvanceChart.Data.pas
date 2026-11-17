@@ -217,6 +217,8 @@ var
     on the machine's; nil is the system's. }
   TyLocalOffsetHook: TTyLocalOffsetFunc = nil;
 
+{ Today's UTC minus local time, in minutes: FPC's GetLocalTimeOffset. }
+function TyLocalTimeOffsetMinutes: Integer;
 { The local zone's offset (local minus UTC, ms) at a UTC instant: the hook's,
   else the system's -- Windows' per-year rules where it has them, the C
   library's localtime_r (the IANA history) elsewhere; today's when neither
@@ -1396,12 +1398,19 @@ end;
 {$ENDIF}
 {$ENDIF}
 
+function TyLocalTimeOffsetMinutes: Integer;
+begin
+  {$IFDEF FPC}Result := GetLocalTimeOffset;{$ELSE}
+  Result := -Round(TTimeZone.Local.UtcOffset.TotalMinutes);
+  {$ENDIF}
+end;
+
 function TyLocalOffsetAt(AUtcMs: Double): Double;
 begin
   if Assigned(TyLocalOffsetHook) then Exit(TyLocalOffsetHook(AUtcMs));
   if IsNan(AUtcMs) or IsInfinite(AUtcMs) or not SystemOffsetAt(AUtcMs, Result) then
-    { GetLocalTimeOffset is UTC minus local, in minutes, today's }
-    Result := -GetLocalTimeOffset * 60000.0;
+    { TyLocalTimeOffsetMinutes is UTC minus local, in minutes, today's }
+    Result := -TyLocalTimeOffsetMinutes * 60000.0;
 end;
 
 function TyUtcToLocalMs(AUtcMs: Double): Double;

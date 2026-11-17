@@ -32,6 +32,7 @@ type
     procedure TestPowAndLogAreV8sToTheBit;
     procedure TestPowFollowsV8NotTheTextbook;
     procedure TestSar32;
+    procedure TestFloorCeil64;
   end;
 
 implementation
@@ -405,6 +406,18 @@ begin
   AssertEquals(-1073741824, TySar32(Low(Integer), 1));
   AssertEquals(0, TySar32(High(Integer), 31));
   AssertEquals(-7, TySar32(-7, 0));
+end;
+
+procedure TAdvChartJsMathTest.TestFloorCeil64;
+begin
+  AssertTrue(TyFloor64(2.5) = 2);
+  AssertTrue(TyFloor64(-2.5) = -3);
+  AssertTrue(TyFloor64(-2.0) = -2);
+  AssertTrue(TyFloor64(4294967296.5) = 4294967296);
+  AssertTrue(TyCeil64(2.5) = 3);
+  AssertTrue(TyCeil64(-2.5) = -2);
+  AssertTrue(TyCeil64(2.0) = 2);
+  AssertTrue(TyCeil64(-4294967296.5) = -4294967296);
 end;
 
 initialization

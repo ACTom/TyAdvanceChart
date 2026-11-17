@@ -40,8 +40,29 @@ begin
   Check(TyIntToDouble(Low(Int64)) = -9223372036854775808.0, 'TyIntToDouble(Low(Int64)) = -2^63');
 end;
 
+procedure CheckFloorCeil64;
+begin
+  Check(TyFloor64(2.5) = 2, 'TyFloor64(2.5) = 2');
+  Check(TyFloor64(-2.5) = -3, 'TyFloor64(-2.5) = -3');
+  Check(TyFloor64(-2.0) = -2, 'TyFloor64(-2.0) = -2');
+  Check(TyFloor64(4294967296.5) = 4294967296, 'TyFloor64(4294967296.5) = 4294967296');
+  Check(TyCeil64(2.5) = 3, 'TyCeil64(2.5) = 3');
+  Check(TyCeil64(-2.5) = -2, 'TyCeil64(-2.5) = -2');
+  Check(TyCeil64(2.0) = 2, 'TyCeil64(2.0) = 2');
+  Check(TyCeil64(-4294967296.5) = -4294967296, 'TyCeil64(-4294967296.5) = -4294967296');
+end;
+
+procedure CheckBoolText;
+begin
+  Check(TyBoolText(True, 'yes', 'no') = 'yes', 'TyBoolText(True, ''yes'', ''no'') = ''yes''');
+  Check(TyBoolText(False, 'yes', 'no') = 'no', 'TyBoolText(False, ''yes'', ''no'') = ''no''');
+  Check(TyBoolText(False, 'c', '') = '', 'TyBoolText(False, ''c'', '''') = ''''');
+end;
+
 begin
   CheckSar32;
   CheckIntToDouble;
+  CheckFloorCeil64;
+  CheckBoolText;
   Writeln('DELPHI VALUES OK');
 end.

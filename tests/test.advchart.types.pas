@@ -18,6 +18,7 @@ type
     procedure TestValidRectIsValid;
     procedure TestRectWithNaNIsNotValid;
     procedure TestIntToDouble;
+    procedure TestBoolText;
   end;
 implementation
 
@@ -120,6 +121,13 @@ begin
   AssertTrue(TyIntToDouble(High(Integer)) = 2147483647.0);
   AssertTrue(TyIntToDouble(Int64(9007199254740993)) = 9007199254740992.0);  // 2^53 + 1 rounds to even
   AssertTrue(TyIntToDouble(Low(Int64)) = -9223372036854775808.0);
+end;
+
+procedure TAdvChartTypesTest.TestBoolText;
+begin
+  AssertEquals('yes', TyBoolText(True, 'yes', 'no'));
+  AssertEquals('no', TyBoolText(False, 'yes', 'no'));
+  AssertEquals('', TyBoolText(False, 'c', ''));
 end;
 
 initialization

@@ -473,11 +473,11 @@ var
   end;
 
 begin
-  Result := BoolToStr(FTipShown, '1', '0') + '|' + H(FTipSnap.X) + ',' + H(FTipSnap.Y)
+  Result := TyBoolText(FTipShown, '1', '0') + '|' + H(FTipSnap.X) + ',' + H(FTipSnap.Y)
     + '|' + IntToStr(Ord(FTipSnap.Datum.Kind)) + ',' + IntToStr(FTipSnap.Datum.SeriesIndex)
     + ',' + IntToStr(FTipSnap.Datum.DataIndex) + ',' + IntToStr(FTipSnap.Datum.ComponentIndex)
-    + ',' + BoolToStr(FTipSnap.Datum.IsEdge, '1', '0') + ',' + IntToStr(FTipSnap.Element)
-    + '|' + FTipSnap.DbcJson + '|' + BoolToStr(FTipSnap.Frozen, '1', '0') + H(FTipSnap.FrozenX)
+    + ',' + TyBoolText(FTipSnap.Datum.IsEdge, '1', '0') + ',' + IntToStr(FTipSnap.Element)
+    + '|' + FTipSnap.DbcJson + '|' + TyBoolText(FTipSnap.Frozen, '1', '0') + H(FTipSnap.FrozenX)
     + ',' + H(FTipSnap.FrozenY) + '|' + FTipSnap.PosJson;
   for i := 0 to High(FTipSnap.Hits) do
   begin
@@ -489,7 +489,7 @@ begin
   for i := 0 to High(FTipHits) do
   begin
     Result := Result + '|p' + IntToHex(UIntPtr(FTipHits[i].Axis), 16) + H(FTipHits[i].Value)
-      + ',' + H(FTipHits[i].SnapValue) + BoolToStr(FTipHits[i].Cross, 'c', '');
+      + ',' + H(FTipHits[i].SnapValue) + TyBoolText(FTipHits[i].Cross, 'c', '');
     for k := 0 to High(FTipHits[i].Rows) do
       Result := Result + ',' + IntToStr(FTipHits[i].Slots[k]) + ':' + IntToStr(FTipHits[i].Rows[k]);
   end;
@@ -6422,7 +6422,7 @@ begin
           animate := PtrMoves(hit, model);
           if animate then
           begin
-            if FPtrProxies = nil then FPtrProxies := TFPList.Create;
+            if FPtrProxies = nil then FPtrProxies := TTyList.Create;
             if FPtrAnim = nil then FPtrAnim := NewAnimDriver;
             if p = nil then
             begin

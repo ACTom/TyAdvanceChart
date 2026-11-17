@@ -33,11 +33,11 @@ unit tyControls.AdvanceChart.Progressive;
   else that renders progressively. A large or progressive switch resets the
   render too (createRenderPlanner).
 
-  PURE: SysUtils, Math, fpjson and AdvanceChart.Types (and the platform's
+  PURE: SysUtils, Classes, Math, fpjson and AdvanceChart.Types (and the platform's
   fine clock). }
 interface
 uses
-  SysUtils, Math, fpjson, tyControls.AdvanceChart.Types;
+  SysUtils, Classes, Math, fpjson, tyControls.AdvanceChart.Types;
 
 const
   { echarts.ts TEST_FRAME_REMAIN_TIME: the ms a frame spends on chunks }
@@ -155,7 +155,7 @@ begin
   if QueryPerformanceFrequency(fq) and (fq > 0) and QueryPerformanceCounter(c) then
     Result := c / fq * 1000
   else
-    Result := GetTickCount64;
+    Result := TThread.GetTickCount64;
 end;
 {$ELSE}
 var tv: TTimeVal;
@@ -163,7 +163,7 @@ begin
   if fpgettimeofday(@tv, nil) = 0 then
     Result := tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0
   else
-    Result := GetTickCount64;
+    Result := TThread.GetTickCount64;
 end;
 {$ENDIF}
 

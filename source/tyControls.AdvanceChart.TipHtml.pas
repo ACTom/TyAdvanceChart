@@ -227,9 +227,9 @@ begin
       if name[1] = '#' then
       begin
         if (Length(name) > 2) and (name[2] in ['x', 'X']) then
-          ok := TryStrToDWord('$' + Copy(name, 3, MaxInt), code)
+          ok := TryStrToUInt('$' + Copy(name, 3, MaxInt), code)
         else if Length(name) > 1 then
-          ok := TryStrToDWord(Copy(name, 2, MaxInt), code);
+          ok := TryStrToUInt(Copy(name, 2, MaxInt), code);
         if ok and (Pos('-', name) > 0) then ok := False;
       end
       else

@@ -869,7 +869,7 @@ begin
     if IsNan(dh) then dh := Infinity;
     { Math.floor: an infinity, and a number past the integers, is itself }
     if IsInfinite(dh) or (Abs(dh) >= 4503599627370496.0) then Result := dh
-    else Result := Floor64(dh);
+    else Result := TyFloor64(dh);
     Result := Math.Max(Double(0.0), Result);
   finally
     UnmaskFP(mask);

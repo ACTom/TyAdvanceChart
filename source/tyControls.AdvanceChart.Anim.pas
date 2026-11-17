@@ -355,7 +355,7 @@ type
     { Animation.pause / resume [F3b] }
     FPaused: Boolean;
     FPauseStart: Double;
-    FElements: TFPList;
+    FElements: TTyList;
     FOnWake: TNotifyEvent;
     FOnFrame: TTyAnimFrameEvent;
   public
@@ -423,8 +423,8 @@ type
   TTyAnimElement = class
   private
     FAnimation: TTyAnimation;
-    FAnimators: TFPList;
-    FOwned: TFPList;
+    FAnimators: TTyList;
+    FOwned: TTyList;
     { THE STATES [Batch 94]: _normalState (flattened, and whether its style
       and shape objects exist), currentStates joined, stateTransition, the
       root keys that are not this element's (a symbol's group position in
@@ -446,7 +446,7 @@ type
       AStyleFilter: Boolean = False);
     procedure Shallow(const ATopKey: string; const AKeys: array of string;
       const AValues: array of TTyAnimValue; const ACfg: TTyAnimCfg;
-      AReverse, AFilter: Boolean; var AList: TFPList);
+      AReverse, AFilter: Boolean; var AList: TTyList);
     function InStateSkip(const AKey: string): Boolean;
     function HasAnimKey(const AKey: string): Boolean;
     procedure SaveCurrentToNormal(const AState: TTyAnimState);
@@ -582,7 +582,7 @@ uses DateUtils, tyControls.AdvanceChart.JsMath, tyControls.AdvanceChart.Color,
 
 var
   GBusy: Integer = 0;
-  GGrave: TFPList = nil;
+  GGrave: TTyList = nil;
   GClockBase: Double = 0;
   GClockTick: UInt64 = 0;
   GClockInited: Boolean = False;
@@ -598,7 +598,7 @@ procedure FreeAnimator(A: TTyAnimator); forward;
 
 procedure FlushGrave;
 var
-  list: TFPList;
+  list: TTyList;
   i: Integer;
 begin
   if (GBusy > 0) or (GGrave = nil) or (GGrave.Count = 0) then Exit;
@@ -607,7 +607,7 @@ begin
     while GGrave.Count > 0 do
     begin
       list := GGrave;
-      GGrave := TFPList.Create;
+      GGrave := TTyList.Create;
       try
         for i := 0 to list.Count - 1 do
           FreeAnimator(TTyAnimator(list[i]));
@@ -645,7 +645,7 @@ procedure Bury(A: TTyAnimator);
 begin
   if A.FInGrave then Exit;
   A.FInGrave := True;
-  if GGrave = nil then GGrave := TFPList.Create;
+  if GGrave = nil then GGrave := TTyList.Create;
   GGrave.Add(A);
 end;
 
@@ -788,7 +788,7 @@ end;
 function TyAnimClockMs: Double;
 var t: UInt64;
 begin
-  t := GetTickCount64;
+  t := TThread.GetTickCount64;
   if not GClockInited then
   begin
     GClockBase := TyIntToDouble(DateTimeToUnix(Now, False)) * 1000;
@@ -1786,7 +1786,7 @@ end;
 constructor TTyAnimation.Create;
 begin
   inherited Create;
-  FElements := TFPList.Create;
+  FElements := TTyList.Create;
 end;
 
 destructor TTyAnimation.Destroy;
@@ -1955,8 +1955,8 @@ end;
 constructor TTyAnimElement.Create;
 begin
   inherited Create;
-  FAnimators := TFPList.Create;
-  FOwned := TFPList.Create;
+  FAnimators := TTyList.Create;
+  FOwned := TTyList.Create;
   FStatePath := True;
 end;
 
@@ -2069,14 +2069,14 @@ end;
 
 procedure TTyAnimElement.StopAnimation(const AScope: string; AForwardToLast: Boolean);
 var
-  snap, left: TFPList;
+  snap, left: TTyList;
   i: Integer;
   a: TTyAnimator;
   g: TEngineGuard;
 begin
   g := EnterEngine;
-  snap := TFPList.Create;
-  left := TFPList.Create;
+  snap := TTyList.Create;
+  left := TTyList.Create;
   try
     snap.Assign(FAnimators);
     for i := 0 to snap.Count - 1 do
@@ -2237,7 +2237,7 @@ end;
 
 procedure TTyAnimElement.Shallow(const ATopKey: string; const AKeys: array of string;
   const AValues: array of TTyAnimValue; const ACfg: TTyAnimCfg;
-  AReverse, AFilter: Boolean; var AList: TFPList);
+  AReverse, AFilter: Boolean; var AList: TTyList);
 var
   keys: TTyStringArray;
   vals: TTyAnimValueArray;
@@ -2382,7 +2382,7 @@ end;
 procedure TTyAnimElement.DoAnimateTo(const AProps: TTyAnimProps; const ACfg: TTyAnimCfg;
   AReverse: Boolean; const AStateName: string; AStyleFilter: Boolean);
 var
-  list: TFPList;
+  list: TTyList;
   prefixes: array of string;
   topKeys, groupKeys: array of string;
   topVals, groupVals: array of TTyAnimValue;
@@ -2394,7 +2394,7 @@ var
   g: TEngineGuard;
 begin
   g := EnterEngine;
-  list := TFPList.Create;
+  list := TTyList.Create;
   try
     { the walk: a nested object recurses where it first appears (its
       animator is made then); the element's own keys wait for the end }
@@ -2690,7 +2690,7 @@ var
   keys: TTyStringArray;
   inner, tn: string;
   hasTarget: Boolean;
-  snap: TFPList;
+  snap: TTyList;
   a: TTyAnimator;
   ck: array of string;
   cv: array of TTyAnimValue;
@@ -2731,7 +2731,7 @@ begin
       srcStyle := FNormalStyle;
       srcShape := FNormalShape;
     end;
-    snap := TFPList.Create;
+    snap := TTyList.Create;
     try
       snap.Assign(FAnimators);
       for i := 0 to snap.Count - 1 do

@@ -365,6 +365,8 @@ type
   TNameCounter = class(TWordWalker)
     Wanted: array of string;
     SkipFpcLines: Boolean;
+    // a name (lower case) not counted where a '.' directly precedes it, '' for none
+    SkipAfterDot: string;
     constructor Create(const AWanted: array of string; ASkipFpcLines: Boolean);
     procedure OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer); override;
   end;
@@ -430,6 +432,8 @@ begin
   for i := 0 to High(Wanted) do
     if Wanted[i] = AWord then
     begin
+      if (AWord = SkipAfterDot) and (AStart > 1) and (AFile.Code[AStart - 1] = '.') then
+        Exit;
       ln := LineOf(AFile, AStart);
       if not (SkipFpcLines and LineHasIfdefFpc(AFile, ln)) then
         Finds.Add(AFile, ln);
@@ -456,12 +460,13 @@ begin
 end;
 
 procedure CountNames(const AWhat: string; const AWanted: array of string; ASkipFpcLines: Boolean;
-  AExpected: Integer);
+  AExpected: Integer; const ASkipAfterDot: string = '');
 var
   w: TNameCounter;
 begin
   w := TNameCounter.Create(AWanted, ASkipFpcLines);
   try
+    w.SkipAfterDot := Lower(ASkipAfterDot);
     w.Walk;
     w.Finds.Check(AWhat, AExpected);
   finally
@@ -762,9 +767,14 @@ end;
 
 procedure TAdvChartDelphiSyntaxTest.TestFpcOnlyNames;
 begin
+  // GetTickCount64 right after a '.' is TThread.GetTickCount64, which both compilers have
   CountNames('FPC-only names outside {$IFDEF FPC} lines (for TStringArray write TTyStringArray; ' +
-    'for TArray<T> a named "array of T" type)', ['DefaultFormatSettings', 'LineEnding',
-    'SarLongint', 'StrToQWord', 'TStringArray', 'TArray'], True, ExpFpcOnlyNames);
+    'for TArray<T> a named "array of T" type; for TFPList TTyList; for GetTickCount64 ' +
+    'TThread.GetTickCount64; for TryStrToQWord TryStrToUInt64; for TryStrToDWord TryStrToUInt; ' +
+    'for Floor64 and Ceil64 TyFloor64 and TyCeil64; for GetLocalTimeOffset TyLocalTimeOffsetMinutes)',
+    ['DefaultFormatSettings', 'LineEnding', 'SarLongint', 'StrToQWord', 'TStringArray', 'TArray',
+    'TFPList', 'GetTickCount64', 'TryStrToQWord', 'TryStrToDWord', 'Floor64', 'Ceil64',
+    'GetLocalTimeOffset'], True, ExpFpcOnlyNames, 'GetTickCount64');
 end;
 
 { True when S, trimmed, is a float literal: an optional sign, digits, then a '.' and digits

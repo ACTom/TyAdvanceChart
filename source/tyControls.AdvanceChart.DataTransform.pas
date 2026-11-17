@@ -80,7 +80,7 @@ type
     FFields: TTySourceFields;
     FDims: TTyTransformDimArray;
     FBuiltIn: Boolean;
-    FMade: TFPList;
+    FMade: TTyList;
     function NameIndex(const AName: string): Integer;
     function ItemAt(AIndex: Integer): TJSONData;
   public
@@ -159,7 +159,7 @@ procedure TyAddTransformResult(var AResults: TTyTransformResultArray;
   Math.random state the transforms draw from [Batch 134]; nil gives them
   one of their own, seeded with TyJitterSeed for this call. }
 function TyApplyDataTransform(ATransform: TJSONData;
-  const AUps: TTySourceRefArray; AOwner: TFPList;
+  const AUps: TTySourceRefArray; AOwner: TTyList;
   out AResults: TTySourceRefArray; out AError: string;
   ARandom: PLongWord = nil): Boolean;
 
@@ -934,7 +934,7 @@ constructor TTyExternalSource.Create(const AFields: TTySourceFields;
 var i: Integer;
 begin
   inherited Create;
-  FMade := TFPList.Create;
+  FMade := TTyList.Create;
   FFields := AFields;
   FBuiltIn := ABuiltIn;
   if AFields.LayoutBy <> slbColumn then
@@ -1238,7 +1238,7 @@ end;
 
 { applySingleDataTransform }
 function ApplySingle(AOpt: TJSONData; const AUps: TTySourceRefArray;
-  AOwner: TFPList; ARandom: PLongWord; out AOut: TTySourceRefArray;
+  AOwner: TTyList; ARandom: PLongWord; out AOut: TTySourceRefArray;
   out AError: string): Boolean;
 var
   func: TTyDataTransformFunc;
@@ -1353,7 +1353,7 @@ begin
 end;
 
 function TyApplyDataTransform(ATransform: TJSONData;
-  const AUps: TTySourceRefArray; AOwner: TFPList;
+  const AUps: TTySourceRefArray; AOwner: TTyList;
   out AResults: TTySourceRefArray; out AError: string;
   ARandom: PLongWord): Boolean;
 var

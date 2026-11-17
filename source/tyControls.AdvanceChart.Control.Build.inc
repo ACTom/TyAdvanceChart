@@ -1738,8 +1738,8 @@ begin
         evBreaks := evBreaks + '{"' + mains[m] + 'Index":' + IntToStr(idx[i])
           + ',"start":' + JsonOrUndefined(bo.Find('start'))
           + ',"end":' + JsonOrUndefined(bo.Find('end'))
-          + ',"isExpanded":' + BoolToStr(now_, 'true', 'false')
-          + ',"old":{"isExpanded":' + BoolToStr(old, 'true', 'false') + '}}';
+          + ',"isExpanded":' + TyBoolText(now_, 'true', 'false')
+          + ',"old":{"isExpanded":' + TyBoolText(old, 'true', 'false') + '}}';
       end;
     end;
   end;
@@ -6133,12 +6133,12 @@ begin
   for k := 0 to High(ADims) do
     Result := Result + '|d' + ADims[k].Name + #1 + IntToStr(Ord(ADims[k].Kind)) + #1
       + IntToStr(ADims[k].SourceSlot) + #1 + ADims[k].Coord + #1
-      + BoolToStr(ADims[k].FromRowIndex, '1', '0') + BoolToStr(ADims[k].Axis <> nil, '1', '0');
-  Result := Result + '|e' + BoolToStr(AEnc.Given, '1', '0') + Ints(AEnc.Columns) + ';';
-  for k := 0 to High(AEnc.Explicit) do Result := Result + BoolToStr(AEnc.Explicit[k], '1', '0');
+      + TyBoolText(ADims[k].FromRowIndex, '1', '0') + TyBoolText(ADims[k].Axis <> nil, '1', '0');
+  Result := Result + '|e' + TyBoolText(AEnc.Given, '1', '0') + Ints(AEnc.Columns) + ';';
+  for k := 0 to High(AEnc.Explicit) do Result := Result + TyBoolText(AEnc.Explicit[k], '1', '0');
   Result := Result + ';' + Ints(AEnc.Tooltip) + ';' + Ints(AEnc.Labels) + ';'
     + IntToStr(AEnc.ItemName) + ';' + IntToStr(AEnc.SeriesName) + ';'
-    + BoolToStr(AEnc.HasNameEncode, '1', '0') + Ints(AEnc.Others);
+    + TyBoolText(AEnc.HasNameEncode, '1', '0') + Ints(AEnc.Others);
 end;
 
 procedure TTyCustomAdvanceChart.StoreKeepPre(const ADims: TTySeriesDimArray;
