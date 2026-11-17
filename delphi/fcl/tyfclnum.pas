@@ -3,7 +3,10 @@
   Delphi only (Lazarus builds with FPC's own units, which call Val, Str and FloatToStr themselves).
 
   For now the bodies are Delphi's RTL with the invariant format settings; they are meant to give what FPC
-  gives, digit for digit, and the transcript of delphi/tests/tyadvchart_fcl.dpr is where that is checked. }
+  gives, digit for digit, and do not yet (delphi/README.md says how far they are off). The transcript of
+  delphi/tests/tyadvchart_fcl.dpr is where the differences are counted and pinned per compiler: its float
+  text lines are informational, and delphi/tests/expected/fcl.dcc32.txt and fcl.dcc64.txt hold what
+  each compiler prints there. }
 unit tyfclnum;
 
 interface

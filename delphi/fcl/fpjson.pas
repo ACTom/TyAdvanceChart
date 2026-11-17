@@ -12,7 +12,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
  **********************************************************************}
-{ Ported for Delphi by the TyAdvanceChart project from Free Pascal 3.2.2,
+{ Ported for Delphi by the TyAdvanceChart project in November 2026 from Free Pascal 3.2.2,
   packages/fcl-json/src/fpjson.pp. Compiled by Delphi only: Lazarus builds with FPC's own unit.
   Changed, by kind:
   - range and overflow checks are off (the directives $R- and $Q- before the unit clause), as
@@ -52,6 +52,9 @@
   - floating-point numbers and text are converted by tyfclnum (TyFclTextToFloat for Val,
     TyFclLocaleTextToFloat for TryStrToFloat, TyFclFloatToText for Str, TyFclFloatToStr for
     FloatToStr);
+  - two quirks of FPC's lists are not copied: setting a TJSONArray's Items[i] to the object
+    already there frees that object in FPC (the port keeps it), and Move(i, i) with i out of range
+    raises in FPC (the port does nothing);
   - a TJSONString's AsInteger, AsInt64, AsQWord and AsBoolean go through Delphi's StrToInt,
     StrToInt64, StrToUInt64 and StrToBool, and its AsFloat through TyFclTextToFloat, where FPC's
     conversions are built on Val. The plain shapes agree ('12', ' 12', '12 ', '1.5', '$1F',

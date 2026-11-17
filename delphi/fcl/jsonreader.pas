@@ -12,7 +12,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
  **********************************************************************}
-{ Ported for Delphi by the TyAdvanceChart project from Free Pascal 3.2.2,
+{ Ported for Delphi by the TyAdvanceChart project in November 2026 from Free Pascal 3.2.2,
   packages/fcl-json/src/jsonreader.pp. Compiled by Delphi only: Lazarus builds with FPC's own unit.
   Changed, by kind:
   - range and overflow checks are off (the directives $R- and $Q- before the unit clause), as

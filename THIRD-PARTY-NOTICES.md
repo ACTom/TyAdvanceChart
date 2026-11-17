@@ -403,13 +403,17 @@ with them. Each file keeps the original's header and lists, below it, the kinds 
 made. They are used on the Delphi side only: a Lazarus build uses Free Pascal's own units, and
 `delphi/` is on none of the Lazarus packages' paths.
 
-Free Pascal's packages are under the GNU Lesser General Public License with the static linking
-exception (Free Pascal's `COPYING.FPC`), the same terms as this project's own: the text of the
-exception is the one in `COPYING.modifiedLGPL.txt`, and the licence is `COPYING.LGPL.txt`.
+Free Pascal states its licence in `COPYING.FPC`, a copy of which is `delphi/fcl/COPYING.FPC`: its
+run-time library and packages are distributed under the GNU Library General Public License (the
+file it names, `COPYING`, is the GNU Lesser General Public License version 2.1 in Free Pascal
+3.2.2's sources), with a special exception for linking. The text of that exception is the same as
+the one in this project's `COPYING.modifiedLGPL.txt`, and the licence is the one whose text this
+project ships as `COPYING.LGPL.txt` (a later printing of the same version 2.1: they differ only in
+the Free Software Foundation's address and web links and in the sample names of its appendix).
 
-**You ship this if you build `TTyAdvanceChart` with Delphi.** As with the chart itself, the
-exception lets you link it into a program under terms of your choice; changes to these units stay
-under the same licence.
+**You would ship this with a program built with Delphi that uses these units.** A Delphi build of
+`TTyAdvanceChart` itself is not possible yet (see `delphi/README.md`). The exception lets such a
+program link them under terms of your choice; changes to these units stay under the same licence.
 
 ---
 
