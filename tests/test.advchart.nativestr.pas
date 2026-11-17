@@ -13,6 +13,8 @@ type
     procedure TestCodePointStr;
     procedure TestFirstCharLen;
     procedure TestLastCharStart;
+    procedure TestCodePointAt;
+    procedure TestCharStartAt;
   end;
 implementation
 
@@ -78,6 +80,43 @@ begin
   AssertEquals('one astral character', 1, TyLastCharStart(cGrin));
   AssertEquals('BMP then ASCII', Length(cGuo) + 1, TyLastCharStart(cGuo + 'a'));
   AssertEquals('astral then ASCII', Length(cGrin) + 1, TyLastCharStart(cGrin + 'a'));
+end;
+
+procedure TAdvChartNativeStrTest.TestCodePointAt;
+var n: Integer;
+begin
+  AssertEquals('A', $41, TyCodePointAt('A', 1, n)); AssertEquals('A len', 1, n);
+  AssertEquals('U+00E9', $E9, TyCodePointAt(cEAcute, 1, n)); AssertEquals('U+00E9 len', 2, n);
+  AssertEquals('U+56FD', $56FD, TyCodePointAt(cGuo, 1, n)); AssertEquals('U+56FD len', 3, n);
+  AssertEquals('U+1F600', $1F600, TyCodePointAt(cGrin, 1, n)); AssertEquals('U+1F600 len', 4, n);
+  AssertEquals('U+56FD inside', $56FD, TyCodePointAt('a' + cGuo + 'b', 2, n));
+  AssertEquals('U+56FD inside len', 3, n);
+  AssertEquals('b after U+56FD', $62, TyCodePointAt('a' + cGuo + 'b', 5, n));
+  AssertEquals('b after U+56FD len', 1, n);
+  { Cut short or malformed: these pin what Data's CodePointAt returned
+    before it moved here -- the lead byte itself, one byte long. }
+  AssertEquals('U+56FD cut short', $E5, TyCodePointAt(#$E5#$9B, 1, n));
+  AssertEquals('U+56FD cut short len', 1, n);
+  AssertEquals('U+1F600 cut short', $F0, TyCodePointAt(#$F0#$9F, 1, n));
+  AssertEquals('U+1F600 cut short len', 1, n);
+  AssertEquals('a lone lead byte', $C3, TyCodePointAt(#$C3, 1, n));
+  AssertEquals('a lone lead byte len', 1, n);
+  AssertEquals('a lone continuation byte', $80, TyCodePointAt(#$80, 1, n));
+  AssertEquals('a lone continuation byte len', 1, n);
+end;
+
+procedure TAdvChartNativeStrTest.TestCharStartAt;
+begin
+  AssertEquals('ASCII', 3, TyCharStartAt('abc', 3, 1));
+  AssertEquals('last byte of U+56FD', 2, TyCharStartAt('a' + cGuo, 4, 1));
+  AssertEquals('middle byte of U+56FD', 2, TyCharStartAt('a' + cGuo, 3, 1));
+  AssertEquals('first byte of U+56FD', 2, TyCharStartAt('a' + cGuo, 2, 1));
+  AssertEquals('last byte of U+1F600', 2, TyCharStartAt('a' + cGrin, 5, 1));
+  AssertEquals('U+56FD alone', 1, TyCharStartAt(cGuo, 3, 1));
+  { The floor holds. }
+  AssertEquals('floor inside U+56FD', 2, TyCharStartAt(cGuo, 3, 2));
+  AssertEquals('continuation bytes down to the floor', 1, TyCharStartAt(#$80#$80, 2, 1));
+  AssertEquals('at the floor', 2, TyCharStartAt(#$80#$80, 2, 2));
 end;
 
 initialization

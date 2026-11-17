@@ -69,6 +69,7 @@ const
   cGrin = #$D83D#$DE00;
 var
   u: UnicodeString;
+  n: Integer;
 begin
   Check(Length(TyJsUnits('a' + cGuo + cEAcute)) = 3, 'Length(TyJsUnits(a + U+56FD + U+00E9)) = 3');
   Check(Length(TyJsUnits(cGrin)) = 2, 'Length(TyJsUnits(U+1F600)) = 2');
@@ -110,6 +111,29 @@ begin
   Check(TyLastCharStart(cGrin) = 1, 'TyLastCharStart(U+1F600) = 1');
   Check(TyLastCharStart(cGuo + 'a') = 2, 'TyLastCharStart(U+56FD + a) = 2');
   Check(TyLastCharStart(cGrin + 'a') = 3, 'TyLastCharStart(U+1F600 + a) = 3');
+
+  Check((TyCodePointAt('A', 1, n) = $41) and (n = 1), 'TyCodePointAt(A, 1) = $41, len 1');
+  Check((TyCodePointAt(cEAcute, 1, n) = $E9) and (n = 1), 'TyCodePointAt(U+00E9, 1) = $E9, len 1');
+  Check((TyCodePointAt(cGuo, 1, n) = $56FD) and (n = 1), 'TyCodePointAt(U+56FD, 1) = $56FD, len 1');
+  Check((TyCodePointAt(cGrin, 1, n) = $1F600) and (n = 2), 'TyCodePointAt(U+1F600, 1) = $1F600, len 2');
+  Check((TyCodePointAt('a' + cGuo + 'b', 2, n) = $56FD) and (n = 1), 'TyCodePointAt(a + U+56FD + b, 2) = $56FD, len 1');
+  Check((TyCodePointAt('a' + cGuo + 'b', 3, n) = $62) and (n = 1), 'TyCodePointAt(a + U+56FD + b, 3) = $62, len 1');
+  Check((TyCodePointAt('a' + cGrin + 'b', 2, n) = $1F600) and (n = 2), 'TyCodePointAt(a + U+1F600 + b, 2) = $1F600, len 2');
+  Check((TyCodePointAt('a' + cGrin + 'b', 4, n) = $62) and (n = 1), 'TyCodePointAt(a + U+1F600 + b, 4) = $62, len 1');
+  Check((TyCodePointAt('a' + #$D83D, 2, n) = $D83D) and (n = 1), 'TyCodePointAt(a + lone high surrogate at the end, 2) = $D83D, len 1');
+  Check((TyCodePointAt(#$D83D + 'a', 1, n) = $D83D) and (n = 1), 'TyCodePointAt(high surrogate + a, 1) = $D83D, len 1');
+  Check((TyCodePointAt(#$DE00, 1, n) = $DE00) and (n = 1), 'TyCodePointAt(lone low surrogate, 1) = $DE00, len 1');
+  Check((TyCodePointAt(cGrin, 2, n) = $DE00) and (n = 1), 'TyCodePointAt(U+1F600, 2) = $DE00, len 1');
+
+  Check(TyCharStartAt('abc', 3, 1) = 3, 'TyCharStartAt(abc, 3, 1) = 3');
+  Check(TyCharStartAt('a' + cGuo, 2, 1) = 2, 'TyCharStartAt(a + U+56FD, 2, 1) = 2');
+  Check(TyCharStartAt('a' + cGrin, 3, 1) = 2, 'TyCharStartAt(a + U+1F600, 3, 1) = 2');
+  Check(TyCharStartAt('a' + cGrin, 2, 1) = 2, 'TyCharStartAt(a + U+1F600, 2, 1) = 2');
+  Check(TyCharStartAt(cGrin, 2, 1) = 1, 'TyCharStartAt(U+1F600, 2, 1) = 1');
+  Check(TyCharStartAt(cGrin, 2, 0) = 1, 'TyCharStartAt(U+1F600, 2, 0) = 1');
+  Check(TyCharStartAt(cGrin, 2, 2) = 2, 'TyCharStartAt(U+1F600, 2, 2) = 2 (the floor holds)');
+  Check(TyCharStartAt(#$DE00, 1, 0) = 1, 'TyCharStartAt(lone low surrogate, 1, 0) = 1');
+  Check(TyCharStartAt('a' + #$DE00, 2, 1) = 2, 'TyCharStartAt(a + lone low surrogate, 2, 1) = 2');
 end;
 
 begin

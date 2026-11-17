@@ -11,7 +11,8 @@ unit tyControls.AdvanceChart.NativeStr;
 
   THE FPC BRANCHES ARE THE OLD CODE. Each one gives exactly what the code
   it replaces gave: UTF8Decode / UTF8Encode, TextPatch's AddCode (one to
-  four bytes, no validation), and Calendar's steps over 10xxxxxx bytes.
+  four bytes, no validation), Calendar's steps over 10xxxxxx bytes, and
+  Data's code point reader for trimming JavaScript's white space.
 
   PURE: SysUtils. }
 interface
@@ -30,6 +31,12 @@ function TyFirstCharLen(const S: string): Integer;
 { The native unit (counted from 1) where the last character of S starts;
   0 for ''. }
 function TyLastCharStart(const S: string): Integer;
+{ The code point that starts at S[AAt], and how many native units it takes. AAt must be within the string.
+  A sequence that is cut short or malformed is read the way the routine's FPC branch always has: see the tests. }
+function TyCodePointAt(const S: string; AAt: Integer; out ALen: Integer): Cardinal;
+{ The index at which the character containing S[AAt] starts, never going below AFloor.
+  AAt must be within the string. }
+function TyCharStartAt(const S: string; AAt, AFloor: Integer): Integer;
 
 implementation
 
@@ -97,6 +104,71 @@ begin
   if (Result >= 2) and (Ord(S[Result]) >= $DC00) and (Ord(S[Result]) <= $DFFF)
     and (Ord(S[Result - 1]) >= $D800) and (Ord(S[Result - 1]) <= $DBFF) then
     Dec(Result);
+{$ENDIF}
+end;
+
+function TyCodePointAt(const S: string; AAt: Integer; out ALen: Integer): Cardinal;
+var
+{$IFDEF FPC}
+  b: Byte;
+{$ELSE}
+  hi, lo: Cardinal;
+{$ENDIF}
+begin
+{$IFDEF FPC}
+  { One to four bytes; a sequence cut short by the end of S, or with a lead
+    byte that starts none, is that one byte. }
+  b := Ord(S[AAt]);
+  ALen := 1;
+  Result := b;
+  if b < $80 then Exit;
+  if (b and $E0 = $C0) and (AAt + 1 <= Length(S)) then
+  begin
+    ALen := 2;
+    Result := ((b and $1F) shl 6) or (Ord(S[AAt + 1]) and $3F);
+  end
+  else if (b and $F0 = $E0) and (AAt + 2 <= Length(S)) then
+  begin
+    ALen := 3;
+    Result := ((b and $0F) shl 12) or ((Ord(S[AAt + 1]) and $3F) shl 6)
+      or (Ord(S[AAt + 2]) and $3F);
+  end
+  else if (b and $F8 = $F0) and (AAt + 3 <= Length(S)) then
+  begin
+    ALen := 4;
+    Result := ((b and $07) shl 18) or ((Ord(S[AAt + 1]) and $3F) shl 12)
+      or ((Ord(S[AAt + 2]) and $3F) shl 6) or (Ord(S[AAt + 3]) and $3F);
+  end;
+{$ELSE}
+  { A high surrogate followed by a low one is one code point; any other
+    unit, a lone surrogate included, is itself. }
+  hi := Ord(S[AAt]);
+  ALen := 1;
+  Result := hi;
+  if (hi >= $D800) and (hi <= $DBFF) and (AAt < Length(S)) then
+  begin
+    lo := Ord(S[AAt + 1]);
+    if (lo >= $DC00) and (lo <= $DFFF) then
+    begin
+      ALen := 2;
+      Result := $10000 + ((hi - $D800) shl 10) + (lo - $DC00);
+    end;
+  end;
+{$ENDIF}
+end;
+
+function TyCharStartAt(const S: string; AAt, AFloor: Integer): Integer;
+begin
+  Result := AAt;
+{$IFDEF FPC}
+  { Back over the 10xxxxxx bytes, never below AFloor. }
+  while (Result > AFloor) and ((Ord(S[Result]) and $C0) = $80) do Dec(Result);
+{$ELSE}
+  { A low surrogate preceded by a high one, above the floor, starts one
+    unit earlier. }
+  if (AAt > AFloor) and (AAt >= 2) and (Ord(S[AAt]) >= $DC00) and (Ord(S[AAt]) <= $DFFF)
+    and (Ord(S[AAt - 1]) >= $D800) and (Ord(S[AAt - 1]) <= $DBFF) then
+    Result := AAt - 1;
 {$ENDIF}
 end;
 

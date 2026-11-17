@@ -27,6 +27,7 @@ type
   published
     procedure TestEveryStringReadsAsUpstreamReadsIt;
     procedure TestNumberAndParseFloatApart;
+    procedure TestJsTrimByCodePoint;
     procedure TestEveryDoubleReadsBackFromItsOwnText;
     procedure TestARawItemPrintsAsString;
     procedure TestAKeyFindsItsPosition;
@@ -208,6 +209,38 @@ begin
     ClearExceptions(False);
     SetExceptionMask(mask);
   end;
+end;
+
+{ TyJsTrim takes JavaScript's white space off both ends one code point at a
+  time, and never splits a character of the core. Non-ASCII text is written
+  as its UTF-8 bytes. }
+procedure TAdvChartRawValueOracleTest.TestJsTrimByCodePoint;
+const
+  NBSP = #$C2#$A0;              // U+00A0
+  IDSP = #$E3#$80#$80;          // U+3000
+  BOM = #$EF#$BB#$BF;           // U+FEFF
+  LSEP = #$E2#$80#$A8;          // U+2028
+  cGuo = #$E5#$9B#$BD;          // U+56FD, no white space
+  cGrin = #$F0#$9F#$98#$80;     // U+1F600, no white space
+begin
+  AssertEquals('U+00A0 both ends', '12', TyJsTrim(NBSP + '12' + NBSP));
+  AssertEquals('U+3000 both ends', 'ab', TyJsTrim(IDSP + 'ab' + IDSP));
+  AssertEquals('U+FEFF both ends', 'x', TyJsTrim(BOM + 'x' + BOM));
+  AssertEquals('U+2028 both ends', 'x', TyJsTrim(LSEP + 'x' + LSEP));
+  AssertEquals('all four, and ASCII space', 'a b',
+    TyJsTrim(NBSP + IDSP + BOM + LSEP + ' a b ' + LSEP + BOM + IDSP + NBSP));
+  AssertEquals('a core that starts and ends with U+56FD', cGuo + 'x' + cGuo,
+    TyJsTrim(NBSP + cGuo + 'x' + cGuo + IDSP));
+  AssertEquals('a core that starts and ends with U+1F600', cGrin + 'y' + cGrin,
+    TyJsTrim(LSEP + cGrin + 'y' + cGrin + BOM));
+  AssertEquals('one U+56FD after a space', cGuo, TyJsTrim(' ' + cGuo));
+  AssertEquals('one U+1F600 before U+3000', cGrin, TyJsTrim(cGrin + IDSP));
+  AssertEquals('white space only', '', TyJsTrim(NBSP + IDSP + BOM + LSEP + ' '));
+  AssertEquals('empty', '', TyJsTrim(''));
+  { Malformed UTF-8: these pin what the code returned before the decoder
+    moved to the native-string unit -- a lone 10xxxxxx byte is no space. }
+  AssertEquals('a lone continuation byte last', 'a'#$80, TyJsTrim('a'#$80));
+  AssertEquals('a lone continuation byte first', #$80'a', TyJsTrim(#$80'a'));
 end;
 
 { Number(String(x)) is x, to the bit, for every Double -- the shortest text

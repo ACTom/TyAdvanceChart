@@ -143,7 +143,7 @@ function TyParseNumberText(const AText: string): Double;
 
 { AText with JavaScript's white space taken off both ends -- which is wider
   than Trim's: no-break space, U+FEFF, the line and paragraph separators and
-  every space separator, as UTF-8. }
+  every space separator. }
 function TyJsTrim(const AText: string): string;
 { `Number(text)`: the whole string, trimmed, as a decimal literal, `Infinity`,
   or a 0x / 0o / 0b integer; nothing at all is nought; anything else is
@@ -675,7 +675,7 @@ implementation
 uses
   {$IFDEF MSWINDOWS}dynlibs,{$ENDIF}
   {$IFDEF UNIX}ctypes, unixtype,{$ENDIF}
-  tyControls.AdvanceChart.Scale;
+  tyControls.AdvanceChart.Scale, tyControls.AdvanceChart.NativeStr;
 
 const
   MsPerDay = 86400000.0;
@@ -718,33 +718,6 @@ end;
 
 { ==================== JavaScript's numbers from text ==================== }
 
-{ The code point at AText[AAt], and how many bytes it takes. }
-function CodePointAt(const AText: string; AAt: Integer; out ALen: Integer): Cardinal;
-var b: Byte;
-begin
-  b := Ord(AText[AAt]);
-  ALen := 1;
-  Result := b;
-  if b < $80 then Exit;
-  if (b and $E0 = $C0) and (AAt + 1 <= Length(AText)) then
-  begin
-    ALen := 2;
-    Result := ((b and $1F) shl 6) or (Ord(AText[AAt + 1]) and $3F);
-  end
-  else if (b and $F0 = $E0) and (AAt + 2 <= Length(AText)) then
-  begin
-    ALen := 3;
-    Result := ((b and $0F) shl 12) or ((Ord(AText[AAt + 1]) and $3F) shl 6)
-      or (Ord(AText[AAt + 2]) and $3F);
-  end
-  else if (b and $F8 = $F0) and (AAt + 3 <= Length(AText)) then
-  begin
-    ALen := 4;
-    Result := ((b and $07) shl 18) or ((Ord(AText[AAt + 1]) and $3F) shl 12)
-      or ((Ord(AText[AAt + 2]) and $3F) shl 6) or (Ord(AText[AAt + 3]) and $3F);
-  end;
-end;
-
 { WhiteSpace and LineTerminator, as the specification lists them. }
 function IsJsSpace(ACode: Cardinal): Boolean;
 begin
@@ -763,18 +736,17 @@ begin
   i := 1;
   while i <= n do
   begin
-    cp := CodePointAt(AText, i, len);
+    cp := TyCodePointAt(AText, i, len);
     if not IsJsSpace(cp) then Break;
     Inc(i, len);
   end;
   if i > n then Exit('');
-  { From the end: step back to a code point's first byte. }
+  { From the end: step back to the first unit of a code point. }
   j := n;
   while j >= i do
   begin
-    len := j;
-    while (len > i) and ((Ord(AText[len]) and $C0) = $80) do Dec(len);
-    cp := CodePointAt(AText, len, cpLen);
+    len := TyCharStartAt(AText, j, i);
+    cp := TyCodePointAt(AText, len, cpLen);
     if not IsJsSpace(cp) then Break;
     j := len - 1;
   end;
