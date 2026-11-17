@@ -95,8 +95,11 @@ Bug fixes should come with a test that fails without the fix.
   - No `{$push}` / `{$pop}`. To switch range and overflow checks off for a stretch of code, include `tyControls.AdvanceChart.ChecksOff.inc` before it and `tyControls.AdvanceChart.ChecksBack.inc` after it; the pair doesn't nest. A directive only FPC knows goes inside `{$IFDEF FPC}` on the same line.
   - Overloaded routines carry `overload;` on every declaration.
   - No `case` over strings, no nested procedure variables (`is nested`), no `specialize`, no `+=`.
+  - Code that depends on the native string's encoding goes through `tyControls.AdvanceChart.NativeStr`: a length or an index as JavaScript counts it, a string from a code point, the code point at a position, the first or the last character. No `UTF8Decode` / `UTF8Encode`, and no testing of UTF-8 bytes by hand: FPC's `string` is UTF-8 bytes, Delphi's is UTF-16.
+  - Dynamic arrays that are assigned to each other or passed as `var` have the same named type on both sides: an existing `TTy…Array = array of T`, or a new one, declared once; string arrays are `TTyStringArray`. Delphi takes two separately written `array of T` for different types. Not `TArray<T>` either: with it FPC 3.2.2 can crash, depending on the order the units are compiled in.
+  - A plain pointer list is a `TTyList`; `TyFloor64`, `TyCeil64` and `TyBoolText` take the place of `Floor64`, `Ceil64` and the three-argument `BoolToStr`; `GetTickCount64` is written `TThread.GetTickCount64`.
   - After changing the public or published part of `TTyCustomAdvanceChart` / `TTyAdvanceChart`, or the package's dependencies, run `python scripts/api-manifest.py --check`; it fails when they no longer match `scripts/api-manifest.txt`. If the change is intended, rewrite the list with `--write` and commit it with the change.
-  - With Delphi installed, `python scripts/delphi-probe.py` compiles the units that need only the RTL with dcc32 and dcc64 (optional; it needs RAD Studio).
+  - With Delphi installed, `python scripts/delphi-probe.py` compiles the units that need only the RTL with dcc32 and dcc64; with `--values` it also builds and runs a small Delphi program that checks the values of the helpers that have a branch of their own for Delphi (optional; it needs RAD Studio).
 - Otherwise, follow the code around you.
 
 **Commit messages** are in English, as `type(scope): summary`, e.g. `fix(tooltip): the box leaves the chart at the right edge`. If it fixes an issue, put `Fixes #N` in the body.

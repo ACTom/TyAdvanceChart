@@ -95,8 +95,11 @@ tests/tyadvchart_tests --all --format=plain
   - 不用 `{$push}` / `{$pop}`。要让一段代码关掉范围和溢出检查，在它前面 include `tyControls.AdvanceChart.ChecksOff.inc`，后面 include `tyControls.AdvanceChart.ChecksBack.inc`；这一对不能嵌套。只有 FPC 认的编译指令，放进同一行的 `{$IFDEF FPC}` 里。
   - 重载的例程，每个声明都要带 `overload;`。
   - 不用字符串 `case`、嵌套过程变量（`is nested`）、`specialize`、`+=`。
+  - 跟原生字符串编码有关的操作都走 `tyControls.AdvanceChart.NativeStr`：按 JavaScript 的算法数长度、算下标，从码点拼出字符串，取某个位置上的码点，取第一个或最后一个字符。不用 `UTF8Decode`、`UTF8Encode`，也不要自己去判断 UTF-8 字节——FPC 的 `string` 是 UTF-8 字节，Delphi 的是 UTF-16。
+  - 动态数组要互相赋值或者按 `var` 传的，两边得是同一个有名字的类型：用现成的 `TTy…Array = array of T`，没有就声明一个，只声明一次；字符串数组用 `TTyStringArray`。Delphi 把分开写的两个 `array of T` 当成不同的类型。也不要用 `TArray<T>`：FPC 3.2.2 遇到它，会随单元的编译顺序不同而崩溃。
+  - 普通的指针列表用 `TTyList`；`Floor64`、`Ceil64` 和三个参数的 `BoolToStr` 换成 `TyFloor64`、`TyCeil64`、`TyBoolText`；`GetTickCount64` 写成 `TThread.GetTickCount64`。
   - 改了 `TTyCustomAdvanceChart` / `TTyAdvanceChart` 的 public 或 published 部分，或者改了包的依赖，跑一遍 `python scripts/api-manifest.py --check`；和 `scripts/api-manifest.txt` 对不上时它会失败。改动是有意的，就用 `--write` 重写这份清单，和改动一起提交。
-  - 装了 Delphi 的话，`python scripts/delphi-probe.py` 会用 dcc32 和 dcc64 编译只依赖 RTL 的那些单元（可选，需要 RAD Studio）。
+  - 装了 Delphi 的话，`python scripts/delphi-probe.py` 会用 dcc32 和 dcc64 编译只依赖 RTL 的那些单元；加上 `--values`，还会编译并运行一个小的 Delphi 程序，核对那些给 Delphi 单写了分支的辅助例程算出的值（可选，需要 RAD Studio）。
 - 其余照周围代码的写法来。
 
 **提交信息**用英文，格式 `类型(范围): 说明`，例如 `fix(tooltip): the box leaves the chart at the right edge`。修复某个 issue 的，正文里写 `Fixes #N`。
