@@ -99,6 +99,8 @@ tests/tyadvchart_tests --all --format=plain
   - 动态数组要互相赋值或者按 `var` 传的，两边得是同一个有名字的类型：用现成的 `TTy…Array = array of T`，没有就声明一个，只声明一次；字符串数组用 `TTyStringArray`。Delphi 把分开写的两个 `array of T` 当成不同的类型。也不要用 `TArray<T>`：FPC 3.2.2 遇到它，会随单元的编译顺序不同而崩溃。
   - 普通的指针列表用 `TTyList`；`Floor64`、`Ceil64` 和三个参数的 `BoolToStr` 换成 `TyFloor64`、`TyCeil64`、`TyBoolText`；`GetTickCount64` 写成 `TThread.GetTickCount64`。
   - 字符串常量里的非 ASCII 字符，直接写字符本身，或者写成一串连在一起的字节转义（`#$E5#$9B#$BD`）；不要把单个字节用 `+` 连起来，也不要单独写一个 `#$80` 以上的转义——Delphi 会把它们读成无效字符，FPC 察觉不到。
+  - 名字到指针的表用 `TTyHashList`（在 `tyControls.AdvanceChart.HashList` 里），名字的类型写 `TTyHashKey`；不用 `TFPHashList`，`uses` 里也不写 `contnrs`。FPC 下它就是 `TFPHashList`，名字是 `ShortString`；Delphi 下名字是 `string`——Delphi 的 `ShortString` 只装得下 ANSI。
+  - 从字符串造字节流交给解析器时，两边的字节都得是 UTF-8：Delphi 下写 `TStringStream.Create(s, TEncoding.UTF8)`，FPC 下 `TStringStream.Create(s)` 就行。Delphi 的 `TStringStream.Create(s)` 默认按 ANSI 编码，FPC 的 `string` 本来就是 UTF-8 字节。
   - 改了 `TTyCustomAdvanceChart` / `TTyAdvanceChart` 的 public 或 published 部分，或者改了包的依赖，跑一遍 `python scripts/api-manifest.py --check`；和 `scripts/api-manifest.txt` 对不上时它会失败。改动是有意的，就用 `--write` 重写这份清单，和改动一起提交。
   - 装了 Delphi 的话，`python scripts/delphi-probe.py` 会用 dcc32 和 dcc64 编译只依赖 RTL 的那些单元；加上 `--values`，还会编译并运行一个小的 Delphi 程序，核对那些给 Delphi 单写了分支的辅助例程算出的值（可选，需要 RAD Studio）。
 - 其余照周围代码的写法来。

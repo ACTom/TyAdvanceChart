@@ -5,6 +5,8 @@ unit dynlibs;
 
 interface
 
+{$IFNDEF MSWINDOWS}{$MESSAGE FATAL 'dynlibs: Windows only'}{$ENDIF}
+
 uses
   Winapi.Windows;
 

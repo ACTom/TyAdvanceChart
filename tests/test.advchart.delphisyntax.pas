@@ -787,11 +787,11 @@ begin
     'for UTF8Decode TyJsUnits; for UTF8Encode TyFromJsUnits; for UnicodeToUTF8 TyCodePointStr; ' +
     'for IndexByte over a string Pos; no LazUTF8 in uses but Option''s {$IFDEF FPC} line: ' +
     'tyControls.AdvanceChart.NativeStr; for TFPHashList TTyHashList, and no contnrs in uses: ' +
-    'tyControls.AdvanceChart.HashList)',
+    'tyControls.AdvanceChart.HashList; vtQWord and VQWord, which Delphi lacks, only on {$IFDEF FPC} lines)',
     ['DefaultFormatSettings', 'LineEnding', 'SarLongint', 'StrToQWord', 'TStringArray', 'TArray',
     'TFPList', 'GetTickCount64', 'TryStrToQWord', 'TryStrToDWord', 'Floor64', 'Ceil64',
     'GetLocalTimeOffset', 'UTF8Decode', 'UTF8Encode', 'UnicodeToUTF8', 'IndexByte', 'LazUTF8',
-    'TFPHashList', 'contnrs'],
+    'TFPHashList', 'contnrs', 'vtQWord', 'VQWord'],
     True, ExpFpcOnlyNames, 'TThread.GetTickCount64');
 end;
 
@@ -1032,17 +1032,71 @@ begin
   Result := AEnd > first;
 end;
 
-{ A character escape of 128..255 (#$80..#$FF, #128..#255, any leading zeros) with no other escape
-  directly before or after it. With --codepage:65001 Delphi decodes a contiguous run of byte
-  escapes as one UTF-8 sequence, but a byte alone -- by itself, or joined to the next by + --
-  becomes U+FFFD; FPC takes the bytes as they are, so nothing on Lazarus notices. }
+{ How many bytes the UTF-8 sequence has that a byte of value AByte starts: 2, 3 or 4; 0 when
+  AByte starts none ($80..$C1, $F5..$FF). }
+function Utf8LeadLength(AByte: Integer): Integer;
+begin
+  if (AByte >= $C2) and (AByte <= $DF) then
+    Result := 2
+  else if (AByte >= $E0) and (AByte <= $EF) then
+    Result := 3
+  else if (AByte >= $F0) and (AByte <= $F4) then
+    Result := 4
+  else
+    Result := 0;
+end;
+
+{ True when the escapes AValues[0..ACount-1] of one run hold their values of 128..255 as whole
+  UTF-8 sequences only: a lead byte, then directly as many escapes of $80..$BF as it announces.
+  An escape below 128 (or above 255) stands for itself between two sequences, never inside one. }
+function RunIsWholeUtf8(const AValues: array of Integer; ACount: Integer): Boolean;
+var
+  i, k, len: Integer;
+begin
+  Result := False;
+  i := 0;
+  while i < ACount do
+    if (AValues[i] < 128) or (AValues[i] > 255) then
+      Inc(i)
+    else
+    begin
+      len := Utf8LeadLength(AValues[i]);
+      if len = 0 then
+        Exit;
+      for k := 1 to len - 1 do
+        if (i + k >= ACount) or (AValues[i + k] < $80) or (AValues[i + k] > $BF) then
+          Exit;
+      Inc(i, len);
+    end;
+  Result := True;
+end;
+
+{ Character escapes of 128..255 (#$80..#$FF, #128..#255, any leading zeros) that do not form whole
+  UTF-8 sequences. A run is a longest chain of escapes with nothing between them. With
+  --codepage:65001 Delphi decodes the bytes of a run as UTF-8 and every byte that is not part of a
+  whole sequence becomes U+FFFD; FPC takes the bytes as they are, so nothing on Lazarus notices.
+  Measured with dcc32 and dcc64 (the same): #13#$E2#$96#$B6 gives $000D $25B6, #$E2#$96 one $FFFD,
+  #$80#$80 and #13#$E2 two units ($FFFD $FFFD, $000D $FFFD), #$E2#13#$96#$B6 $FFFD $000D $FFFD $FFFD.
+  When a run fails, each of its escapes of 128..255 counts. }
 procedure TAdvChartDelphiSyntaxTest.TestHighByteEscapesComeInRuns;
 var
   finds: TFinds;
-  i, p, v, e, v2, e2, prevEnd: Integer;
   f: TSourceFile;
   c: string;
-  before, after: Boolean;
+  runValues, runLines: array of Integer;
+  runCount, i, p, v, e, prevEnd: Integer;
+
+  procedure CheckRun;
+  var
+    k: Integer;
+  begin
+    if not RunIsWholeUtf8(runValues, runCount) then
+      for k := 0 to runCount - 1 do
+        if (runValues[k] >= 128) and (runValues[k] <= 255) then
+          finds.Add(f, runLines[k]);
+    runCount := 0;
+  end;
+
 begin
   Load;
   finds := TFinds.Create;
@@ -1051,24 +1105,33 @@ begin
     begin
       f := FileAt(i);
       c := f.Code;
+      runCount := 0;
       prevEnd := 0;
       p := 1;
       while p <= Length(c) do
         if (c[p] = '#') and ReadEscape(c, p, v, e) then
         begin
-          before := prevEnd = p;
-          after := (e <= Length(c)) and (c[e] = '#') and ReadEscape(c, e, v2, e2);
-          if (v >= 128) and (v <= 255) and not before and not after then
-            finds.Add(f, LineOf(f, p));
+          if prevEnd <> p then
+            CheckRun;
+          if runCount = Length(runValues) then
+          begin
+            SetLength(runValues, runCount * 2 + 8);
+            SetLength(runLines, runCount * 2 + 8);
+          end;
+          runValues[runCount] := v;
+          runLines[runCount] := LineOf(f, p);
+          Inc(runCount);
           prevEnd := e;
           p := e;
         end
         else
           Inc(p);
+      CheckRun;
     end;
-    finds.Check('character escapes #$80..#$FF not in a run of escapes (Delphi reads a lone byte as ' +
-      'an invalid character, U+FFFD; write the character itself, or its UTF-8 bytes as one contiguous ' +
-      'run like #$E5#$9B#$BD, never joined by +)', ExpLoneHighByteEscapes);
+    finds.Check('character escapes #$80..#$FF that are not part of a whole UTF-8 sequence in a run ' +
+      'of escapes (Delphi reads each such byte as an invalid character, U+FFFD; write the character ' +
+      'itself, or its UTF-8 bytes as one contiguous run like #$E5#$9B#$BD, never joined by +)',
+      ExpLoneHighByteEscapes);
   finally
     finds.Free;
   end;

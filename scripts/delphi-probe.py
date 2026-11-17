@@ -56,7 +56,8 @@ SRC = os.path.join(ROOT, 'source')
 DEFAULT_BIN = r'C:\Program Files (x86)\Embarcadero\Studio\37.0\bin'
 PREFIX = 'tyControls.AdvanceChart.'
 
-UNITS = ['Types', 'StrConsts', 'JsMath', 'JsRegExp', 'Jitter', 'Locate', 'GeoFix', 'Connect', 'Catalog', 'NativeStr']
+UNITS = ['Types', 'StrConsts', 'JsMath', 'JsRegExp', 'Jitter', 'Locate', 'GeoFix', 'Connect', 'Catalog', 'NativeStr',
+         'HashList']
 COMPILERS = ['dcc32', 'dcc64']
 # --all leaves out the control unit itself (PREFIX without the dot) and these, which need the LCL
 EXCLUDED = ['Render', 'Images', 'DirtyRect', 'ToolboxDlg', 'KeyNav']
@@ -113,12 +114,13 @@ def compile_unit(exe, unit, tmp, standins=None, rebuild=True):
 
 def source_place(line):
     """(file, line number) of a message about a file under source/, None for any other file.
-    dcc runs in source/, so a file named without a folder is one of source/."""
+    dcc runs in source/, so a file named without a folder is one of source/ -- when such a file
+    exists there (dcc names a file of another folder on the unit path without its folder too)."""
     m = re.match(r'(.*?)\((\d+)\)', line)
     if not m:
         return None
     path = os.path.normcase(os.path.abspath(os.path.join(SRC, m.group(1))))
-    if os.path.dirname(path) != os.path.normcase(os.path.abspath(SRC)):
+    if os.path.dirname(path) != os.path.normcase(os.path.abspath(SRC)) or not os.path.isfile(path):
         return None
     return path, int(m.group(2))
 

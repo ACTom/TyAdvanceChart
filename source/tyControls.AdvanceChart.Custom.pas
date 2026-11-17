@@ -522,13 +522,7 @@ begin
           Result[i].Kind := cckNumber;
           Result[i].Num := AData[i].VInt64^;
         end;
-      {$IFDEF FPC}
-      vtQWord:
-        begin
-          Result[i].Kind := cckNumber;
-          Result[i].Num := AData[i].VQWord^;
-        end;
-      {$ENDIF}
+      {$IFDEF FPC}vtQWord: begin Result[i].Kind := cckNumber; Result[i].Num := AData[i].VQWord^; end;{$ENDIF}
       vtExtended:
         begin
           Result[i].Kind := cckNumber;

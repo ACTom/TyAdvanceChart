@@ -56,6 +56,16 @@ begin
   AddABC;
   AssertTrue('other names: Find', FList.Find('x') = nil);
   AssertEquals('other names: FindIndexOf', -1, FList.FindIndexOf('x'));
+  { an entry whose item is nil is counted but never found, and does not hide an
+    earlier entry of its name }
+  AssertEquals('Add n, nil', 3, FList.Add('n', nil));
+  AssertTrue('nil item: Find n', FList.Find('n') = nil);
+  AssertEquals('nil item: FindIndexOf n', -1, FList.FindIndexOf('n'));
+  AssertEquals('nil item: Count', 4, FList.Count);
+  AssertEquals('Add a, nil', 4, FList.Add('a', nil));
+  AssertTrue('nil item: Find a, the earlier', FList.Find('a') = pA);
+  AssertEquals('nil item: FindIndexOf a, the earlier', 0, FList.FindIndexOf('a'));
+  AssertEquals('nil items: Count', 5, FList.Count);
 end;
 
 procedure TAdvChartHashListTest.TestAddThenFind;
@@ -70,6 +80,13 @@ begin
   AssertEquals('FindIndexOf a', 0, FList.FindIndexOf('a'));
   AssertEquals('FindIndexOf b', 1, FList.FindIndexOf('b'));
   AssertEquals('FindIndexOf c', 2, FList.FindIndexOf('c'));
+  { the empty name is a name like any other }
+  AssertTrue('Find empty, not added', FList.Find('') = nil);
+  AssertEquals('FindIndexOf empty, not added', -1, FList.FindIndexOf(''));
+  AssertEquals('Add empty', 3, FList.Add('', pD));
+  AssertTrue('Find empty', FList.Find('') = pD);
+  AssertEquals('FindIndexOf empty', 3, FList.FindIndexOf(''));
+  AssertEquals('Count with empty', 4, FList.Count);
 end;
 
 procedure TAdvChartHashListTest.TestSameNameAddedTwice;
@@ -85,6 +102,13 @@ begin
   AssertTrue('after Delete: Find b', FList.Find('b') = pB);
   AssertEquals('after Delete: Count', 3, FList.Count);
   AssertEquals('after Delete: FindIndexOf b', 1, FList.FindIndexOf('b'));
+  { deleting the earlier leaves the later found, one index down }
+  AssertEquals('Add b once more', 3, FList.Add('b', pD));
+  FList.Delete(1);
+  AssertTrue('after Delete of the earlier: Find b', FList.Find('b') = pD);
+  AssertEquals('after Delete of the earlier: FindIndexOf b', 2, FList.FindIndexOf('b'));
+  AssertEquals('after Delete of the earlier: Count', 3, FList.Count);
+  AssertEquals('after Delete of the earlier: FindIndexOf c', 1, FList.FindIndexOf('c'));
 end;
 
 procedure TAdvChartHashListTest.TestDeleteByIndex;

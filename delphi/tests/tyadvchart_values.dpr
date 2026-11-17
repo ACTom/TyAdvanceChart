@@ -547,6 +547,14 @@ begin
     AddABC;
     Check(h.Find('x') = nil, 'HashList other names: Find(''x'') = nil');
     Check(h.FindIndexOf('x') = -1, 'HashList other names: FindIndexOf(''x'') = -1');
+    Check(h.Add('n', nil) = 3, 'HashList Add n, nil = 3');
+    Check(h.Find('n') = nil, 'HashList nil item: Find n = nil');
+    Check(h.FindIndexOf('n') = -1, 'HashList nil item: FindIndexOf n = -1');
+    Check(h.Count = 4, 'HashList nil item: Count = 4');
+    Check(h.Add('a', nil) = 4, 'HashList Add a, nil = 4');
+    Check(h.Find('a') = pA, 'HashList nil item: Find a is the earlier');
+    Check(h.FindIndexOf('a') = 0, 'HashList nil item: FindIndexOf a = 0');
+    Check(h.Count = 5, 'HashList nil items: Count = 5');
   finally
     h.Free;
   end;
@@ -563,6 +571,12 @@ begin
     Check(h.FindIndexOf('a') = 0, 'HashList FindIndexOf a = 0');
     Check(h.FindIndexOf('b') = 1, 'HashList FindIndexOf b = 1');
     Check(h.FindIndexOf('c') = 2, 'HashList FindIndexOf c = 2');
+    Check(h.Find('') = nil, 'HashList Find empty, not added = nil');
+    Check(h.FindIndexOf('') = -1, 'HashList FindIndexOf empty, not added = -1');
+    Check(h.Add('', pD) = 3, 'HashList Add empty = 3');
+    Check(h.Find('') = pD, 'HashList Find empty');
+    Check(h.FindIndexOf('') = 3, 'HashList FindIndexOf empty = 3');
+    Check(h.Count = 4, 'HashList Count with empty = 4');
   finally
     h.Free;
   end;
@@ -578,6 +592,12 @@ begin
     Check(h.Find('b') = pB, 'HashList twice, later deleted: Find b is the earlier');
     Check(h.Count = 3, 'HashList twice, later deleted: Count = 3');
     Check(h.FindIndexOf('b') = 1, 'HashList twice, later deleted: FindIndexOf b = 1');
+    Check(h.Add('b', pD) = 3, 'HashList Add b once more = 3');
+    h.Delete(1);
+    Check(h.Find('b') = pD, 'HashList twice, earlier deleted: Find b is the later');
+    Check(h.FindIndexOf('b') = 2, 'HashList twice, earlier deleted: FindIndexOf b = 2');
+    Check(h.Count = 3, 'HashList twice, earlier deleted: Count = 3');
+    Check(h.FindIndexOf('c') = 1, 'HashList twice, earlier deleted: FindIndexOf c = 1');
   finally
     h.Free;
   end;
