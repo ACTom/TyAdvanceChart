@@ -498,8 +498,8 @@ type
     Hbo: array of Cardinal;
     Blured: Boolean;
     { the transforms the last frame drew with }
-    Prev: array of TTyMat2D;
-    PrevHas: array of Boolean;
+    Prev: TTyMat2DArray;
+    PrevHas: TTyBoolArray;
   end;
 
   { [F6b] where a label host's text was last placed (updateInnerText runs
@@ -594,22 +594,22 @@ type
       downplay of its row reaches it -- the action's element is the last
       one of the name (leaveEmphasis there) }
     FSvgPointerLit: Boolean;
-    FSvgEl, FSvgLbl: array of TTyStElement;
+    FSvgEl, FSvgLbl: TTyStElementArray;
     FSvgLook: array of TTyGeoSvgLook;
     FSvgLabel: array of TTyGeoLabel;
     FSvgHasLabel: array of Boolean;
     FSvgDisp: array of TTyIntegerArray;
     FSvgFocusSelf: Boolean;
     FSvgRegionNode: TTyIntegerArray;
-    FSvgGlobal: array of TTyMat2D;
-    FSvgHasGlobal, FSvgReached: array of Boolean;
+    FSvgGlobal: TTyMat2DArray;
+    FSvgHasGlobal, FSvgReached: TTyBoolArray;
     FSvgGlobalGen: Integer;
     FSvgChanged: Boolean;
     { the global transforms the last build drew with (a group host's
       children are updated after it: its label reads theirs), and the
       labels' placements }
-    FSvgPrevGlobal: array of TTyMat2D;
-    FSvgPrevHas: array of Boolean;
+    FSvgPrevGlobal: TTyMat2DArray;
+    FSvgPrevHas: TTyBoolArray;
     FSvgPlace: array of TTyGeoSvgPlace;
     FSvgPlaceGen: Integer;
     procedure SvgPlaceLabel(ANode, APPI: Integer);
@@ -5531,7 +5531,7 @@ end;
 procedure TTyGeo.SvgPicture(const AInk: TTyGeoInk);
 var
   n, i, it, g, si: Integer;
-  old: array of TTyStElement;
+  old: TTyStElementArray;
   el, lb: TTyStElement;
   look: TTyGeoSvgLook;
   ropt: TJSONObject;

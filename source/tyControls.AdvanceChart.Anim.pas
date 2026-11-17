@@ -131,6 +131,7 @@ type
       offset, r, g, b, a -- the colour parsed (NaN when it does not parse) }
     Stops: TTyDoubleArray;
   end;
+  TTyAnimValueArray = array of TTyAnimValue;
 
   TTyAnimProp = record
     Key: string;
@@ -2238,15 +2239,15 @@ procedure TTyAnimElement.Shallow(const ATopKey: string; const AKeys: array of st
   const AValues: array of TTyAnimValue; const ACfg: TTyAnimCfg;
   AReverse, AFilter: Boolean; var AList: TFPList);
 var
-  keys: array of string;
-  vals: array of TTyAnimValue;
+  keys: TTyStringArray;
+  vals: TTyAnimValueArray;
   assigned: array of Boolean;
   i, n, idx: Integer;
   cur: TTyAnimValue;
   full: string;
   a: TTyAnimator;
-  kept: array of string;
-  keptVals: array of TTyAnimValue;
+  kept: TTyStringArray;
+  keptVals: TTyAnimValueArray;
   fromVals, toVals: array of TTyAnimValue;
   duration: Double;
   others: array of TTyAnimator;

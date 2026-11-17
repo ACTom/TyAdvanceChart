@@ -1761,7 +1761,7 @@ var
   rich: Boolean;
   cw, ch, rx, ry, dist, tw, th, ow, oh, bx, by, xl, lt, tokW, h_: Double;
   pd: array[0..3] of Double;
-  lines: TStringArray;
+  lines: TTyStringArray;
 begin
   cw := ACW;
   ch := ACH;
@@ -1995,7 +1995,7 @@ var
   has, rich: Boolean;
   bw, cw, ch, rx, ry, dist, tw, th, ow, oh, bx, by, xl, lt, tokW, h_: Double;
   pd: array[0..3] of Double;
-  lines: TStringArray;
+  lines: TTyStringArray;
   d: TJSONData;
   mask: TFPUExceptionMask;
   prm: TTyChartCallbackParams;
@@ -2134,7 +2134,7 @@ var
   has, inside: Boolean;
   rx, ry, rw, rh, w, h, ax, ay, tx: Double;
   pad: array[0..3] of Double;
-  lines: TStringArray;
+  lines: TTyStringArray;
   mask: TFPUExceptionMask;
 begin
   if not ASolved.Valid or (AMeasurer = nil) then Exit;
@@ -2461,11 +2461,11 @@ var
   box: TTyRawBox;
   avail, pos: TTyXYWH;
   keys: array[0..3] of TTyBoxRaw;
-  lines: TStringArray;
+  lines: TTyStringArray;
   head, tail, hasG: Boolean;
-  pts: array of TTyPointF;
+  pts: TTyPointFArray;
   bb: array of TTyXYWH;
-  polys: array of array of TTyPointF;
+  polys: array of TTyPointFArray;
   shown: array of string;
   mask: TFPUExceptionMask;
   tr: TTmTransArray;

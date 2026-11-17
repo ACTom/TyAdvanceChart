@@ -289,7 +289,7 @@ begin
 end;
 
 { The first word of a CSS value: '1px solid #ccc' word by word. }
-function CssWords(const AText: string): TStringArray;
+function CssWords(const AText: string): TTyStringArray;
 var
   s, w: string;
   i, depth: Integer;
@@ -699,15 +699,15 @@ end;
 procedure TReader.ReadStyle(const ADecls: string; var AStyle: TStyle;
   var ABox: TBox);
 var
-  decls: TStringArray;
+  decls: TTyStringArray;
   i, p, k: Integer;
   prop, val, low: string;
   px: Double;
   c: TTyChartColor;
-  words: TStringArray;
+  words: TTyStringArray;
 
   procedure Edges(const AVal: string; var T, R, B, L: Double; AKeepNeg: Boolean);
-  var w: TStringArray; v: array[0..3] of Double; j: Integer;
+  var w: TTyStringArray; v: array[0..3] of Double; j: Integer;
   begin
     w := CssWords(AVal);
     if (Length(w) = 0) or (Length(w) > 4) then Exit;
@@ -729,7 +729,7 @@ var
   end;
 
   procedure Border(const AVal: string; var AW: Double; var AColour: TTyChartColor);
-  var w: TStringArray; j: Integer; wd: Double; col: TTyChartColor; styled: Boolean;
+  var w: TTyStringArray; j: Integer; wd: Double; col: TTyChartColor; styled: Boolean;
   begin
     w := CssWords(AVal);
     wd := 3;  // CSS's 'medium'
@@ -1318,8 +1318,9 @@ type
     S, E: Integer;
   end;
   THtmlRowSpans = array of THtmlCellSpan;
+  THtmlTableSpans = array of THtmlRowSpans;
   { per table, per row (the header row too), per cell }
-  THtmlSpans = array of array of THtmlRowSpans;
+  THtmlSpans = array of THtmlTableSpans;
 
   { one table being read: its rows, whether each sat in a <thead> and was
     all <th>, and where its cells lie }
@@ -1327,7 +1328,7 @@ type
     Caption: string;
     Rows: array of TTyStringArray;
     InHead, AllTh: array of Boolean;
-    Spans: array of THtmlRowSpans;
+    Spans: THtmlTableSpans;
   end;
 
 function ReadHtmlTables(const AHtml: string; out AOutside: string;

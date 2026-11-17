@@ -81,7 +81,7 @@ unit tyControls.AdvanceChart.OptionMerge;
 
   LCL-free: SysUtils, Math, fcl-json and the scale's number printer. *)
 interface
-uses SysUtils, Math, fpjson;
+uses SysUtils, Math, fpjson, tyControls.AdvanceChart.Types;
 
 type
   { ONE MODEL'S IDENTITY: upstream's keyInfo, as the model keeps it. }
@@ -130,7 +130,7 @@ type
   end;
 
   TTyMergeReport = record
-    Visited: TStringArray;
+    Visited: TTyStringArray;
     Slots: array of TTyMergeSlots;
     { [R3-B] no merge: a fresh option's base was just made into models
       (initBase), before its timeline frame and media are merged over it --
@@ -155,7 +155,7 @@ function TyOptionHasSubTypes(const AMainType: string): Boolean;
 
 { The main types a setOption writing AWritten visits: those, the series and
   the axisPointer, and every main type that depends on a visited one. }
-function TyOptionVisited(const AWritten: array of string): TStringArray;
+function TyOptionVisited(const AWritten: array of string): TTyStringArray;
 { [R7-AH] ComponentModel.topologicalTravel's order over every main type --
   the order a merge visits them in, so the order a componentsMap key new to
   the model goes in: AIndex's type (0 .. TyOptionMainTypeCount - 1) }
@@ -225,7 +225,7 @@ function TyOptionToJson(ARoot: TJSONData): string;
 
 { an object's keys in JavaScript's order: index keys ascending, then the
   rest as inserted }
-function TyJsOrderedKeys(AObj: TJSONObject): TStringArray;
+function TyJsOrderedKeys(AObj: TJSONObject): TTyStringArray;
 { JSON.stringify of one string }
 function TyJsonQuote(const AText: string): string;
 
@@ -309,7 +309,7 @@ begin
   Result := False;
 end;
 
-function InList(const AList: TStringArray; const AKey: string): Boolean;
+function InList(const AList: TTyStringArray; const AKey: string): Boolean;
 var i: Integer;
 begin
   for i := 0 to High(AList) do
@@ -317,7 +317,7 @@ begin
   Result := False;
 end;
 
-procedure AddTo(var AList: TStringArray; const AKey: string);
+procedure AddTo(var AList: TTyStringArray; const AKey: string);
 begin
   if InList(AList, AKey) then Exit;
   SetLength(AList, Length(AList) + 1);
@@ -325,7 +325,7 @@ begin
 end;
 
 { the words of a space separated list }
-function Words(const AText: string): TStringArray;
+function Words(const AText: string): TTyStringArray;
 var
   i, s: Integer;
 begin
@@ -339,11 +339,11 @@ begin
     end;
 end;
 
-function VisitedOf(const AWritten: array of string; ASeeded: Boolean): TStringArray;
+function VisitedOf(const AWritten: array of string; ASeeded: Boolean): TTyStringArray;
 var
   i: Integer;
   grew: Boolean;
-  deps: TStringArray;
+  deps: TTyStringArray;
   d: string;
 begin
   Result := nil;
@@ -372,7 +372,7 @@ begin
   until not grew;
 end;
 
-function TyOptionVisited(const AWritten: array of string): TStringArray;
+function TyOptionVisited(const AWritten: array of string): TTyStringArray;
 begin
   Result := VisitedOf(AWritten, True);
 end;
@@ -394,7 +394,7 @@ begin
   Result := v < UInt64(4294967295);
 end;
 
-function TyJsOrderedKeys(AObj: TJSONObject): TStringArray;
+function TyJsOrderedKeys(AObj: TJSONObject): TTyStringArray;
 var
   i, j, n: Integer;
   idx: array of UInt64;
@@ -1038,7 +1038,7 @@ type
   end;
   TSlotArray = array of TSlot;
 
-function IdTaken(const AIds: TStringArray; const AId: string): Boolean;
+function IdTaken(const AIds: TTyStringArray; const AId: string): Boolean;
 begin
   Result := InList(AIds, AId);
 end;
@@ -1046,7 +1046,7 @@ end;
 { makeIdAndName (util/model.ts:449-534) }
 procedure MakeIdAndName(var ASlots: TSlotArray);
 var
-  ids: TStringArray;
+  ids: TTyStringArray;
   i, n: Integer;
   d: TJSONData;
   cand: string;
@@ -1235,7 +1235,7 @@ end;
 
 procedure TyOptionKeysOfTree(ARoot: TJSONData; out AKeys: TTyOptionKeys);
 var
-  written, visited: TStringArray;
+  written, visited: TTyStringArray;
   i, j: Integer;
   k: string;
   d: TJSONData;
@@ -1395,7 +1395,7 @@ end;
 { two of the new option's components on one id: upstream asserts }
 function DuplicateId(const ANew: TNodeArray; out AId: string): Boolean;
 var
-  ids: TStringArray;
+  ids: TTyStringArray;
   i: Integer;
   d: TJSONData;
   k: string;
@@ -1652,7 +1652,7 @@ var
   i, j, ki, si: Integer;
   k, mt, sub, dupId: string;
   v, old, oldVal: TJSONData;
-  written, visited: TStringArray;
+  written, visited: TTyStringArray;
   newComps, exNodes: TNodeArray;
   existing, items: TTyOptionKeyArray;
   slots: TSlotArray;
@@ -1666,7 +1666,7 @@ var
   brands: TTyMergeBoolArray;
   reused, virt: array of Boolean;
   exObj: TJSONObject;
-  replace: TStringArray;
+  replace: TTyStringArray;
 begin
   AReport := Default(TTyMergeReport);
   AError := '';
@@ -1867,7 +1867,7 @@ end;
 procedure WriteValue(AData: TJSONData; var AOut: string);
 var
   i: Integer;
-  keys: TStringArray;
+  keys: TTyStringArray;
   v: Double;
 begin
   case AData.JSONType of

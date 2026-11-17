@@ -251,6 +251,7 @@ type
     LinePen, TickPen, MinorTickPen, SplitPen, MinorSplitPen: TTyAxisPen;
     AreaOpacity: Double;
   end;
+  TTyAxisFurnitureArray = array of TTyAxisFurniture;
 
   { WHAT UPSTREAM KEEPS ON AN AXIS FROM ONE RENDER TO THE NEXT [Batch 101]:
     calculateCategoryInterval's store on the axis MODEL -- the last auto
@@ -272,7 +273,7 @@ type
       keeps per break (by its identity) so a render does not shake them:
       a break no longer drawn is forgotten, a new one draws afresh }
     BreakIds: TTyStringArray;
-    BreakRands: array of TTyDoubleArray;
+    BreakRands: TTyDoubleArrays;
   end;
   PTyAxisMemory = ^TTyAxisMemory;
 
@@ -316,7 +317,7 @@ type
     FSpecs: TTyAxisLayoutSpecArray;
     { Index-parallel to FSpecs: the x axes then the y axes, which is the
       order SpecFor already walks. }
-    FFurniture: array of TTyAxisFurniture;
+    FFurniture: TTyAxisFurnitureArray;
     FXAxes: TTyAxisArray;
     FYAxes: TTyAxisArray;
     FCartesians: array of TTyCartesian2D;   // OWNED
@@ -3548,7 +3549,7 @@ procedure TyLayoutAxisBreakAreas(var ASpec: TTyAxisLayoutSpec; AAxis: TTyAxis;
     brks: TTyAxisBreakArray;
     q, k, w, m: Integer;
     ids: TTyStringArray;
-    rands: array of TTyDoubleArray;
+    rands: TTyDoubleArrays;
     r: TTyDoubleArray;
     rect: TTyXYWH;
     zMin, zMax: Double;
@@ -4548,7 +4549,7 @@ procedure TyLayoutGrids(ABuild: TTyChartBuild; AOption: TTyChartOption;
 var
   g, i, j, t: Integer;
   specs: TTyAxisLayoutSpecArray;
-  furn: array of TTyAxisFurniture;
+  furn: TTyAxisFurnitureArray;
   xIsValue, yIsValue: Boolean;
   ax: TTyAxis;
   ticks: TTyScaleTickArray;

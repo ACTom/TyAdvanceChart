@@ -1934,7 +1934,7 @@ var
   num, tok, f: string;
   fs: TFormatSettings;
   v: Double;
-  parts: TStringArray;
+  parts: TTyStringArray;
 begin
   fs := FormatSettings;
   fs.DecimalSeparator := '.';

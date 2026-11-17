@@ -390,7 +390,7 @@ type
       string }
     AccumWidthV: TTyRtJs;
     Lines: array of string;
-    Widths: array of Double;
+    Widths: TTyDoubleArray;
   end;
 
 function IsWordBreakCode(ACode: Integer): Boolean;
@@ -594,7 +594,7 @@ var
   ts: TTyRtStyle;
   found, newLine, isEmptyStr: Boolean;
   strLines: array of string;
-  widths: array of Double;
+  widths: TTyDoubleArray;
   hasWidths: Boolean;
   fam: string;
   px: Double;
@@ -602,7 +602,7 @@ var
   wt, i, n, k: Integer;
   tok: TTyRtToken;
   wr: TWrapResult;
-  parts: TStringArray;
+  parts: TTyStringArray;
 begin
   isEmptyStr := AStr = '';
   ts := StyleOf(ARich, AStyleIndex, AStyle, found);
@@ -1098,7 +1098,7 @@ var
   fam: string;
   px: Double;
   wt: Integer;
-  cut: TStringArray;
+  cut: TTyStringArray;
   pending: array of record L, T: Integer; end;
   topW, topH, th: TTyRtJs;
   hasTopW: Boolean;
@@ -1759,10 +1759,10 @@ var
 
   procedure PlainLayout;
   var
-    lines: TStringArray;
+    lines: TTyStringArray;
     lh, contentH, height, contentW, textY, bx, by, fontH, q: Double;
     k, keep: Integer;
-    cut: TStringArray;
+    cut: TTyStringArray;
     p: TTyRtPiece;
     useDefaultFill, bgDrawn, hasW: Boolean;
     wr: TWrapResult;

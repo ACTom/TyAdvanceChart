@@ -746,7 +746,7 @@ end;
 procedure TTyCustomAdvanceChart.NotMergePass(const AReport: TTyMergeReport);
 var
   si, s, n, k: Integer;
-  written: TStringArray;
+  written: TTyStringArray;
 begin
   { [R7-AH] THE componentsMap'S NEW KEYS: what the pass visits -- the base's
     (initBase's _mergeOption) from the main types the fresh tree writes --

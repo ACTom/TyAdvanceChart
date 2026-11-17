@@ -154,6 +154,7 @@ type
     NormOwn: Boolean;
     Norm: TTyStObject;
   end;
+  TTyStElementArray = array of TTyStElement;
 
   { A data item's element and what is attached to it: the label, which
     always takes its host's state list, and a pie's label line.
@@ -1472,7 +1473,7 @@ end;
 
 function TyStDashOf(const AObj: TTyStObject; AWidthLogical: Double): TTyDoubleArray;
 var
-  parts: TStringArray;
+  parts: TTyStringArray;
   ex: TTyDoubleArray;
   k: Integer;
 begin

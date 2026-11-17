@@ -1324,7 +1324,7 @@ function TyPiePlainFit(const AText: string; AHasWidth: Boolean; AWidth: Double;
   const AFontName: string; AFontSizeLogical, AWeight: Integer;
   out AContentW: Double): string;
 var
-  lines: TStringArray;
+  lines: TTyStringArray;
   i: Integer;
   w, h: Double;
 begin

@@ -2230,7 +2230,7 @@ end;
 procedure WriteJson(AData: TJSONData; var AOut: string);
 var
   i: Integer;
-  keys: TStringArray;
+  keys: TTyStringArray;
   v: Double;
 begin
   if AData = nil then

@@ -1979,11 +1979,11 @@ type
       GlobalModel's 'series', then every merge pass' visited main types new
       to it, in topological order (a type a dependency visits goes in with
       no model) -- the order prepareView meets the types in }
-    FViewKeys: TStringArray;
+    FViewKeys: TTyStringArray;
     { [R7-AH] the models a replaceMerge mapped by index since the last
       prepare ('<mainType>#<index>', brandNew): a new view whatever id they
       made }
-    FViewBrand: TStringArray;
+    FViewBrand: TTyStringArray;
     { [R7-AH] '<mainType>#<index>' -> 1 + the view's rank }
     FViewRank: TFPHashList;
     { [R7-AH] ALLOCATEZLEVELS (render's first step): where a series asks for

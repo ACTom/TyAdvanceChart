@@ -528,7 +528,7 @@ procedure TyExpandLabels(AList: TTyPaintList; const ASpecs: TTyLabelSpecArray;
 function TyZrPlainTextLines(const AText: string; AWidth, AHeight: Double;
   AMinChar: Integer; const AEllipsis: string; const AMeasurer: ITyTextMeasurer;
   const AFontName: string; AFontSizeLogical, AWeight: Integer;
-  ARich: Boolean = False): TStringArray;
+  ARich: Boolean = False): TTyStringArray;
 { AItemSpecs[series][raw row]: a data item's own label read over its
   series', for a caption whose ItemSpec names it [Batch 68] }
 procedure TyExpandLabels(AList: TTyPaintList; const ASpecs: TTyLabelSpecArray;
@@ -1379,12 +1379,12 @@ end;
 function TyZrPlainTextLines(const AText: string; AWidth, AHeight: Double;
   AMinChar: Integer; const AEllipsis: string; const AMeasurer: ITyTextMeasurer;
   const AFontName: string; AFontSizeLogical, AWeight: Integer;
-  ARich: Boolean): TStringArray;
+  ARich: Boolean): TTyStringArray;
 const
   { U+56FD, zrender's stand-in for any wide character, as UTF-8 }
   cGuo = #$E5#$9B#$BD;
 var
-  lines: TStringArray;
+  lines: TTyStringArray;
   lh, containerWidth, contentWidth, asc, ellW, lw, w: Double;
   ell: string;
   k, j, i, n, keep, sub: Integer;

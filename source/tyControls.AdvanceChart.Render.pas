@@ -2663,7 +2663,7 @@ procedure TyDrawTextRotatedLines(P: TTyPainter; const AText, AFontName: string;
   AFontSize, AWeight: Integer; AColor: TTyColor; AX, AY, ARotationRad: Double;
   AHAlign: TAlignment; AVAlign: TTextLayout; ABlockH: Double);
 var
-  lines: TStringArray;
+  lines: TTyStringArray;
   c: TTyPointFArray;
   i, bw, bh: Integer;
 begin

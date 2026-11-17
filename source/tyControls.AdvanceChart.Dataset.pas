@@ -110,7 +110,7 @@ type
     an unclaimed coordinate gets. *)
   TTySeriesEncode = record
     Given: Boolean;
-    Columns: array of Integer;
+    Columns: TTyIntegerArray;
     { Parallel to Columns: the coordinate was WRITTEN in `encode` -- even as
       -1, which asks for no mapping. An unwritten one takes the next unclaimed
       dimension (TyEncodeFillUnclaimed). }
@@ -122,7 +122,7 @@ type
       `[1, 'b', 3]` is (1, -1, 3), `[1, 3, 1]` is (-1, 3, 1). A tooltip skips
       a gap but counts it; a label prints the whole raw item there.
       [spec 255: was every entry resolved, the unresolved ones dropped] }
-    Tooltip, Labels: array of Integer;
+    Tooltip, Labels: TTyIntegerArray;
     { `itemName`: the dimension the list names FIRST and not again
       (SeriesData's `otherDims.itemName === 0`), -1 for none. `['nope', 'g']`
       names none. HasNameEncode: the list reached any dimension at all, which
@@ -135,7 +135,7 @@ type
       dropped -- the series is named their display names joined by a space
       (getSeriesAutoName) [spec 255: was the first entry alone]. }
     SeriesName: Integer;
-    SeriesNames: array of Integer;
+    SeriesNames: TTyIntegerArray;
     { [spec 255] A COORDINATE WRITTEN AS A LIST holds every dimension it
       reaches: entry 0 is Columns' (-1 when it reached none -- mapDimension
       answers nothing then), and every one past the coordinate system's own
@@ -143,7 +143,7 @@ type
       the column of the coordinate it belongs to, ExtraIndex its place in the
       list. They size the axis, can be the series' label and the stacked
       dimension, and collect categories. }
-    ExtraCoord, ExtraDim, ExtraIndex: array of Integer;
+    ExtraCoord, ExtraDim, ExtraIndex: TTyIntegerArray;
     { Per source dimension: some coordinate of the encode -- written in it,
       not a tooltip, label or name -- holds it, so no unwritten coordinate is
       filled from it. }
@@ -151,7 +151,7 @@ type
     { The dimensions a key no coordinate system asks for holds (`value` on a
       scatter, any other word): coordinates all the same, so the label may
       be one of them. }
-    Others: array of Integer;
+    Others: TTyIntegerArray;
   end;
 
   { One coordinate of a series, as this unit needs it: what it is called and

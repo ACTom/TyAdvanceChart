@@ -120,7 +120,7 @@ const
 
 function TyAriaDefaultLocale: TTyAriaLocale;
 var
-  seps: TStringArray;
+  seps: TTyStringArray;
 begin
   Result := Default(TTyAriaLocale);
   Result.WithTitle := rsTyChartAriaWithTitle;

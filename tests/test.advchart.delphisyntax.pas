@@ -762,8 +762,9 @@ end;
 
 procedure TAdvChartDelphiSyntaxTest.TestFpcOnlyNames;
 begin
-  CountNames('FPC-only names outside {$IFDEF FPC} lines', ['DefaultFormatSettings', 'LineEnding',
-    'SarLongint', 'StrToQWord'], True, ExpFpcOnlyNames);
+  CountNames('FPC-only names outside {$IFDEF FPC} lines (for TStringArray write TTyStringArray; ' +
+    'for TArray<T> a named "array of T" type)', ['DefaultFormatSettings', 'LineEnding',
+    'SarLongint', 'StrToQWord', 'TStringArray', 'TArray'], True, ExpFpcOnlyNames);
 end;
 
 { True when S, trimmed, is a float literal: an optional sign, digits, then a '.' and digits

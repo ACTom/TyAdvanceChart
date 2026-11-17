@@ -312,6 +312,7 @@ type
     { Set once measured. }
     X, W: Double;
   end;
+  TTyTooltipRunArray = array of TTyTooltipRun;
 
   { [R2-I8] A horizontal rule an html block's top or bottom border draws
     across the box: OffsetLogical from its line's top (negative: above it,
@@ -322,7 +323,7 @@ type
   end;
 
   TTyTooltipLine = record
-    Runs: array of TTyTooltipRun;
+    Runs: TTyTooltipRunArray;
     { How many EMPTY lines come before this one. A gap level of 1 means the
       blocks are on consecutive lines, not that there is a blank between them:
       upstream's richText gaps are 0/1/2/3 NEWLINES, which is 0/0/1/2 blank
@@ -1911,7 +1912,7 @@ procedure TyTooltipSplitMarkers(var ALines: TTyTooltipLineArray;
   const AInk: TTyTooltipInk);
 var
   i, j, k, p, best, bestK, q: Integer;
-  runs: array of TTyTooltipRun;
+  runs: TTyTooltipRunArray;
   run, piece: TTyTooltipRun;
   rest, tok: string;
 

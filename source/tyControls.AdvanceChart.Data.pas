@@ -66,6 +66,7 @@ type
     Text: string;
   end;
   TTyDataValueArray = array of TTyDataValue;
+  TTyCardinalArray = array of Cardinal;
 
   (* WHAT A DATA ITEM WAS, as written -- upstream's getRawValue, for the text a
     label or a tooltip prints. rshNone is "nothing kept", and every reader
@@ -255,8 +256,8 @@ type
       with deduplication puts a new one, and collecting without it never
       touches the map [was: the first ordinal, and the blind append put a
       new category into a map already built] }
-    FSlots: array of Integer;
-    FHashes: array of Cardinal;
+    FSlots: TTyIntegerArray;
+    FHashes: TTyCardinalArray;
     FUsed: Integer;
     FMapOn: Boolean;
     FNeedCollect: Boolean;
@@ -368,11 +369,11 @@ type
       gap at place 0 of a list) -- upstream has no such dimension at all }
     FDimVoid: array of Boolean;
     FRawDimInfo: array of TTyRawDimInfo; // per raw position
-    FTipPos, FLabelPos: array of Integer;
+    FTipPos, FLabelPos: TTyIntegerArray;
     FHasTipPos, FHasLabelPos: Boolean;
     FRawWidth: Integer;
     FNameFallback: Integer;       // 0 the first ordinal column, -1 none, k + 1 column k
-    FCollectOrder: array of Integer; // the columns collected first, column by column; nil: none
+    FCollectOrder: TTyIntegerArray; // the columns collected first, column by column; nil: none
     FOvrHead: array of Integer;   // per raw row, -1 = no overrides
     FOvr: array of TOvr;
     FOvrCount: Integer;
@@ -1651,8 +1652,8 @@ end;
 procedure TTyOrdinalMeta.MapPut(AOrdinal: Integer; AHash: Cardinal);
 var
   i, mask, k, n: Integer;
-  oldSlots: array of Integer;
-  oldHashes: array of Cardinal;
+  oldSlots: TTyIntegerArray;
+  oldHashes: TTyCardinalArray;
 begin
   if (FUsed + 1) * 2 > Length(FSlots) then
   begin

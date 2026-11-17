@@ -15,6 +15,7 @@ uses SysUtils, Math;
 
 type
   TTyDoubleArray = array of Double;
+  TTyDoubleArrays = array of TTyDoubleArray;
 
   { What stacking did to one series -- see AdvanceChart.Stack, which computes it.
 
@@ -69,6 +70,7 @@ type
   { zrender's 2-D affine matrix [a, b, c, d, tx, ty]:
     x' = a x + c y + tx, y' = b x + d y + ty. }
   TTyMat2D = array[0..5] of Double;
+  TTyMat2DArray = array of TTyMat2D;
 
   { A closed value range. TyRange DOES normalise, because a reversed VALUE range
     is always a caller mistake — an inverse axis is expressed by the PIXEL extent
@@ -129,7 +131,7 @@ type
     thinning instead. }
   TTyLabelOverflow = (loNone, loTruncate, loBreak);
 
-  TTyStringArray = array of string;
+  TTyStringArray = {$IFDEF FPC}TStringArray{$ELSE}TArray<string>{$ENDIF};
   TTyBoolArray = array of Boolean;
   TTyIntegerArray = array of Integer;
 

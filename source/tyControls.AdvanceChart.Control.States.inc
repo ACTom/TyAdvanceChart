@@ -3751,7 +3751,7 @@ const
   cStPxLine = 4;
 
 function StNamesOf(const AText: string): TTyStNames;
-var n: TTyStName; parts: TStringArray; i: Integer;
+var n: TTyStName; parts: TTyStringArray; i: Integer;
 begin
   Result := [];
   parts := AText.Split([',']);
