@@ -232,7 +232,7 @@ var
   oldEls, newEls: TTyAxisAnimElArray;
   oldKeys, newKeys, oldAx, newAx, nowAxes: TTyStringArray;
   kept: TStringList;
-  oldIdx, oldMap: TFPHashList;
+  oldIdx, oldMap: TTyHashList;
   oldList: TTyList;
   i, k: Integer;
   p, q: TTyChartAnimProxy;
@@ -245,15 +245,15 @@ begin
   if FAxisList = nil then
   begin
     FAxisList := TTyList.Create;
-    FAxisProxies := TFPHashList.Create;
+    FAxisProxies := TTyHashList.Create;
   end;
   oldEls := AxisAnimElementsOf(AOldBuild, FLastPPI, oldKeys, oldAx);
   newEls := AxisAnimElementsOf(ANewBuild, FLastPPI, newKeys, newAx);
   oldList := FAxisList;
   oldMap := FAxisProxies;
   FAxisList := TTyList.Create;
-  FAxisProxies := TFPHashList.Create;
-  oldIdx := TFPHashList.Create;
+  FAxisProxies := TTyHashList.Create;
+  oldIdx := TTyHashList.Create;
   { WHICH AXIS VIEWS ARE KEPT [Batch 99]: prepareView's '_ec_' + model id +
     '_' + type is the same and the model does not ask for a new view. A
     replaced axis, or one whose type changed, is a new view: its leaves
@@ -325,7 +325,7 @@ procedure TTyCustomAdvanceChart.UtStaleHarvest;
 var
   i, k: Integer;
   pe: PTyChartElement;
-  idx: TFPHashList;
+  idx: TTyHashList;
   key: string;
   v: Pointer;
 begin
@@ -338,7 +338,7 @@ begin
       if (pe^.Anim.Role <> carSunPiece) or (pe^.Anim.Index <= 0) then Continue;
       if idx = nil then
       begin
-        idx := TFPHashList.Create;
+        idx := TTyHashList.Create;
         for k := 0 to High(FUtStale) do
           idx.Add(IntToStr(FUtStale[k].Anim.Series) + ':' + IntToStr(FUtStale[k].Anim.Index),
             Pointer(IntPtr(k + 1)));

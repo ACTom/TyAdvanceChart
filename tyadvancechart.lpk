@@ -58,6 +58,10 @@ Homepage: https://github.com/ACTom/TyAdvanceChart"/>
         <UnitName Value="tyControls.AdvanceChart.NativeStr"/>
       </Item>
       <Item>
+        <Filename Value="source/tyControls.AdvanceChart.HashList.pas"/>
+        <UnitName Value="tyControls.AdvanceChart.HashList"/>
+      </Item>
+      <Item>
         <Filename Value="source/tyControls.AdvanceChart.AxisLabels.pas"/>
         <UnitName Value="tyControls.AdvanceChart.AxisLabels"/>
       </Item>

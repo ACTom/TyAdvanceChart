@@ -24,8 +24,8 @@ const
   ExpFinalizationWithoutInitialization = 0;
   ExpLoneHighByteEscapes = 0;
   // Load fails when it finds fewer units than this under source/ (114 when the census was written,
-  // 115 since tyControls.AdvanceChart.NativeStr was added).
-  MinSourceUnits = 115;
+  // 115 since tyControls.AdvanceChart.NativeStr was added, 116 since tyControls.AdvanceChart.HashList).
+  MinSourceUnits = 116;
 
 type
   TPascalScanTest = class(TTestCase)
@@ -786,10 +786,12 @@ begin
     'for Floor64 and Ceil64 TyFloor64 and TyCeil64; for GetLocalTimeOffset TyLocalTimeOffsetMinutes; ' +
     'for UTF8Decode TyJsUnits; for UTF8Encode TyFromJsUnits; for UnicodeToUTF8 TyCodePointStr; ' +
     'for IndexByte over a string Pos; no LazUTF8 in uses but Option''s {$IFDEF FPC} line: ' +
-    'tyControls.AdvanceChart.NativeStr)',
+    'tyControls.AdvanceChart.NativeStr; for TFPHashList TTyHashList, and no contnrs in uses: ' +
+    'tyControls.AdvanceChart.HashList)',
     ['DefaultFormatSettings', 'LineEnding', 'SarLongint', 'StrToQWord', 'TStringArray', 'TArray',
     'TFPList', 'GetTickCount64', 'TryStrToQWord', 'TryStrToDWord', 'Floor64', 'Ceil64',
-    'GetLocalTimeOffset', 'UTF8Decode', 'UTF8Encode', 'UnicodeToUTF8', 'IndexByte', 'LazUTF8'],
+    'GetLocalTimeOffset', 'UTF8Decode', 'UTF8Encode', 'UnicodeToUTF8', 'IndexByte', 'LazUTF8',
+    'TFPHashList', 'contnrs'],
     True, ExpFpcOnlyNames, 'TThread.GetTickCount64');
 end;
 

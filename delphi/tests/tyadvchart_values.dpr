@@ -8,12 +8,14 @@ program tyadvchart_values;
 uses
   SysUtils,
   Classes,
+  dynlibs,
   fpjson,
   jsonparser,
   jsonscanner,
   DOM,
   XMLRead,
   tyControls.AdvanceChart.Catalog,
+  tyControls.AdvanceChart.HashList,
   tyControls.AdvanceChart.JsMath,
   tyControls.AdvanceChart.NativeStr,
   tyControls.AdvanceChart.Types;
@@ -514,6 +516,152 @@ begin
   Check(XmlRaises(XmlNested(5000)) = 'EXMLReadError', 'XML limit: 5000 nested elements raise EXMLReadError');
 end;
 
+{ The same checks as tests/test.advchart.hashlist.pas (the values FPC's TFPHashList gives), on the Delphi
+  TTyHashList; then two only Delphi gives a meaning to: a name outside ANSI is kept whole, and a name longer
+  than a ShortString's 255 is found. }
+procedure CheckHashList;
+const
+  pA = Pointer(10);
+  pB = Pointer(20);
+  pC = Pointer(30);
+  pD = Pointer(40);
+  pZ = Pointer(99);
+var
+  h: TTyHashList;
+  long: string;
+
+  procedure AddABC;
+  begin
+    h.Add('a', pA);
+    h.Add('b', pB);
+    h.Add('c', pC);
+  end;
+
+begin
+  { TestFindMissingIsNil }
+  h := TTyHashList.Create;
+  try
+    Check(h.Find('x') = nil, 'HashList empty: Find(''x'') = nil');
+    Check(h.FindIndexOf('x') = -1, 'HashList empty: FindIndexOf(''x'') = -1');
+    Check(h.Count = 0, 'HashList empty: Count = 0');
+    AddABC;
+    Check(h.Find('x') = nil, 'HashList other names: Find(''x'') = nil');
+    Check(h.FindIndexOf('x') = -1, 'HashList other names: FindIndexOf(''x'') = -1');
+  finally
+    h.Free;
+  end;
+  { TestAddThenFind }
+  h := TTyHashList.Create;
+  try
+    Check(h.Add('a', pA) = 0, 'HashList Add a = 0');
+    Check(h.Add('b', pB) = 1, 'HashList Add b = 1');
+    Check(h.Add('c', pC) = 2, 'HashList Add c = 2');
+    Check(h.Count = 3, 'HashList Count = 3');
+    Check(h.Find('a') = pA, 'HashList Find a');
+    Check(h.Find('b') = pB, 'HashList Find b');
+    Check(h.Find('c') = pC, 'HashList Find c');
+    Check(h.FindIndexOf('a') = 0, 'HashList FindIndexOf a = 0');
+    Check(h.FindIndexOf('b') = 1, 'HashList FindIndexOf b = 1');
+    Check(h.FindIndexOf('c') = 2, 'HashList FindIndexOf c = 2');
+  finally
+    h.Free;
+  end;
+  { TestSameNameAddedTwice }
+  h := TTyHashList.Create;
+  try
+    AddABC;
+    Check(h.Add('b', pD) = 3, 'HashList Add b again = 3');
+    Check(h.Find('b') = pD, 'HashList twice: Find b is the later');
+    Check(h.Count = 4, 'HashList twice: Count = 4');
+    Check(h.FindIndexOf('b') = 3, 'HashList twice: FindIndexOf b = 3');
+    h.Delete(h.FindIndexOf('b'));
+    Check(h.Find('b') = pB, 'HashList twice, later deleted: Find b is the earlier');
+    Check(h.Count = 3, 'HashList twice, later deleted: Count = 3');
+    Check(h.FindIndexOf('b') = 1, 'HashList twice, later deleted: FindIndexOf b = 1');
+  finally
+    h.Free;
+  end;
+  { TestDeleteByIndex }
+  h := TTyHashList.Create;
+  try
+    AddABC;
+    h.Delete(h.FindIndexOf('b'));
+    Check(h.Find('b') = nil, 'HashList Delete: Find b = nil');
+    Check(h.FindIndexOf('b') = -1, 'HashList Delete: FindIndexOf b = -1');
+    Check(h.Count = 2, 'HashList Delete: Count = 2');
+    Check(h.FindIndexOf('a') = 0, 'HashList Delete: FindIndexOf a = 0');
+    Check(h.FindIndexOf('c') = 1, 'HashList Delete: FindIndexOf c = 1');
+    Check(h.Find('a') = pA, 'HashList Delete: Find a');
+    Check(h.Find('c') = pC, 'HashList Delete: Find c');
+  finally
+    h.Free;
+  end;
+  { TestRemoveByItem }
+  h := TTyHashList.Create;
+  try
+    AddABC;
+    Check(h.Remove(pB) = 1, 'HashList Remove b = 1');
+    Check(h.Find('b') = nil, 'HashList Remove: Find b = nil');
+    Check(h.Count = 2, 'HashList Remove: Count = 2');
+    Check(h.Find('c') = pC, 'HashList Remove: Find c');
+    Check(h.FindIndexOf('c') = 1, 'HashList Remove: FindIndexOf c = 1');
+    Check(h.Remove(pZ) = -1, 'HashList Remove a pointer not held = -1');
+    Check(h.Count = 2, 'HashList Remove not held: Count = 2');
+    Check(h.Add('x', pA) = 2, 'HashList Add x = 2');
+    Check(h.Remove(pA) = 0, 'HashList Remove a: the first entry = 0');
+    Check(h.Count = 2, 'HashList Remove a: Count = 2');
+    Check(h.Find('a') = nil, 'HashList Remove a: Find a = nil');
+    Check(h.Find('x') = pA, 'HashList Remove a: Find x');
+    Check(h.FindIndexOf('x') = 1, 'HashList Remove a: FindIndexOf x = 1');
+  finally
+    h.Free;
+  end;
+  { TestClear }
+  h := TTyHashList.Create;
+  try
+    AddABC;
+    h.Clear;
+    Check(h.Count = 0, 'HashList Clear: Count = 0');
+    Check(h.Find('a') = nil, 'HashList Clear: Find a = nil');
+    Check(h.FindIndexOf('a') = -1, 'HashList Clear: FindIndexOf a = -1');
+    Check(h.Add('b', pD) = 0, 'HashList Add after Clear = 0');
+    Check(h.Find('b') = pD, 'HashList after Clear: Find b');
+    Check(h.Count = 1, 'HashList after Clear: Count = 1');
+  finally
+    h.Free;
+  end;
+  { Delphi only }
+  h := TTyHashList.Create;
+  try
+    h.Add(#$56FD, pA);
+    h.Add('?', pB);
+    Check(h.Count = 2, 'HashList: U+56FD and ''?'' are two entries');
+    Check(h.Find(#$56FD) = pA, 'HashList: Find U+56FD');
+    Check(h.Find('?') = pB, 'HashList: Find ''?''');
+    long := StringOfChar('k', 299) + 'z';
+    h.Add(long, pC);
+    Check(h.Find(long) = pC, 'HashList: a 300-character name is found');
+    Check(h.Find(StringOfChar('k', 299) + 'y') = nil, 'HashList: 300 characters, the last differing, not found');
+  finally
+    h.Free;
+  end;
+end;
+
+{ The dynlibs port: kernel32 loads, a routine it exports is found, one it does not export is nil. }
+procedure CheckDynLibs;
+var
+  h: TLibHandle;
+begin
+  h := LoadLibrary('kernel32.dll');
+  Check(h <> NilHandle, 'dynlibs: LoadLibrary(''kernel32.dll'') <> NilHandle');
+  try
+    Check(GetProcedureAddress(h, 'GetTickCount') <> nil, 'dynlibs: GetProcedureAddress(h, ''GetTickCount'') <> nil');
+    Check(GetProcedureAddress(h, 'NoSuchRoutine_') = nil, 'dynlibs: GetProcedureAddress(h, ''NoSuchRoutine_'') = nil');
+  finally
+    UnloadLibrary(h);
+  end;
+end;
+
 begin
   CheckSar32;
   CheckIntToDouble;
@@ -528,5 +676,7 @@ begin
   CheckJsonStringLocaleFloat;
   CheckSvgBytes;
   CheckXmlLimits;
+  CheckHashList;
+  CheckDynLibs;
   Writeln('DELPHI VALUES OK');
 end.

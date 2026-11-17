@@ -79,7 +79,7 @@ uses
   tyControls.AdvanceChart.DirtyRect,
   { the keyboard and the accessible tree [Batch 144] }
   tyControls.AdvanceChart.Aria, tyControls.AdvanceChart.KeyNav, tyControls.Accessible,
-  fpjson, contnrs, tyControls.SubPixel;
+  fpjson, tyControls.AdvanceChart.HashList, tyControls.SubPixel;
 
 const
   { The four axis metrics, and the defaults to fall back on when a theme has not
@@ -1985,14 +1985,14 @@ type
       made }
     FViewBrand: TTyStringArray;
     { [R7-AH] '<mainType>#<index>' -> 1 + the view's rank }
-    FViewRank: TFPHashList;
+    FViewRank: TTyHashList;
     { [R7-AH] ALLOCATEZLEVELS (render's first step): where a series asks for
       a layer of its own (getZLevelKey: a lines series with a trail, a
       scatter or lines series of more rows than its progressiveThreshold),
       every model's zlevel as upstream writes it back into the model --
       '<mainType>#<index>' -> the level + cZAllocBias; FZAllocOn when it
       ran (no key: nothing written, the option's own) }
-    FZAlloc: TFPHashList;
+    FZAlloc: TTyHashList;
     FZAllocOn: Boolean;
 
     { [R7-AG] the band holds an element the continuous phase draws (a ripple,
@@ -2380,7 +2380,7 @@ type
     { THE AXES' groupTransition [Batch 96]: one proxy per leaf of an axis
       group, by 'xAxis0/anid', on the series' driver; made by a full update's
       arming, dropped with every other proxy }
-    FAxisProxies: TFPHashList;
+    FAxisProxies: TTyHashList;
     FAxisList: TTyList;
     { THE SERIES WHOSE MODEL replaceMerge MADE BRAND NEW since the old keys
       were taken: upstream's __requireNewView, a new view whatever the id

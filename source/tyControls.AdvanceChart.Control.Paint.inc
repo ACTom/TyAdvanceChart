@@ -1781,7 +1781,7 @@ var
   end;
 
 begin
-  if FZAlloc = nil then FZAlloc := TFPHashList.Create;
+  if FZAlloc = nil then FZAlloc := TTyHashList.Create;
   FZAllocOn := FZAlloc.Count > 0;
   if FOption = nil then Exit;
   root := nil;
@@ -3409,7 +3409,7 @@ begin
       pairs[High(pairs)] := pv;
     end;
   end;
-  if FViewRank = nil then FViewRank := TFPHashList.Create else FViewRank.Clear;
+  if FViewRank = nil then FViewRank := TTyHashList.Create else FViewRank.Clear;
   for i := 0 to n - 1 do
   begin
     pv := Int64(FViews[i].Gen) * (Int64(MaxInt) + 1) + FViews[i].Key;

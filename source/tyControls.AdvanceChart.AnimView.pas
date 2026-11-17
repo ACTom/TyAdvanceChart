@@ -201,7 +201,7 @@ unit tyControls.AdvanceChart.AnimView;
   round), sorted, each new element morphing from its piece. An old element
   a morph takes from stops leaving. The drill direction is UT3's. }
 interface
-uses SysUtils, Classes, Math, contnrs, fpjson,
+uses SysUtils, Classes, Math, tyControls.AdvanceChart.HashList, fpjson,
   tyControls.AdvanceChart.Types, tyControls.AdvanceChart.Shape,
   tyControls.AdvanceChart.Paint, tyControls.AdvanceChart.Anim,
   tyControls.AdvanceChart.AnimOpt, tyControls.AdvanceChart.Lines,
@@ -692,7 +692,7 @@ type
   TTyChartAnimSet = class
   private
     FItems: TTyList;
-    FIndex: TFPHashList;
+    FIndex: TTyHashList;
     FGhosts: TTyList;
     FAnimation: TTyAnimation;
     { the updates armed so far: a style transition's stamp [Batch 136] }
@@ -726,7 +726,7 @@ type
       faded in -- then, where anything morphed, every path of the new views
       that has no animation fades in }
     procedure ArmUniversal(AList: TTyPaintList; const ASeries: TTyChartAnimSeriesArray;
-      const APrev: TTyChartAnimPrev; AUtIdx: TFPHashList;
+      const APrev: TTyChartAnimPrev; AUtIdx: TTyHashList;
       const AUtSnaps: TTyUtOldSnapArray; const AUtItems: TTyUtItemPathsArray;
       const AOldOf: TTyIntegerArray;
       const ARowMap: array of TTyIntegerArray; const AUpd: array of Boolean);
@@ -735,7 +735,7 @@ type
       paths (snaps into ASnaps) in getPathList's order [F3c]; nothing when
       no new series asks for a transition }
     procedure SnapUniversal(const ASeries: TTyChartAnimSeriesArray;
-      const APrev: TTyChartAnimPrev; AOldIndex, AIdx: TFPHashList;
+      const APrev: TTyChartAnimPrev; AOldIndex, AIdx: TTyHashList;
       out ASnaps: TTyUtOldSnapArray; out AItems: TTyUtItemPathsArray);
     function Make(ASeries, AIndex: Integer; const ARole: string): TTyChartAnimProxy;
     procedure ArmOne(AList: TTyPaintList; AAt: Integer; const AEl: TTyChartElement;
@@ -1318,11 +1318,11 @@ end;
 
 function TyDataDiff(const AOld, ANew: TTyStringArray): TTyDataDiffCmdArray;
 var
-  map: TFPHashList;
+  map: TTyHashList;
   lists: TTyList;
   i, j, n: Integer;
   l: TList;
-  key: ShortString;
+  key: TTyHashKey;
 
   procedure Push(AKind: TTyDataDiffKind; ANewIdx, AOldIdx: Integer);
   begin
@@ -1333,7 +1333,7 @@ var
     Inc(n);
   end;
 
-  function KeyOfS(const S: string): ShortString;
+  function KeyOfS(const S: string): TTyHashKey;
   var
     h: Cardinal;
     c: Integer;
@@ -1353,7 +1353,7 @@ var
 begin
   Result := nil;
   n := 0;
-  map := TFPHashList.Create;
+  map := TTyHashList.Create;
   lists := TTyList.Create;
   try
     { the new rows by key, in order: a key held twice is a list }
@@ -1456,7 +1456,7 @@ end;
 
 { ==================== the set ==================== }
 
-function KeyOf(ASeries, AIndex: Integer; const ARole: string): ShortString;
+function KeyOf(ASeries, AIndex: Integer; const ARole: string): TTyHashKey;
 begin
   Result := IntToStr(ASeries) + ':' + IntToStr(AIndex) + ':' + ARole;
 end;
@@ -1466,7 +1466,7 @@ begin
   inherited Create;
   FAnimation := AAnimation;
   FItems := TTyList.Create;
-  FIndex := TFPHashList.Create;
+  FIndex := TTyHashList.Create;
   FGhosts := TTyList.Create;
   FLsdSeries := -1;
 end;
@@ -3001,9 +3001,9 @@ procedure TTyChartAnimSet.ArmUpdate(AList: TTyPaintList;
   const ASeries: TTyChartAnimSeriesArray; const APrev: TTyChartAnimPrev);
 var
   oldItems: TTyList;
-  oldIndex: TFPHashList;
-  prevIdx: TFPHashList;
-  utIdx: TFPHashList;
+  oldIndex: TTyHashList;
+  prevIdx: TTyHashList;
+  utIdx: TTyHashList;
   utSnaps: TTyUtOldSnapArray;
   utItems: TTyUtItemPathsArray;
   oldOf: TTyIntegerArray;
@@ -3105,7 +3105,7 @@ var
     end;
 
   var
-    olds: TFPHashList;
+    olds: TTyHashList;
     i, q, row: Integer;
     e, oe: TTyChartElement;
     key: string;
@@ -3113,12 +3113,12 @@ var
     p: TTyChartAnimProxy;
     props, oprops: TTyAnimProps;
     opts: TTyAnimCallOpts;
-    taken: TFPHashList;
+    taken: TTyHashList;
     ov: TTyDoubleArray;
   begin
     if not AC.Enabled then Exit;
-    olds := TFPHashList.Create;
-    taken := TFPHashList.Create;
+    olds := TTyHashList.Create;
+    taken := TTyHashList.Create;
     try
       for i := 0 to High(APrev.Elements) do
       begin
@@ -5544,9 +5544,9 @@ begin
   oldItems := FItems;
   oldIndex := FIndex;
   FItems := TTyList.Create;
-  FIndex := TFPHashList.Create;
-  prevIdx := TFPHashList.Create;
-  utIdx := TFPHashList.Create;
+  FIndex := TTyHashList.Create;
+  prevIdx := TTyHashList.Create;
+  utIdx := TTyHashList.Create;
   try
     for i := 0 to oldItems.Count - 1 do
       TTyChartAnimProxy(oldItems[i]).FClaimed := False;
@@ -10675,7 +10675,7 @@ begin
 end;
 
 procedure TTyChartAnimSet.SnapUniversal(const ASeries: TTyChartAnimSeriesArray;
-  const APrev: TTyChartAnimPrev; AOldIndex, AIdx: TFPHashList;
+  const APrev: TTyChartAnimPrev; AOldIndex, AIdx: TTyHashList;
   out ASnaps: TTyUtOldSnapArray; out AItems: TTyUtItemPathsArray);
 var
   i, s, n, k, first, it: Integer;
@@ -10930,7 +10930,7 @@ end;
 
 procedure TTyChartAnimSet.ArmUniversal(AList: TTyPaintList;
   const ASeries: TTyChartAnimSeriesArray; const APrev: TTyChartAnimPrev;
-  AUtIdx: TFPHashList; const AUtSnaps: TTyUtOldSnapArray;
+  AUtIdx: TTyHashList; const AUtSnaps: TTyUtOldSnapArray;
   const AUtItems: TTyUtItemPathsArray; const AOldOf: TTyIntegerArray;
   const ARowMap: array of TTyIntegerArray; const AUpd: array of Boolean);
 type
@@ -10945,7 +10945,7 @@ type
   TNewRefArray = array of TNewRef;
   TNewRefLists = array of TNewRefArray;
 var
-  newIdx: TFPHashList;
+  newIdx: TTyHashList;
   newItems: array of TTyIntegerArray;
   newOrders: array of TTyIntegerArray;
   bKeys: TTyStringArray;
@@ -11493,9 +11493,9 @@ var
   var
     oldItems, newItems: TUtItemArray;
     useId, hasMorph: Boolean;
-    still: TFPHashList;
+    still: TTyHashList;
     oldKeys, newKeys: TTyStringArray;
-    oldMap, newMap: TFPHashList;
+    oldMap, newMap: TTyHashList;
     oldGroups, newGroups: array of TTyIntegerArray;
     j, q, at: Integer;
     timing: TTyAnimTiming;
@@ -11699,12 +11699,12 @@ var
       that order, item by item; none else. Only truthy ids are kept. }
     function Direction: Integer;
     var
-      og, oc: TFPHashList;
+      og, oc: TTyHashList;
       x: Integer;
     begin
       Result := cUtDirNone;
-      og := TFPHashList.Create;
-      oc := TFPHashList.Create;
+      og := TTyHashList.Create;
+      oc := TTyHashList.Create;
       try
         for x := 0 to High(oldItems) do
         begin
@@ -11735,7 +11735,7 @@ var
       else Result := 'undefined';
     end;
 
-    procedure IndexKeys(const AKeys: TTyStringArray; AMap: TFPHashList;
+    procedure IndexKeys(const AKeys: TTyStringArray; AMap: TTyHashList;
       var AGroups: array of TTyIntegerArray; out AOrder: TTyIntegerArray);
     var
       x, g, c2: Integer;
@@ -11783,13 +11783,13 @@ var
           Break;
         end;
     still := nil;
-    oldMap := TFPHashList.Create;
-    newMap := TFPHashList.Create;
+    oldMap := TTyHashList.Create;
+    newMap := TTyHashList.Create;
     try
       if not useId then
       begin
         { isElementStillInChart: an old element some new item still draws }
-        still := TFPHashList.Create;
+        still := TTyHashList.Create;
         for j := 0 to High(newItems) do
           for q := 0 to High(oldItems) do
             if (still.Find(KeyOf(oldItems[q].Series, oldItems[q].Row, 'ut')) = nil)
@@ -12037,7 +12037,7 @@ var
 begin
   { series:transition runs on a setOption only (optionChanged) }
   if APrev.FullUpdate then Exit;
-  newIdx := TFPHashList.Create;
+  newIdx := TTyHashList.Create;
   try
     { THE NEW ITEMS' PATHS, in getPathList's order [F3c] }
     newItems := nil;
