@@ -26,8 +26,9 @@
     StrToQWord is StrToUInt64, and a UInt64 is printed with UIntToStr (Delphi's IntToStr takes
     it for an Int64); array of const takes Delphi's kinds of string and character as well;
     AsUnicodeString converts nothing;
-  - floating-point numbers and text are converted by tyfclnum (TyFclTextToFloat for Val and
-    TryStrToFloat, TyFclFloatToText for Str, TyFclFloatToStr for FloatToStr);
+  - floating-point numbers and text are converted by tyfclnum (TyFclTextToFloat for Val,
+    TyFclLocaleTextToFloat for TryStrToFloat, TyFclFloatToText for Str, TyFclFloatToStr for
+    FloatToStr);
   - the branches for PAS2JS and for other FPC versions are removed, and so is the include of
     fcl-json.inc (its mode switch, a define these units do not test and a warning switch are
     FPC's only).
@@ -1399,7 +1400,8 @@ function TJSONString.GetAsFloat: TJSONFloat;
 
 begin
   If Not TyFclTextToFloat(FValue,Result) then
-    Raise EConvertError.CreateFmt(SErrInvalidFloat,[FValue]);
+    If Not TyFclLocaleTextToFloat(FValue,Result) then
+      Raise EConvertError.CreateFmt(SErrInvalidFloat,[FValue]);
 end;
 
 function TJSONString.GetAsInteger: Integer;

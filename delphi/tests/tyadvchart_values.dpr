@@ -188,6 +188,33 @@ begin
   end;
 end;
 
+{ As FPC's, a JSON string that Val cannot read is read again with the locale's format settings. The
+  decimal separator is set here, so the check does not depend on the machine's locale. }
+procedure CheckJsonStringLocaleFloat;
+var
+  sep: Char;
+  s: TJSONString;
+begin
+  sep := FormatSettings.DecimalSeparator;
+  try
+    FormatSettings.DecimalSeparator := ',';
+    s := TJSONString.Create('1,5');
+    try
+      Check(s.AsFloat = 1.5, 'JSON: with the decimal separator '','', the string 1,5 reads as 1.5');
+    finally
+      s.Free;
+    end;
+    s := TJSONString.Create('1.5');
+    try
+      Check(s.AsFloat = 1.5, 'JSON: with the decimal separator '','', the string 1.5 still reads as 1.5');
+    finally
+      s.Free;
+    end;
+  finally
+    FormatSettings.DecimalSeparator := sep;
+  end;
+end;
+
 begin
   CheckSar32;
   CheckIntToDouble;
@@ -196,5 +223,6 @@ begin
   CheckNativeStr;
   CheckByteEscapeRun;
   CheckJsonLongKeys;
+  CheckJsonStringLocaleFloat;
   Writeln('DELPHI VALUES OK');
 end.

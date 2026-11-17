@@ -10,6 +10,8 @@ interface
 
 { text of a JSON number -> Double; False when S is not a number }
 function TyFclTextToFloat(const S: string; out AValue: Double): Boolean;
+{ what FPC's TryStrToFloat(S, AValue) gives: the text read with the current locale's format settings }
+function TyFclLocaleTextToFloat(const S: string; out AValue: Double): Boolean;
 { what FPC's Str(AValue, S) gives for a Double, without the leading blank:
   17 significant digits, 'E', a sign, three exponent digits; 'Nan', '+Inf', '-Inf' }
 function TyFclFloatToText(AValue: Double): string;
@@ -25,6 +27,12 @@ function TyFclTextToFloat(const S: string; out AValue: Double): Boolean;
 begin
   AValue := 0;
   Result := TryStrToFloat(S, AValue, TFormatSettings.Invariant);
+end;
+
+function TyFclLocaleTextToFloat(const S: string; out AValue: Double): Boolean;
+begin
+  AValue := 0;
+  Result := TryStrToFloat(S, AValue);
 end;
 
 function TyFclFloatToText(AValue: Double): string;
