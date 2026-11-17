@@ -8,9 +8,12 @@
 Windows only: it runs dcc32.exe and dcc64.exe from a Delphi installation. Nothing is written
 into the repository; the compiled units go to a temporary directory that is removed at the end.
 
-For every unit in UNITS and for both compilers it prints the number of errors and warnings,
-then the warnings summed up by code per compiler, then PROBE OK or PROBE FAILED.
-With --verbose the error and the warning lines are printed too.
+For every unit in UNITS and for both compilers it prints the number of errors and warnings of
+that compiler call, then per compiler the warnings and the hints summed up by code, then per
+compiler the number of units that compiled, then PROBE OK or PROBE FAILED. The sums count each
+message once (one file, line and code, however many calls compiled that file) and only messages
+about files under source/, not about the stand-ins. With --verbose the error and the warning lines
+are printed too.
 
 --standins DIR   puts DIR (compile-only stand-ins for the units Delphi lacks) on the unit and include paths.
 --all            compiles every unit under source/ except the control and the units that need the LCL
@@ -21,7 +24,8 @@ With --verbose the error and the warning lines are printed too.
                  exit code 0 and DELPHI VALUES OK as the last output line.
 Every dcc call and every run of the values program has a timeout (TIMEOUT seconds); a timeout is an error.
 
-Exit code: 0 no errors, 1 at least one error, 2 the compilers were not found.
+Exit code: 0 no errors, 1 at least one error or no unit compiled with a compiler, 2 the compilers
+were not found.
 The list of units grows with the later plans (every unit added reaches only units already listed
 or the RTL).
 """
@@ -73,7 +77,7 @@ def run_dcc(cmd, cwd):
 def compile_unit(exe, unit, tmp, standins=None, rebuild=True):
     cmd = [exe] + dcc_args(tmp, standins) + (['-B'] if rebuild else []) + [PREFIX + unit + '.pas']
     rc, out = run_dcc(cmd, SRC)
-    errors, warnings = [], []
+    errors, warnings, hints = [], [], []
     for line in out:
         m = MSG_RE.search(line)
         if not m:
@@ -82,9 +86,23 @@ def compile_unit(exe, unit, tmp, standins=None, rebuild=True):
             errors.append(line.strip())
         elif m.group(1) == 'W':
             warnings.append((m.group(2), line.strip()))
+        elif m.group(1) == 'H':
+            hints.append((m.group(2), line.strip()))
     if rc != 0 and not errors:
         errors.append('compiler exit code %d: %s' % (rc, ' | '.join(out[-3:])))
-    return errors, warnings
+    return errors, warnings, hints
+
+
+def source_place(line):
+    """(file, line number) of a message about a file under source/, None for any other file.
+    dcc runs in source/, so a file named without a folder is one of source/."""
+    m = re.match(r'(.*?)\((\d+)\)', line)
+    if not m:
+        return None
+    path = os.path.normcase(os.path.abspath(os.path.join(SRC, m.group(1))))
+    if os.path.dirname(path) != os.path.normcase(os.path.abspath(SRC)):
+        return None
+    return path, int(m.group(2))
 
 
 def error_file(line):
@@ -138,14 +156,21 @@ def main():
         os.mkdir(d)
     units = all_units() if args.all else UNITS
     total_errors = 0
-    warn_by_code = {c: collections.Counter() for c in COMPILERS}
+    # each message once: the set of (file, line, code) per compiler and kind, files under source/ only
+    seen = {c: {'W': set(), 'H': set()} for c in COMPILERS}
+    compiled = {c: 0 for c in COMPILERS}
     try:
         for unit in units:
             for c in COMPILERS:
-                errors, warnings = compile_unit(exes[c], unit, tmps[c], standins, rebuild=not args.all)
+                errors, warnings, hints = compile_unit(exes[c], unit, tmps[c], standins, rebuild=not args.all)
                 total_errors += len(errors)
-                for code, _ in warnings:
-                    warn_by_code[c]['W' + code] += 1
+                if not errors:
+                    compiled[c] += 1
+                for kind, msgs in (('W', warnings), ('H', hints)):
+                    for code, line in msgs:
+                        place = source_place(line)
+                        if place:
+                            seen[c][kind].add(place + (kind + code,))
                 note = ''
                 if errors and args.all:
                     f = error_file(errors[0])
@@ -167,14 +192,21 @@ def main():
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
+    for kind, what in (('W', 'warnings'), ('H', 'hints')):
+        for c in COMPILERS:
+            by_code = collections.Counter(code for _, _, code in seen[c][kind])
+            print('%s by code, %s (each once, source/ only):' % (what, c))
+            for code, n in sorted(by_code.items()):
+                print('  %s: %d' % (code, n))
+            if not by_code:
+                print('  none')
     for c in COMPILERS:
-        print('warnings by code, %s:' % c)
-        for code, n in sorted(warn_by_code[c].items()):
-            print('  %s: %d' % (code, n))
-        if not warn_by_code[c]:
-            print('  none')
+        print('units, %s: %d' % (c, compiled[c]))
     if total_errors:
         print('PROBE FAILED (%d errors)' % total_errors)
+        return 1
+    if not all(compiled.values()):
+        print('PROBE FAILED (no unit compiled with %s)' % ', '.join(c for c in COMPILERS if not compiled[c]))
         return 1
     print('PROBE OK')
     return 0
