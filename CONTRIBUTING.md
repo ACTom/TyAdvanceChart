@@ -85,6 +85,18 @@ tests/tyadvchart_tests --all --format=plain
 - 用户可见的文字用 `resourcestring`，放在 `tyControls.AdvanceChart.StrConsts`，并同步更新 `languages/` 下的 zh_CN `.po`。
 - 示例用 `.lfm` 窗体，带标题栏，能在运行时换主题。
 - 不用比 Lazarus 3.0 更新的 LCL API；必须用时，按 `LCL_FULLVERSION` 给旧版本留一条路。
+- `source/` 下的单元要能同时用 FPC 和 Delphi 编译（Delphi 支持还在做）。下面这些规矩大部分由 `TAdvChartDelphiSyntaxTest` 检查，违反了会报出文件和行号：
+  - 单元开头写 `{$I tyControls.AdvanceChart.Compiler.inc}`，不写 `{$mode}` 行；这些单元用的是 `{$mode delphi}`。测试、设计期单元、示例和工具仍然是 `{$mode objfpc}`。
+  - 方法当事件或回调用时不加 `@`：写 `OnTimer := TimerFired`，不写 `@TimerFired`。取数据的地址、取单元级普通例程的地址，照旧用 `@`。
+  - 花括号注释里不能再出现 `{`；这样的注释改用 `(* … *)`。
+  - 整数转成 Double：字面量写 `Double(1.0)`，表达式写 `TyIntToDouble(n)`，不要写 `Double(n)`——FPC 在 Delphi 模式下会把整数的二进制位直接当成浮点数，不转换，也不报错。要双精度结果的地方也不能只写 `1.0`：FPC 把它当单精度。
+  - 整数类型用两边编译器都认的名字：`UInt64`、`IntPtr`、`UIntPtr`、`Cardinal`、`Integer`，不用 `QWord`、`PtrInt`、`PtrUInt`、`LongWord`、`LongInt`。`PtrInt` 也别换成 `NativeInt`，在 FPC 里那是另一个类型。
+  - 条件符号用 `MSWINDOWS` 和 `CPUX64`，不用 `WINDOWS` 和 `CPUX86_64`。
+  - 不用 `{$push}` / `{$pop}`。要让一段代码关掉范围和溢出检查，在它前面 include `tyControls.AdvanceChart.ChecksOff.inc`，后面 include `tyControls.AdvanceChart.ChecksBack.inc`；这一对不能嵌套。只有 FPC 认的编译指令，放进同一行的 `{$IFDEF FPC}` 里。
+  - 重载的例程，每个声明都要带 `overload;`。
+  - 不用字符串 `case`、嵌套过程变量（`is nested`）、`specialize`、`+=`。
+  - 改了 `TTyCustomAdvanceChart` / `TTyAdvanceChart` 的 public 或 published 部分，或者改了包的依赖，跑一遍 `python scripts/api-manifest.py --check`；和 `scripts/api-manifest.txt` 对不上时它会失败。改动是有意的，就用 `--write` 重写这份清单，和改动一起提交。
+  - 装了 Delphi 的话，`python scripts/delphi-probe.py` 会用 dcc32 和 dcc64 编译只依赖 RTL 的那些单元（可选，需要 RAD Studio）。
 - 其余照周围代码的写法来。
 
 **提交信息**用英文，格式 `类型(范围): 说明`，例如 `fix(tooltip): the box leaves the chart at the right edge`。修复某个 issue 的，正文里写 `Fixes #N`。

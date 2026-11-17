@@ -85,6 +85,18 @@ Bug fixes should come with a test that fails without the fix.
 - User-visible text goes in a `resourcestring` in `tyControls.AdvanceChart.StrConsts`, with the zh_CN `.po` under `languages/` updated to match.
 - Examples use `.lfm` forms, have a title bar and can switch themes at runtime.
 - Don't use LCL API newer than Lazarus 3.0; where you must, keep a path for older versions behind `LCL_FULLVERSION`.
+- The units under `source/` are written so that both FPC and Delphi compile them (Delphi support is in progress). `TAdvChartDelphiSyntaxTest` checks most of the rules below and names the file and line when one is broken:
+  - A unit starts with `{$I tyControls.AdvanceChart.Compiler.inc}`, not a `{$mode}` line; the units are in `{$mode delphi}`. Tests, design-time units, examples and tools stay in `{$mode objfpc}`.
+  - A method used as an event or callback takes no `@`: `OnTimer := TimerFired`, not `@TimerFired`. `@` stays for the address of data and of plain unit-level routines.
+  - A comment in braces can't contain another `{`; write such a comment with `(* … *)`.
+  - An integer becomes a Double by `Double(1.0)` for a literal and `TyIntToDouble(n)` for an expression, never `Double(n)`: FPC in Delphi mode reads the integer's bits instead of converting it, and says nothing. Where the result must be double precision, a bare `1.0` won't do either: FPC treats it as single.
+  - Integer types go by the names both compilers know: `UInt64`, `IntPtr`, `UIntPtr`, `Cardinal`, `Integer`, not `QWord`, `PtrInt`, `PtrUInt`, `LongWord`, `LongInt`. Don't swap `PtrInt` for `NativeInt` either; in FPC that is a different type.
+  - Conditional symbols are `MSWINDOWS` and `CPUX64`, not `WINDOWS` and `CPUX86_64`.
+  - No `{$push}` / `{$pop}`. To switch range and overflow checks off for a stretch of code, include `tyControls.AdvanceChart.ChecksOff.inc` before it and `tyControls.AdvanceChart.ChecksBack.inc` after it; the pair doesn't nest. A directive only FPC knows goes inside `{$IFDEF FPC}` on the same line.
+  - Overloaded routines carry `overload;` on every declaration.
+  - No `case` over strings, no nested procedure variables (`is nested`), no `specialize`, no `+=`.
+  - After changing the public or published part of `TTyCustomAdvanceChart` / `TTyAdvanceChart`, or the package's dependencies, run `python scripts/api-manifest.py --check`; it fails when they no longer match `scripts/api-manifest.txt`. If the change is intended, rewrite the list with `--write` and commit it with the change.
+  - With Delphi installed, `python scripts/delphi-probe.py` compiles the units that need only the RTL with dcc32 and dcc64 (optional; it needs RAD Studio).
 - Otherwise, follow the code around you.
 
 **Commit messages** are in English, as `type(scope): summary`, e.g. `fix(tooltip): the box leaves the chart at the right edge`. If it fixes an issue, put `Fixes #N` in the body.
