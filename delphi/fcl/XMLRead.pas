@@ -52,7 +52,11 @@
     and types of ATTLIST);
   - elements nested deeper than 4096 levels (FPC has no such limit). The reader keeps open elements on
     a stack of its own, but freeing the tree and TextContent recurse per level: the cap keeps a deep
-    file an EXMLReadError instead of a stack overflow.
+    file an EXMLReadError instead of a stack overflow;
+  - entity references nested deeper than 64 levels (an entity whose text refers to an entity whose text
+    refers to another ..., in content or in an attribute value; FPC has no such limit). Each level is a
+    recursive call of the reader: the cap keeps a long chain an EXMLReadError instead of a stack
+    overflow.
   Names follow the XML 1.0 (fifth edition) name characters, with every UTF-16 surrogate allowed; FPC's
   tables may differ for some names outside ASCII. Error messages are this unit's own (and say where, as a
   character offset in the decoded text or in an entity's replacement text). }
@@ -120,7 +124,9 @@ type
     FStandalone: Boolean;   // the declaration says standalone="yes"
     FUndeclaredOk: Boolean; // an undeclared entity is no error: the DOCTYPE has an external identifier
     FDepth: Integer;        // elements open
+    FEntityDepth: Integer;  // entities being expanded
     procedure Fail(const AMsg: string; const ASrc: TXmlSource);
+    procedure EnterEntity(const ASrc: TXmlSource);
     function AtEnd(const ASrc: TXmlSource): Boolean;
     function Peek(const ASrc: TXmlSource): WideChar;
     function StartsWith(const ASrc: TXmlSource; const AText: UnicodeString): Boolean;
@@ -150,6 +156,7 @@ type
 
 const
   cMaxDepth = 4096;
+  cMaxEntityDepth = 64;
 
 function MakeSource(const AText: UnicodeString): TXmlSource;
 begin
@@ -318,6 +325,16 @@ end;
 procedure TXmlReader.Fail(const AMsg: string; const ASrc: TXmlSource);
 begin
   raise EXMLReadError.Create(AMsg + ' (at character ' + IntToStr(ASrc.P) + ')');
+end;
+
+{ One more entity being expanded; raises beyond cMaxEntityDepth. The caller decrements FEntityDepth when
+  the entity's text is read (after an exception the reader is not used again). }
+procedure TXmlReader.EnterEntity(const ASrc: TXmlSource);
+begin
+  if FEntityDepth >= cMaxEntityDepth then
+    Fail('Entity references nested deeper than ' + IntToStr(cMaxEntityDepth)
+      + ' levels are not supported by this XMLRead', ASrc);
+  Inc(FEntityDepth);
 end;
 
 function TXmlReader.AtEnd(const ASrc: TXmlSource): Boolean;
@@ -534,10 +551,12 @@ begin
         k := FindEntity(name, ASrc);
         if k >= 0 then // an undeclared entity adds nothing to an attribute value, as in FPC
         begin
+          EnterEntity(ASrc);
           FEntities[k].Active := True;
           sub := MakeSource(FEntities[k].Text);
           ReadAttChars(sub, #0, AOut);
           FEntities[k].Active := False;
+          Dec(FEntityDepth);
         end;
       end;
     end;
@@ -576,7 +595,8 @@ begin
   Inc(ASrc.P, 3);
 end;
 
-{ '<?' target data '?>'; a node under AParent unless AParent is nil. }
+{ '<?' target data '?>'; a node under AParent unless AParent is nil. As in FPC's ParsePI, white space
+  after the target is needed unless a '?' follows it: then the data starts there ('<?pi?d?>': data '?d'). }
 procedure TXmlReader.ReadPI(var ASrc: TXmlSource; AParent: TDOMNode);
 var
   target: UnicodeString;
@@ -587,20 +607,17 @@ begin
   target := ReadName(ASrc);
   if SameText(target, 'xml') then
     Fail('Processing instruction target ''xml'' is reserved', ASrc);
-  data := '';
-  if not Accept(ASrc, '?>') then
-  begin
+  if Peek(ASrc) <> '?' then
     NeedSpaces(ASrc);
-    start := ASrc.P;
-    while not StartsWith(ASrc, '?>') do
-    begin
-      if AtEnd(ASrc) then
-        Fail('Unterminated processing instruction', ASrc);
-      Inc(ASrc.P);
-    end;
-    data := Copy(ASrc.S, start, ASrc.P - start);
-    Inc(ASrc.P, 2);
+  start := ASrc.P;
+  while not StartsWith(ASrc, '?>') do
+  begin
+    if AtEnd(ASrc) then
+      Fail('Unterminated processing instruction', ASrc);
+    Inc(ASrc.P);
   end;
+  data := Copy(ASrc.S, start, ASrc.P - start);
+  Inc(ASrc.P, 2);
   if AParent <> nil then
     AParent.AppendChild(FDoc.CreateProcessingInstruction(target, data));
 end;
@@ -813,7 +830,11 @@ var
 begin
   top := 0;
   cur := ABase;
+  { pending takes APending over and must hold the only reference to the text: with a second one every
+    append would copy the whole text (quadratic in what entities expand to). APending gets it back when
+    an entity's text ends. }
   pending := APending;
+  APending := '';
   repeat
     start := ASrc.P;
     while (ASrc.P <= ASrc.Len) do
@@ -863,10 +884,12 @@ begin
           end
           else
           begin
+            EnterEntity(ASrc);
             FEntities[k].Active := True;
             sub := MakeSource(FEntities[k].Text);
             ReadContent(sub, cur, True, pending);
             FEntities[k].Active := False;
+            Dec(FEntityDepth);
           end;
         end;
       end;
@@ -969,6 +992,8 @@ begin
     Result := Copy(ASrc.S, start, ASrc.P - start);
     if Peek(ASrc) <> q then
       Fail('Illegal encoding name', ASrc);
+    if Result = '' then // FPC: no encoding has the empty name
+      Fail('Encoding '''' is not supported', ASrc);
     Inc(ASrc.P);
     sp := SkipSpaces(ASrc);
   end;

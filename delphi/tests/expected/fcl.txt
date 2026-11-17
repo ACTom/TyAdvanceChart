@@ -2212,4 +2212,21 @@ text 2014-12-19
 5 3 #text \u000A       \u0020
 5 1 dc:creator
 text \u000A          \u000A            Ivan d'Hostingue (user S\u00E9mhur in Wikimedia Commons)\u000A          \u000A       \u0020
+== xml 51
+raises EXMLReadError
+== xml 52
+0 9 #document
+1 1 svg
+text
+2 7 pi ?data
+== xml 53
+0 9 #document
+1 10 svg
+1 1 svg
+text ab
+2 3 #text a
+2 5 u
+2 3 #text b
+== xml 54
+raises EXMLReadError
 FCL TRANSCRIPT END

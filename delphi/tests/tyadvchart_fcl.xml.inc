@@ -36,7 +36,11 @@
                surrogate in UTF-16 LE input; ']]>' whose brackets are character references
     13 48-50   the three SVG files of examples/advchart/maps (read relative to delphi/tests, the working
                directory the probe gives): the number of element and of text nodes, the FNV-1a (32 bits)
-               of all the node lines (each followed by a line feed), and the first 40 node lines *)
+               of all the node lines (each followed by a line feed), and the first 40 node lines
+    -  51-54   what FPC does with: encoding="" in the XML declaration; '<?pi?data?>' (no white space
+               before the data: a '?' follows the target); a declared entity whose text refers to an
+               undeclared one, under a DOCTYPE with an external identifier; an undeclared entity under the
+               SVG 1.1 DOCTYPE when the declaration says standalone="yes" *)
 
 const
   { The names GeoSvg reads (its Attr, AttrOr and ParseFloatAttr calls, cInhAttr and cSelfAttr), and
@@ -336,4 +340,9 @@ begin
   { group 13 }
   for i := 0 to High(cXmlMapFiles) do
     XmlFileCase(cXmlMapFiles[i]);
+  { after the final review }
+  XmlTextCase('<?xml version="1.0" encoding=""?><svg/>');
+  XmlTextCase('<svg><?pi?data?></svg>');
+  XmlTextCase('<!DOCTYPE svg SYSTEM "x" [<!ENTITY e "a&u;b">]><svg>&e;</svg>');
+  XmlTextCase('<?xml version="1.0" standalone="yes"?>' + cXmlSvg11 + '<svg>&nbsp;</svg>');
 end;

@@ -516,6 +516,102 @@ begin
   Check(XmlRaises(XmlNested(5000)) = 'EXMLReadError', 'XML limit: 5000 nested elements raise EXMLReadError');
 end;
 
+{ A DOCTYPE of ALevels entities, each referring ten times to the one below, the lowest "lol"; the root's
+  text is the top one: 3 * 10^ALevels characters. }
+function XmlLaughs(ALevels: Integer): string;
+var
+  i, k: Integer;
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  try
+    sb.Append('<!DOCTYPE s [<!ENTITY l0 "lol">');
+    for i := 1 to ALevels do
+    begin
+      sb.Append('<!ENTITY l').Append(i).Append(' "');
+      for k := 1 to 10 do
+        sb.Append('&l').Append(i - 1).Append(';');
+      sb.Append('">');
+    end;
+    sb.Append(']><s>&l').Append(ALevels).Append(';</s>');
+    Result := sb.ToString;
+  finally
+    sb.Free;
+  end;
+end;
+
+{ A chain of AN entities, e1 -> e2 -> ... -> eN, the last "x"; e1 is used in the root's text or, when
+  AInAttr is set, in its id. }
+function XmlChain(AN: Integer; AInAttr: Boolean): string;
+var
+  i: Integer;
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  try
+    sb.Append('<!DOCTYPE s [');
+    for i := 1 to AN - 1 do
+      sb.Append('<!ENTITY e').Append(i).Append(' "&e').Append(i + 1).Append(';">');
+    sb.Append('<!ENTITY e').Append(AN).Append(' "x">]>');
+    if AInAttr then
+      sb.Append('<s id="&e1;"/>')
+    else
+      sb.Append('<s>&e1;</s>');
+    Result := sb.ToString;
+  finally
+    sb.Free;
+  end;
+end;
+
+{ The root's TextContent, or its id when AId is set, after parsing AText; raises what the parser raises. }
+function XmlRootValue(const AText: string; AId: Boolean): string;
+var
+  parser: TDOMParser;
+  src: TXMLInputSource;
+  st: TStringStream;
+  doc: TXMLDocument;
+begin
+  doc := nil;
+  parser := TDOMParser.Create;
+  st := TStringStream.Create(AText, TEncoding.UTF8);
+  src := TXMLInputSource.Create(st);
+  try
+    parser.Options.PreserveWhitespace := True;
+    parser.Options.Namespaces := False;
+    parser.Options.ExpandEntities := True;
+    parser.Options.Validate := False;
+    parser.Parse(src, doc);
+    if AId then
+      Result := doc.DocumentElement.GetAttributeNode('id').NodeValue
+    else
+      Result := doc.DocumentElement.TextContent;
+  finally
+    doc.Free;
+    src.Free;
+    st.Free;
+    parser.Free;
+  end;
+end;
+
+{ Entities: expansion takes time linear in the text (a 319-byte document expands to 300,000 characters;
+  no timing is checked here), and entity nesting is capped at 64 levels, in content and in attribute
+  values, with EXMLReadError (FPC has no cap; without it a long chain overflows the stack). }
+procedure CheckXmlEntities;
+begin
+  Check(Length(XmlLaughs(5)) = 319, 'XML entities: the five-level document has 319 characters');
+  Check(Length(XmlRootValue(XmlLaughs(5), False)) = 300000,
+    'XML entities: five levels of ten references expand to 300,000 characters');
+  Check(XmlRootValue(XmlChain(64, False), False) = 'x', 'XML entities: a chain of 64 parses, in text');
+  Check(XmlRootValue(XmlChain(64, True), True) = 'x', 'XML entities: a chain of 64 parses, in an attribute value');
+  Check(XmlRaises(XmlChain(65, False)) = 'EXMLReadError', 'XML entities: a chain of 65 raises EXMLReadError, in text');
+  Check(XmlRaises(XmlChain(65, True)) = 'EXMLReadError',
+    'XML entities: a chain of 65 raises EXMLReadError, in an attribute value');
+  Check(XmlRaises(XmlChain(20000, False)) = 'EXMLReadError',
+    'XML entities: a chain of 20,000 raises EXMLReadError (not EStackOverflow), in text');
+  Check(XmlRaises(XmlChain(20000, True)) = 'EXMLReadError',
+    'XML entities: a chain of 20,000 raises EXMLReadError (not EStackOverflow), in an attribute value');
+end;
+
 { The same checks as tests/test.advchart.hashlist.pas (the values FPC's TFPHashList gives), on the Delphi
   TTyHashList; then two only Delphi gives a meaning to: a name outside ANSI is kept whole, and a name longer
   than a ShortString's 255 is found. }
@@ -696,6 +792,7 @@ begin
   CheckJsonStringLocaleFloat;
   CheckSvgBytes;
   CheckXmlLimits;
+  CheckXmlEntities;
   CheckHashList;
   CheckDynLibs;
   Writeln('DELPHI VALUES OK');
