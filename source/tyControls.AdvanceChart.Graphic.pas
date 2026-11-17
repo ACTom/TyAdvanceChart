@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Graphic;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- THE GRAPHIC COMPONENT: free elements over the chart.
   [Batch 122, C13]
 
@@ -847,7 +847,7 @@ begin
   if AEl.HasLeaveTo and (AEl.Animation <> nil) then
   begin
     cfg := ElementCfg('update', AOpt, AEl);
-    cfg.Done := @AEl.LeaveDone;
+    cfg.Done := AEl.LeaveDone;
     AEl.Leaving := True;
     AEl.AnimateTo(AEl.LeaveToProps, cfg);
   end

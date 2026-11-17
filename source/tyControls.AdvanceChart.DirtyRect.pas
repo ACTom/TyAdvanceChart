@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.DirtyRect;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the coarse pointer and the dirty-rectangle repaint, as
   zrender does them. [Batch 142, D9]
 

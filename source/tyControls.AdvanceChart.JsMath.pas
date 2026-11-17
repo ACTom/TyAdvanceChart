@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.JsMath;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- JavaScript's Math.sin, cos, atan and atan2, to the bit.
 
   WHY NOT FPC'S. The run-time library's Sin and Cos come out one unit in the

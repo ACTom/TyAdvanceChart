@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Geo;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { THE GEO FOUNDATION [Batch 146, D14 GE1]: registerMap and the GeoJSON parse,
   the geo coordinate system and the geo component's picture -- ECharts 6.1's
   coord/geo (geoSourceManager.ts, GeoJSONResource.ts, parseGeoJson.ts,

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.WhiskerBox;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The candlestick's and the boxplot's shared geometry -- upstream's
   whiskerBoxCommon, candlestickLayout and boxplotLayout. [Batch 108, C1]
 

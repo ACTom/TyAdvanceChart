@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.ToolboxDlg;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The toolbox's two dialogs, in the library's own dialog family [Batch 125,
   C16].
 
@@ -613,8 +613,8 @@ begin
   v.FMemo.ReadOnly := AReadOnly;
   v.FPages.ActivePageIndex := 0;
   v.LoadTable(AText);
-  v.FPages.OnChanging := @v.PagesChanging;
-  Result.OnShow := @v.DialogShow;
+  v.FPages.OnChanging := v.PagesChanging;
+  Result.OnShow := v.DialogShow;
   { upstream floats Refresh, then Close, to the right: Refresh is the
     rightmost }
   if not AReadOnly then Result.AddButton(ARefreshCaption, mrOK, True, False);
@@ -723,7 +723,7 @@ begin
       v.FMemo.ReadOnly := not AEditable or (AContent.Kind <> cdvText);
     end;
     v.FPages.ActivePageIndex := 0;
-    Result.OnShow := @v.DialogShow;
+    Result.OnShow := v.DialogShow;
   end;
   if not AReadOnly then Result.AddButton(ARefreshCaption, mrOK, True, False);
   Result.AddButton(ACloseCaption, mrCancel, AReadOnly, True);

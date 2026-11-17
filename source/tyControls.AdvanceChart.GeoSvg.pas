@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.GeoSvg;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { SVG MAPS [F6b]: echarts.registerMap(name, svg-object) and what GeoSVGResource
   makes of it -- zrender 6.1's tool/parseXML.ts and tool/parseSVG.ts, ported
   line for line onto FCL's DOM, and GeoSVGResource._buildGraphic of ECharts

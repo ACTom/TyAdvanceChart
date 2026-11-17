@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Treemap;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The treemap series: a hierarchy drawn as nested rectangles, each node's
   area its share of its parent's inside.
 

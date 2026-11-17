@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.DataZoomView;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { A slider dataZoom's own picture -- SliderZoomView as the first render
   leaves it: where the slider sits (_resetLocation over the box-layout merge,
   the 'ph' placeholders filled from the grid), the window's two ends along

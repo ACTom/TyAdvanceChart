@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Types;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart — shared geometry primitives.
 
   DOUBLE, not Single. The whole geometry layer is double precision because a

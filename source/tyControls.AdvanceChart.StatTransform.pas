@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.StatTransform;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { ECSTAT'S DATASET TRANSFORMS -- 'ecStat:regression', 'ecStat:histogram'
   and 'ecStat:clustering', the three echarts-stat ships for
   echarts.registerTransform. [Batch 134, roadmap D3]
@@ -611,7 +611,7 @@ begin
         sorter.Keys[i] := CellNum(fit.Points.Items[i], xd);
         idx[i] := i;
       end;
-      TyJsArraySort(idx, @sorter.Compare);
+      TyJsArraySort(idx, sorter.Compare);
     finally
       sorter.Free;
     end;
@@ -750,7 +750,7 @@ begin
     s.Values := AV;
     SetLength(idx, Length(AV));
     for i := 0 to High(idx) do idx[i] := i;
-    TyJsArraySort(idx, @s.Compare);
+    TyJsArraySort(idx, s.Compare);
     SetLength(out_, Length(AV));
     for i := 0 to High(idx) do out_[i] := AV[idx[i]];
     AV := out_;

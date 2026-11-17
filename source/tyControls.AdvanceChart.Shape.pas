@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Shape;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart — the shape a chart element is, and whether a point is in it.
 
   THE POINT OF THIS UNIT is that a shape is DATA, not a pair of routines. The old
@@ -172,7 +172,7 @@ function TyPathHitContains(const AHit: TTyPathHit; AX, AY: Double): Boolean;
 
 { ---- constructors, so a caller never has to remember which fields a kind uses ---- }
 function TyShapeRect(const ABounds: TTyRectF): TTyChartShape;
-function TyShapeRoundRect(const ABounds: TTyRectF; ARadiusPx: Double): TTyChartShape;
+function TyShapeRoundRect(const ABounds: TTyRectF; ARadiusPx: Double): TTyChartShape; overload;
 { The four-corner form. ARadii is read the way zrender reads RectShape.r:
   one value is every corner, two are the diagonals, three leave the
   top-right and bottom-left sharing the middle one, four are themselves.
@@ -201,7 +201,7 @@ function TyHasCorner(const ARadii: TTyCornerRadii): Boolean;
 function TyBoxRadiiOf(AData: TJSONData): TTyCornerRadii;
 function TyShapeCircle(ACX, ACY, AR: Double): TTyChartShape;
 function TyShapeEllipse(ACX, ACY, ARX, ARY: Double): TTyChartShape;
-function TyShapeSector(ACX, ACY, AR0, AR1, AStartRad, AEndRad: Double): TTyChartShape;
+function TyShapeSector(ACX, ACY, AR0, AR1, AStartRad, AEndRad: Double): TTyChartShape; overload;
 { The rounded-corner form. ACorners is read the way zrender reads
   SectorShape.cornerRadius, which is NOT how it reads a rect's: see
   TySectorRadii. }

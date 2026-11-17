@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.AnimAxis;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- an axis' groupTransition: its elements as upstream's
   axis view builds them, keyed by anid. [Batch 96, AN5]
 

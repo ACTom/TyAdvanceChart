@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Coord;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart — the coordinate-system layer.
 
   CONTRACT 1 (see docs/superpowers/specs/2026-09-01-advancechart-tier0.md §2).

@@ -1985,8 +1985,8 @@ begin
     A.Wrap.Ready := now_.Live;
     cfg := TyAnimCfg(dur, 0, easing);
     cfg.SetToFinal := True;
-    cfg.Done := @A.Wrap.Hit;
-    cfg.Aborted := @A.Wrap.Hit;
+    cfg.Done := A.Wrap.Hit;
+    cfg.Aborted := A.Wrap.Hit;
     reRoot := (AView.Kind = tpkRootToNode) and (AView.Target >= 0);
     drill := reRoot and (ADirection = 1);
     tasks := nil;

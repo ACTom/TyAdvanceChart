@@ -496,7 +496,7 @@ begin
             any := True;
             Break;
           end;
-        if any then st.FilterSelf(@KeepGraphNode);
+        if any then st.FilterSelf(KeepGraphNode);
       finally
         FFilterStore := nil;
         FFilterCats := nil;
@@ -533,7 +533,7 @@ begin
     if not any then Continue;
     FFilterStore := st;
     try
-      st.FilterSelf(@KeepSlice);
+      st.FilterSelf(KeepSlice);
     finally
       FFilterStore := nil;
     end;

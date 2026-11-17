@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.VisualMap;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { visualMap: a value on each datum turned into a colour, an opacity -- later a
   symbol and a size -- by a component that is not a series.
 

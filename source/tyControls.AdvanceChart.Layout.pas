@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Layout;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart — the box layout solver.
 
   CONTRACT 1, second half (see the Tier 0 spec §2). The solver takes an
@@ -147,7 +147,7 @@ const
   TyBoxNowhereSize = 100;
 
 { The one solver. Every component's rect comes from here. }
-function TySolveBox(const ASpec: TTyBoxSpec; const AContainer: ITyBoxContainer): TTyRectF;
+function TySolveBox(const ASpec: TTyBoxSpec; const AContainer: ITyBoxContainer): TTyRectF; overload;
 { The same, with a MARGIN: space kept outside the solved rect on each edge,
   in CSS order (top, right, bottom, left).
 

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Tooltip;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The hover tooltip: what it says, how big it is, and where it goes.
 
   WHAT THIS UNIT IS NOT. It is not a window. Every other popup in this library

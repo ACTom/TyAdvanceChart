@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Chord;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The chord series (new in ECharts 6): the nodes as sectors round a ring, the
   links as ribbons between them. [Batch 120, C11]
 

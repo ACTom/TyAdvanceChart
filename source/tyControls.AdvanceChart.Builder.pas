@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Builder;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Option text in, axes and coordinate systems out.
 
   Until this unit existed, every TTyAxis in the repository was constructed by a

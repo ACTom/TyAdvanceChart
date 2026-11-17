@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.KeyNav;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { THE CHART'S KEYBOARD [Batch 144]: which key does what, and where a key
   moves the keyboard focus item. Upstream ECharts has no keyboard at all --
   its accessibility is the aria description and the decals -- so this is the

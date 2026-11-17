@@ -1232,7 +1232,7 @@ procedure TTyCustomAdvanceChart.RenderTo(ACanvas: TCanvas; const ARect: TRect;
 var prev: TComponent; prevRes: TTyChartImageUrlResolver;
 begin
   prev := TyChartImageScopeEnter(Owner);
-  prevRes := TyChartImageResolverEnter(@ResolveImageUrl);
+  prevRes := TyChartImageResolverEnter(ResolveImageUrl);
   try
     RenderToBody(ACanvas, ARect, APPI);
   finally
@@ -5083,7 +5083,7 @@ procedure TTyCustomAdvanceChart.Paint;
 var prev: TComponent; prevRes: TTyChartImageUrlResolver;
 begin
   prev := TyChartImageScopeEnter(Owner);
-  prevRes := TyChartImageResolverEnter(@ResolveImageUrl);
+  prevRes := TyChartImageResolverEnter(ResolveImageUrl);
   try
     PaintBody;
   finally

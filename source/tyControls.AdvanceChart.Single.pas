@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Single;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the single axis coordinate system and its axis view.
   [Batch 118, C10]
 

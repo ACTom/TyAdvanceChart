@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Pie;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The first series that is not on a coordinate system.
 
   Everything the chart drew until now went through a cartesian: a datum became a

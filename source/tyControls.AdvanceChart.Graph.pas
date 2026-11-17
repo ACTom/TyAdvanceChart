@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Graph;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The graph: nodes, the edges between them, and the box they are laid out in.
 
   THREE COLLECTIONS WHERE EVERY OTHER SERIES HAS ONE. A node list, an edge list
@@ -804,7 +804,7 @@ function TyGraphLabelPosOf(const AWord: string): TTyGraphLabelPos;
 function TyGraphEdgeLabelPlace(const AP1, AP2, ACP: TTyPointF; ACurved: Boolean;
   const AFrame: TTyGraphLabelFrame; APos: TTyGraphLabelPos;
   ADistX, ADistY: Double; out AX, AY, ARot: Double;
-  out AAH: TTyTextAnchorH; out AAV: TTyTextAnchorV): Boolean;
+  out AAH: TTyTextAnchorH; out AAV: TTyTextAnchorV): Boolean; overload;
 { [F2a] with the label's own `rotate` (radians) and `offset` (NaN: none):
   zrender's updateInnerText -- the rotation replaces the one beforeUpdate
   set, the offset is added to the place and becomes the origin (-offset) }
@@ -1048,7 +1048,7 @@ function TyGraphWheelScale(AWheelDelta: Integer): Double;
   so nothing downstream ever sees an infinity. }
 function TyGraphSolve(AOption: TTyChartOption; ASeriesIndex: Integer;
   AStore: TTyDataStore; const AContainer: TTyRectF;
-  var AForce: TTyGraphForceState): TTyGraphSolved;
+  var AForce: TTyGraphForceState): TTyGraphSolved; overload;
 function TyGraphSolve(AOption: TTyChartOption; ASeriesIndex: Integer;
   AStore: TTyDataStore; const AContainer: TTyRectF;
   var AForce: TTyGraphForceState;
@@ -1202,7 +1202,7 @@ function TyGraphArrowRotationRad(const ATangent: TTyPointF;
 function TyBuildGraphMarks(ASeriesIndex: Integer;
   const ASpec: TTyGraphSpec; const ANodes: TTyGraphNodeArray;
   const AEdges: TTyGraphEdgeArray; const AInk: TTyGraphInk;
-  AStore: TTyDataStore; AList: TTyPaintList): Integer;
+  AStore: TTyDataStore; AList: TTyPaintList): Integer; overload;
 { ON A VIEW: every node's symbol scaled by ASymX across and ASymY down -- the
   overall scale times the compensation scale, which is one only when the
   view maps one data unit to one pixel. }
@@ -1210,7 +1210,7 @@ function TyBuildGraphMarks(ASeriesIndex: Integer;
   const ASpec: TTyGraphSpec; const ANodes: TTyGraphNodeArray;
   const AEdges: TTyGraphEdgeArray; const AInk: TTyGraphInk;
   AStore: TTyDataStore; AList: TTyPaintList;
-  ASymX, ASymY: Double): Integer;
+  ASymX, ASymY: Double): Integer; overload;
 
 var
   { [R2-J3] THE SERIES' VISUAL CALLBACKS while the chart solves a graph:

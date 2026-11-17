@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Brush;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The brush component's covers: what ECharts 6.1's component/brush
   (BrushModel.ts, BrushView.ts, the `brush` action) and
   component/helper/BrushController.ts and BrushTargetManager.ts do between

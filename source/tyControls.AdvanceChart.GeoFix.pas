@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.GeoFix;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The fixes ECharts 6.1 applies to a map REGISTERED UNDER THE NAME 'china'
   (src/coord/geo/fix/nanhai.ts, textCoord.ts, diaoyuIsland.ts), as data.
 

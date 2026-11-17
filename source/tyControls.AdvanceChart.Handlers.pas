@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Handlers;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 (* Named handlers and template strings -- what a function-valued ECharts option
   becomes when the host cannot run JavaScript.
 
@@ -1257,7 +1257,7 @@ begin
     AText := Format(rsTyChartNoSuchHandler, [name]);
     Exit(False);
   end;
-  if h = nil then
+  if not Assigned(h) then
   begin
     AText := Format(rsTyChartNoSuchHandler, [name]);
     Exit(False);

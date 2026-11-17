@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Series;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Series types, and what each series is bound to.
 
   This is the unit that makes a chart able to MIX SERIES TYPES and give a series

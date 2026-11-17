@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Option;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart — the option tree. THIS IS THE API.
 
   A chart is configured by an ECharts-shaped option object rather than by

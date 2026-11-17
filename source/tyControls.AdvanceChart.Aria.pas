@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Aria;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { THE CHART'S DESCRIPTION [Batch 131]: the sentence ECharts writes into the
   chart's `aria-label` -- what a screen reader says for a chart that is
   otherwise a picture.

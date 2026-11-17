@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Tree;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The tree series: a hierarchy, laid out by Reingold-Tilford, drawn as a
   symbol per node, an edge from each parent to each child and a label on
   every node.

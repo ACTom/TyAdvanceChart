@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.SeriesEdit;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The design-time series and data editor's whole model. [Batch 143]
 
   WHY THIS IS IN source/ AND NOT BESIDE THE DIALOG. The same reason Complete,

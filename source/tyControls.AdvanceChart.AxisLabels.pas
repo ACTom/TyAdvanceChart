@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.AxisLabels;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- WHICH of an axis' labels are drawn.
 
   UPSTREAM'S RULES, transcribed operation for operation:

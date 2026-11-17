@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.AnimView;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the enter, update and leave animations, between the
   paint list and the engine. [Batch 89, AN2; Batch 90, AN3]
 
@@ -2099,7 +2099,7 @@ begin
   MergeFinal(AP, props);
   AP.SetNum('percent', 0);
   opts := TyAnimCallAt(ARow);
-  opts.During := @AP.ValueDuring;
+  opts.During := AP.ValueDuring;
   if AUpdate then TyUpdateProps(AP, props, AModel, opts)
   else TyInitProps(AP, props, AModel, opts);
 end;
@@ -2163,8 +2163,8 @@ begin
     top := 1;
   end;
   an := AP.Animate('', loop).WhenWithKeys(life, ['__t'], [TyAnimNum(top)])
-    .Delay(delay).During(@AP.LinesEffectDuring);
-  if not loop then an.Done(@AP.LinesEffectDone);
+    .Delay(delay).During(AP.LinesEffectDuring);
+  if not loop then an.Done(AP.LinesEffectDone);
   an.Start('');
 end;
 
@@ -2321,7 +2321,7 @@ begin
         else p.SetNum('shape.height', 0);
         { [R2-I7] the callback in the dataIndex slot: null }
         opts := TyAnimCallNull;
-        opts.Done := @NoOp;
+        opts.Done := NoOp;
         Start(TyAnimProps([Num1('shape.width', AEl.Anim.G[2]),
           Num1('shape.height', AEl.Anim.G[3])]), opts);
       end;
@@ -2342,7 +2342,7 @@ begin
         p.SetNum('shape.width', 0);
         { [R2-I7] the callback in the dataIndex slot: null }
         opts := TyAnimCallNull;
-        opts.Done := @NoOp;
+        opts.Done := NoOp;
         Start(TyAnimProps([props[2]]), opts);
       end;
     carTreeNode:
@@ -2630,15 +2630,15 @@ begin
         end;
         { [R2-I7] createGridClipPath: initProps(..., seriesModel, null, done) }
         opts := TyAnimCallNull;
-        opts.Done := @NoOp;
+        opts.Done := NoOp;
         { THE END LABEL RIDES THE CLIP: its during and done [Batch 92] }
         if FindEndLabel(AList, AEl.Anim.Series, endEl) then
         begin
           SetupEndLabel(p, endEl);
           p.FEnd.TextOf := OnEndLabelText;
           p.FEnd.PiecesOf := OnEndLabelPieces;
-          opts.During := @p.EndLabelDuring;
-          opts.Done := @p.EndLabelDone;
+          opts.During := p.EndLabelDuring;
+          opts.Done := p.EndLabelDone;
         end;
         Start(props, opts);
         { `clip: false` widens across the base axis AFTER the call; what the
@@ -3194,7 +3194,7 @@ var
         p.FFinal := nil;
         FGhosts.Add(p);
         p.SetNum('style.opacity', e.Style.Alpha);
-        TyFadeOutElement(p, AC.Model, e.Anim.TwRow, True, @p.LeaveDone);
+        TyFadeOutElement(p, AC.Model, e.Anim.TwRow, True, p.LeaveDone);
       end;
     finally
       olds.Free;
@@ -3448,7 +3448,7 @@ var
       AProxy.FFinal := nil;
       FGhosts.Add(AProxy);
       o := RemoveOpts;
-      o.Done := @AProxy.LeaveDone;
+      o.Done := AProxy.LeaveDone;
       TyRemoveElement(AProxy, AProps, AC.Model, o);
     end;
 
@@ -4033,7 +4033,7 @@ var
     FGhosts.Add(g);
     if g.GetAnimProp('style.opacity').Kind = avkNull then
       g.SetNum('style.opacity', AOldEl.Style.Alpha);
-    TyFadeOutElement(g, AC.Model, AOldRow, True, @g.LeaveDone);
+    TyFadeOutElement(g, AC.Model, AOldRow, True, g.LeaveDone);
     props := PolarBarProps(AEl);
     p := Make(s, r, 'bar');
     p.Attr(props);
@@ -4934,7 +4934,7 @@ var
         opts.DelayIndex := oe.Anim.Sub;
         opts.HasDelayCount := True;
         opts.DelayCount := cnt;
-        opts.Done := @g.LeaveDone;
+        opts.Done := g.LeaveDone;
         TyUpdateProps(g, TyAnimProps([Num1('scaleX', 0), Num1('scaleY', 0)]),
           ItemModelOf(AC, nr), opts);
       end;
@@ -4990,7 +4990,7 @@ var
       g.FFinal := nil;
       FGhosts.Add(g);
       opts := TyAnimCallAt(oe.Anim.Index);
-      opts.Done := @g.LeaveDone;
+      opts.Done := g.LeaveDone;
       TyRemoveElement(g, TyAnimProps([Num1('style.opacity', 0), Num1('scaleX', 0),
         Num1('scaleY', 0)]), AC.MarkPoint, opts);
     end;
@@ -5375,7 +5375,7 @@ var
         poly.FFollow[High(poly.FFollow)].P := sym;
         poly.FFollow[High(poly.FFollow)].Pt := j;
       end;
-    if poly.AnimatorCount > 0 then poly.AnimatorAt(0).During(@poly.FollowDuring);
+    if poly.AnimatorCount > 0 then poly.AnimatorAt(0).During(poly.FollowDuring);
   end;
 
   { [R2-C] LINEVIEW'S INIT BRANCH IN AN UPDATE: `!(polyline &&
@@ -5479,7 +5479,7 @@ var
       g.FPictBundle := qb;
       FGhosts.Add(g);
       opts := TyAnimCallAt(AOldRow);
-      opts.Done := @g.LeaveDone;
+      opts.Done := g.LeaveDone;
       TyRemoveElement(g, TyAnimProps([Num1('scaleX', 0), Num1('scaleY', 0)]), AModel, opts);
     end;
   end;
@@ -5524,14 +5524,14 @@ var
       if g.GetAnimProp('style.opacity').Kind = avkNull then
         g.SetNum('style.opacity', oe.Style.Alpha);
       opts := TyAnimCallAt(AOldRow);
-      opts.Done := @g.LeaveDone;
+      opts.Done := g.LeaveDone;
       if (cRoles[j] = 'symbol') or (cRoles[j] = 'lineSymbol') then
         { Symbol.fadeOut: the path's opacity and scale to nought }
         TyRemoveElement(g, TyAnimProps([Num1('style.opacity', 0), Num1('scaleX', 0),
           Num1('scaleY', 0)]), AModel, opts)
       else
         { removeElementWithFadeOut }
-        TyFadeOutElement(g, AModel, AOldRow, True, @g.LeaveDone);
+        TyFadeOutElement(g, AModel, AOldRow, True, g.LeaveDone);
     end;
   end;
 
@@ -11159,7 +11159,7 @@ var
     P.FMorph := TyPrepareMorph(AFrom.Data, AFrom.HasM, AFrom.M, ATo.Data, ATo.HasM, ATo.M);
     P.FMorphOn := True;
     P.SetNum('__morphT', 0);
-    UtAnimate(P, TyAnimProps([Num1('__morphT', 1)]), ATm, False, True, '', @P.MorphDone);
+    UtAnimate(P, TyAnimProps([Num1('__morphT', 1)]), ATm, False, True, '', P.MorphDone);
   end;
 
   { updateMorphingPathProps on a new element: its style from AStyle }
@@ -11169,7 +11169,7 @@ var
     SeedStyle(P, AEl);
     P.FUtStyleOn := True;
     P.FUtPass := FPass;
-    UtAnimate(P, AStyle, ATm, True, True, '', @P.UtStyleDone);
+    UtAnimate(P, AStyle, ATm, True, True, '', P.UtStyleDone);
   end;
 
   { fadeInElement: initProps from opacity 0, enter timing }
@@ -11183,7 +11183,7 @@ var
       ANew.P.FUtStyleOn := True;
       ANew.P.FUtPass := FPass;
       UtAnimate(ANew.P, TyAnimProps([Num1('style.opacity', 0)]), tm, True, True, 'enter',
-        @ANew.P.UtStyleDone);
+        ANew.P.UtStyleDone);
     end;
   end;
 
@@ -11257,7 +11257,7 @@ var
       { one __morphT on the host, handed to every child in its during }
       host.SetNum('__morphT', 0);
       UtAnimate(host, TyAnimProps([Num1('__morphT', 1)]), ATm, False, True, '',
-        @host.CombineDone, @host.CombineDuring);
+        host.CombineDone, host.CombineDuring);
     end
     else
     begin
@@ -11269,7 +11269,7 @@ var
         t2.Delay := Or0(ATm.Delay) + UtDelayAt(ASer, i2 + AIdx, ACount);
         pc := host.FPieces[i2];
         pc.SetNum('__morphT', 0);
-        UtAnimate(pc, TyAnimProps([Num1('__morphT', 1)]), t2, False, True, '', @pc.PieceMorphDone);
+        UtAnimate(pc, TyAnimProps([Num1('__morphT', 1)]), t2, False, True, '', pc.PieceMorphDone);
       end;
     end;
     { animateOtherProps: each child's style from its old path's (rawFrom
@@ -11595,7 +11595,7 @@ var
           SeedStyle(p2, ne2);
           p2.FUtStyleOn := True;
           p2.FUtPass := FPass;
-          UtAnimate(p2, AUtSnaps[ops[k2]].Style, tm, True, False, '', @p2.UtStyleDone);
+          UtAnimate(p2, AUtSnaps[ops[k2]].Style, tm, True, False, '', p2.UtStyleDone);
         end;
         Exit;
       end;
@@ -11859,7 +11859,7 @@ var
               p.FUtStyleOn := True;
               p.FUtPass := FPass;
               UtAnimate(p, TyAnimProps([Num1('style.opacity', 0)]), timing, True, False, '',
-                @p.UtStyleDone);
+                p.UtStyleDone);
               Continue;
             end;
             { a path of the view that is no item's (a treemap leaf's
@@ -11873,7 +11873,7 @@ var
               p.FUtStyleOn := True;
               p.FUtPass := FPass;
               UtAnimate(p, TyAnimProps([Num1('style.opacity', 0)]), timing, True, False, '',
-                @p.UtStyleDone);
+                p.UtStyleDone);
               Continue;
             end;
             role := UtElKey(ne);
@@ -11901,7 +11901,7 @@ var
             p.FUtStyleOn := True;
             p.FUtPass := FPass;
             UtAnimate(p, TyAnimProps([Num1('style.opacity', 0)]), timing, True, False, '',
-              @p.UtStyleDone);
+              p.UtStyleDone);
           end;
         end;
     finally

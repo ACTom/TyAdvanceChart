@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.AxisPointer;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The line, or the band, that follows the pointer along an axis.
 
   WHERE THE OPTION COMES FROM, and this is the part that reads backwards.

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Decal;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { DECALS [Batch 131]: the patterns ECharts GENERATES from a decal object and
   lays over a filled shape -- what `aria.decal.show` hands every series so a
   chart can be read without its colours, and what any itemStyle.decal asks

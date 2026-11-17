@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Locate;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Where in the TEXT does an option path live?
 
   The dual of TyOptContextAt next door. That one scans BACKWARD from a caret to

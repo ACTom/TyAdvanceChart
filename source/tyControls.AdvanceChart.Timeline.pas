@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Timeline;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The timeline component: its option, its model and its slider view, as
   ECharts 6.1's component/timeline makes them -- held to the real dist by
   tools/advchart-oracle/timeline.js. [Batch 129, C21]

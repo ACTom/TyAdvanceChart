@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Marks;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { A bound series plus its store, turned into paint-list elements.
 
   THIS IS WHERE THE TIER 0 SUBSTRATE FINALLY HAS A CONSUMER. Every piece it
@@ -4786,7 +4786,7 @@ end;
 function TySeriesTypeHasRenderer(const AType: string): Boolean;
 var i: Integer;
 begin
-  if RendererFor(AType) <> nil then Exit(True);
+  if Assigned(RendererFor(AType)) then Exit(True);
   for i := 0 to High(cElsewhere) do
     if cElsewhere[i] = AType then Exit(True);
   Result := False;
@@ -5773,7 +5773,7 @@ begin
     lgkCandle: Result := BuildLargeCandles(ABinding, AStore, AStack, AVisual, AList, colX, colY);
   else
     build := RendererFor(ABinding.SeriesType);
-    if build <> nil then
+    if Assigned(build) then
       Result := build(ABinding, AStore, AStack, AVisual, AList, colX, colY);
   end;
   end;

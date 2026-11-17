@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Loading;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the loading effect: showLoading's `default` effect,
   read off src/loading/default.ts and held to the real dist by
   tools/advchart-oracle/export-loading.js. [Batch 106, B11]

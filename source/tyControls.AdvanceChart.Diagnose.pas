@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Diagnose;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Everything wrong with a piece of option text, as one list an editor can show.
 
   ONE CALL IS THE POINT. The design-time dialog is not in the test build, so

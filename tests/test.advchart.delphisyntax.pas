@@ -12,11 +12,11 @@ uses
 const
   // The expected counts. Edit these, nothing else, to ratchet.
   ExpNestedBraceComments = 0;
-  ExpObjFpcMode = 114;
+  ExpObjFpcMode = 0;
   ExpFpcTypeNames = 0;
   ExpStringCaseLabels = 0;
   ExpCompoundAssignments = 0;
-  ExpFpcOnlyKeywords = 4;
+  ExpFpcOnlyKeywords = 0;
   ExpBarePushPop = 0;
   ExpConditionalSymbols = 0;
   ExpFpcOnlyNames = 0;
@@ -467,6 +467,7 @@ var
   finds: TFinds;
   i, k: Integer;
   f: TSourceFile;
+  first: Boolean;
 begin
   Load;
   finds := TFinds.Create;
@@ -474,11 +475,22 @@ begin
     for i := 0 to Files.Count - 1 do
     begin
       f := FileAt(i);
+      first := True;
       for k := 0 to High(f.Segs) do
-        if (f.Segs[k].Kind = pskDirective) and (DirectiveText(f, f.Segs[k]) = '{$modeobjfpc}') then
-          finds.Add(f, f.Segs[k].Line);
+        if f.Segs[k].Kind = pskDirective then
+        begin
+          if DirectiveText(f, f.Segs[k]) = '{$modeobjfpc}' then
+            finds.Add(f, f.Segs[k].Line);
+          // a unit whose first directive is not the shared include counts as well
+          if first and (Lower(ExtractFileExt(f.Name)) = '.pas') and
+             (DirectiveText(f, f.Segs[k]) <> '{$itycontrols.advancechart.compiler.inc}') then
+            finds.Add(f, f.Segs[k].Line);
+          first := False;
+        end;
+      if first and (Lower(ExtractFileExt(f.Name)) = '.pas') then
+        finds.Add(f, 1);
     end;
-    finds.Check('{$mode objfpc}', ExpObjFpcMode);
+    finds.Check('{$mode objfpc} and units whose first directive is not the shared include', ExpObjFpcMode);
   finally
     finds.Free;
   end;

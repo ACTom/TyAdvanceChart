@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Render;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart — drawing a paint list through TTyPainter.
 
   The second of the two bridge units that may see the LCL (the other is
@@ -1430,7 +1430,7 @@ const
   TraceKeptMaxBytes = 32 * 1024 * 1024;
 
 var
-  GTraceKept: specialize TDictionary<UInt64, TTyTraceKept> = nil;
+  GTraceKept: TDictionary<UInt64, TTyTraceKept> = nil;
   GTraceKeptCount: Integer = 0;
   GTraceKeptBytes: Int64 = 0;
   GTraceKeptHits: Integer = 0;
@@ -1767,7 +1767,7 @@ begin
     if keep then
     begin
       if GTraceKept = nil then
-        GTraceKept := specialize TDictionary<UInt64, TTyTraceKept>.Create;
+        GTraceKept := TDictionary<UInt64, TTyTraceKept>.Create;
       if (GTraceKeptCount >= TraceKeptMaxCount) or (GTraceKeptBytes + aw * ah
         + 8 * Length(o.Pts) + 4 * Length(o.Starts) > TraceKeptMaxBytes) then
       begin
@@ -1983,7 +1983,7 @@ const
   HaloOutlineMaxPoints = 1024 * 1024;
 
 var
-  GHaloOutlines: specialize TDictionary<string, TTyHaloOutline> = nil;
+  GHaloOutlines: TDictionary<string, TTyHaloOutline> = nil;
   GHaloPoints: Int64 = 0;
   GHaloGeneration: Cardinal = 0;
   GHaloCacheOff: Boolean = False;
@@ -2021,7 +2021,7 @@ end;
 procedure KeepHaloOutline(const AKey: string; AOutline: TTyHaloOutline);
 begin
   if GHaloOutlines = nil then
-    GHaloOutlines := specialize TDictionary<string, TTyHaloOutline>.Create;
+    GHaloOutlines := TDictionary<string, TTyHaloOutline>.Create;
   if GHaloGeneration <> TyTextMeasureGeneration then
   begin
     DropHaloOutlines;
@@ -3225,8 +3225,8 @@ begin
 end;
 
 procedure RenderElementAsStyled(P: TTyPainter; const AElement: TTyChartElement;
-  APen: Boolean; const APenMap: TTyMat2D); forward;
-procedure RenderElementAsStyled(P: TTyPainter; const AElement: TTyChartElement); forward;
+  APen: Boolean; const APenMap: TTyMat2D); overload; forward;
+procedure RenderElementAsStyled(P: TTyPainter; const AElement: TTyChartElement); overload; forward;
 
 { [R6-E] a pen in the shape's own frame (PenScale) drawn at its scale: the
   width, the lengths of its dash and its phase }

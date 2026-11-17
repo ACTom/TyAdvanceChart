@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.LinePath;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { A line series' path as upstream builds it: ECPolyline's and ECPolygon's
   buildPath over the series' points, through poly.ts's drawSegment -- the
   smoothed curve (smooth, smoothMonotone), a run broken or bridged at a null

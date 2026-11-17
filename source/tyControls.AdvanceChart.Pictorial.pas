@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Pictorial;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The pictorial bar's own options, and the arithmetic they come to.
 
   A PICTORIAL BAR IS A BAR WHOSE RECTANGLE IS NEVER DRAWN. It shares the whole

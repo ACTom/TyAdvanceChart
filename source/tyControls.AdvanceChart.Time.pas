@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Time;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Where a time axis' ticks fall, and what its labels say.
 
   A time axis was already MAPPED correctly -- epoch milliseconds are numbers and
@@ -146,11 +146,11 @@ function TyTimeLeveledLabel(const AFormatter: TTyTimeLabelFormatter; AMs: Double
   and defaults to FALSE -- server data is UTC but people read their own clock,
   and `'2011-01-02'` has to come back as `2011-01-02` rather than shifted. }
 function TyTimeTicks(AMinMs, AMaxMs: Double; ASplitNumber: Integer;
-  AUTC: Boolean): TTyTimeTickArray;
+  AUTC: Boolean): TTyTimeTickArray; overload;
 { The same with the axis' minInterval / maxInterval in milliseconds, 0 for
   none: they clamp the approximate interval, and so the tick count aimed at. }
 function TyTimeTicks(AMinMs, AMaxMs: Double; ASplitNumber: Integer;
-  AUTC: Boolean; AMinInterval, AMaxInterval: Double): TTyTimeTickArray;
+  AUTC: Boolean; AMinInterval, AMaxInterval: Double): TTyTimeTickArray; overload;
 
 type
   { a break of a time axis, as its ticks step over it [Batch 132] }

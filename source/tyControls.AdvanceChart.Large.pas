@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Large;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { LARGE MODE: one path for a whole series [Batch 117, C8].
 
   When a bar, scatter or candlestick series holds at least `largeThreshold`

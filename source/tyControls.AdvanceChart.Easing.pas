@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Easing;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- zrender's easing functions, to the bit. [Batch 87, AN1]
 
   WHAT AN EASING IS. A clip hands its percent k in [0, 1] to one function and

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.States;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Element states as ECharts 6.1 and zrender 6.1 run them, and the series
   selection model behind `select` [Batch 88].
 

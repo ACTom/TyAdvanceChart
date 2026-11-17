@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.VisualMapView;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { A continuous visualMap's own picture: the bar, its two gradients, the end
   texts, the handles and their labels, the background -- ContinuousView and
   VisualMapView as they lay the component out before anyone touches it. And a
@@ -293,7 +293,7 @@ function TyVmSymbolRect(const ASymbol: string; const ABox: TTyXYWH): TTyXYWH;
 function TyLayoutVisualMap(const AModel: TTyVisualMapSpec;
   const AView: TTyVmViewSpec; const AContent: TTyVisualColor;
   ACanvasW, ACanvasH, AScale: Double; const AMeasurer: ITyTextMeasurer;
-  const AInk: TTyVisualMapInk): TTyVisualMapLayout;
+  const AInk: TTyVisualMapInk): TTyVisualMapLayout; overload;
 { [Batch 154] the same with positionGroup's container ARef (device px, the
   canvas' origin nought): createBoxLayoutReference's refContainer -- a
   matrix cell or a calendar day for a visualMap in one. The item align's
@@ -302,19 +302,19 @@ function TyLayoutVisualMap(const AModel: TTyVisualMapSpec;
   const AView: TTyVmViewSpec; const AContent: TTyVisualColor;
   ACanvasW, ACanvasH: Double; const ARef: TTyXYWH; AScale: Double;
   const AMeasurer: ITyTextMeasurer;
-  const AInk: TTyVisualMapInk): TTyVisualMapLayout;
+  const AInk: TTyVisualMapInk): TTyVisualMapLayout; overload;
 
 { The elements, at AOriginX/Y on the canvas. SILENT: the component is not a
   datum. Answers how many were added. }
 function TyBuildVisualMapMarks(const ALayout: TTyVisualMapLayout;
   const AView: TTyVmViewSpec; const AInk: TTyVisualMapInk;
-  AOriginX, AOriginY: Double; AList: TTyPaintList): Integer;
+  AOriginX, AOriginY: Double; AList: TTyPaintList): Integer; overload;
 
 { The elements with what the view shows now (ALive) [Batch 116]. }
 function TyBuildVisualMapMarks(const ALayout: TTyVisualMapLayout;
   const AView: TTyVmViewSpec; const AInk: TTyVisualMapInk;
   AOriginX, AOriginY: Double; AList: TTyPaintList;
-  const ALive: TTyVmLiveDraw): Integer;
+  const ALive: TTyVmLiveDraw): Integer; overload;
 
 { ---- the interaction [Batch 116] ---- }
 { ContinuousView._updateView on an interval and its handle ends (device px

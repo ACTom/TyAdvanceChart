@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Morph;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { zrender's PATH MORPHING, transcribed: tool/convertPath.ts (pathToBezierCurves,
   pathToPolygons), tool/morphPath.ts (alignSubpath, alignBezierCurves, centroid,
   findBestRingOffset, reverse, findBestMorphingRotation, applyTransformOnBeziers,
@@ -1519,7 +1519,7 @@ begin
   try
     srt.Keys := projs;
     srt.Descending := False;
-    TyJsArraySort(order, @srt.Compare);
+    TyJsArraySort(order, srt.Compare);
   finally
     srt.Free;
   end;
@@ -1666,7 +1666,7 @@ begin
         for i := 0 to n - 1 do order[i] := i;
         dv.Keys := areas;
         dv.Descending := True;
-        TyJsArraySort(order, @dv.Compare);
+        TyJsArraySort(order, dv.Compare);
         left := ACount;
         for i := 0 to n - 1 do
         begin

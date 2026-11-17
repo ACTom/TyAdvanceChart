@@ -121,7 +121,7 @@ function q(s) { return pasQuote(s); }
 
 const L = [];
 L.push('unit tyControls.AdvanceChart.Catalog;');
-L.push('{$mode objfpc}{$H+}');
+L.push('{$I tyControls.AdvanceChart.Compiler.inc}');
 L.push('{ GENERATED FILE -- DO NOT EDIT BY HAND.');
 L.push('');
 L.push('  The Apache ECharts ' + cat.echartsVersion + ' option vocabulary, as a deduplicated DAG.');

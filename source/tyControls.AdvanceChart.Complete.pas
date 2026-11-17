@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Complete;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Lookup, completion and validation over the generated option catalog.
 
   The catalog unit next door is pure GENERATED data; everything that reasons

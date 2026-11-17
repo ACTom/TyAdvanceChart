@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Jitter;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The scatter's jitter (beeswarm) -- upstream's util/jitter.ts and
   chart/scatter/jitterLayout.ts. [Batch 110, C2]
 

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Scale;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart — the scale layer.
 
   CONTRACT 2 (see docs/superpowers/specs/2026-09-01-advancechart-tier0.md §2).
@@ -4219,7 +4219,7 @@ begin
   end;
   if brk = nil then Exit;
   TyPruneTicksByBreaks(Result, AOpt.Prune, brks, approx, e);
-  if AOpt.BreakMode <> tbmNone then AddBreakTicks(Result, brks, e, @BreakTimeProps);
+  if AOpt.BreakMode <> tbmNone then AddBreakTicks(Result, brks, e, BreakTimeProps);
 end;
 
 end.

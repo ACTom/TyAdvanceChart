@@ -1272,7 +1272,7 @@ begin
   d := APayload.Find('newOption');
   if d is TJSONObject then
   begin
-    merged := TyDataViewChange(TJSONObject(d), @TbDvFind);
+    merged := TyDataViewChange(TJSONObject(d), TbDvFind);
     try
       if DoMerge(TyTbJson(merged), []) then AfterSetOption(False, True);
     finally
@@ -1434,7 +1434,7 @@ begin
   if FTbBrushCtl = nil then
   begin
     FTbBrushCtl := TTyBrushController.Create;
-    FTbBrushCtl.IsIrrelevant := @BrushIrrelevant;
+    FTbBrushCtl.IsIrrelevant := BrushIrrelevant;
   end;
   pn := nil;
   FTbBrushGrids := nil;

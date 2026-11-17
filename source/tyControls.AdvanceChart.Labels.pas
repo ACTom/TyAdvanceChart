@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Labels;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Text on a mark: where it goes, what it says, and what colour it comes out.
 
   A LABEL IS DECLARED ON ITS MARK AND EXPANDED INTO ITS OWN PAINT ENTRY. The

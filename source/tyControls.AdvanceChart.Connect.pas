@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Connect;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- what echarts.connect needs that is not a chart: the map
   from an event back to the action that reproduces it, and the layout of the
   combined export. Read off core/echarts.ts (registerAction's

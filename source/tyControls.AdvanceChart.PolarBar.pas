@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.PolarBar;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the bars on a polar. [Batch 113, C4]
 
   UPSTREAM'S layout/barPolar.ts (calcRadialBar, layoutPerAxisPerSeries), the

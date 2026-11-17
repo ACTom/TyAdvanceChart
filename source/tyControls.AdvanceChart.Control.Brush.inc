@@ -257,7 +257,7 @@ begin
     begin
       FBrushCtls[i] := TTyBrushController.Create;
       { isTargetByCursor's onIrrelevantElement [Batch 127] }
-      FBrushCtls[i].IsIrrelevant := @BrushIrrelevant;
+      FBrushCtls[i].IsIrrelevant := BrushIrrelevant;
     end;
   end;
 end;
@@ -1076,7 +1076,7 @@ begin
   if FBrushTimer = nil then
   begin
     FBrushTimer := TTimer.Create(nil);
-    FBrushTimer.OnTimer := @BrushTimerFired;
+    FBrushTimer.OnTimer := BrushTimerFired;
   end;
   FBrushTimer.Enabled := False;
   FBrushTimer.Interval := Math.Max(1, Ceil(due - BrushClock));
@@ -2240,7 +2240,7 @@ begin
         panel asks onIrrelevantElement too [was: never] }
       pn[0].ParallelComponent := p;
       pn[0].AxisComponent := k;
-      ctl.IsIrrelevant := @ParallelIrrelevant;
+      ctl.IsIrrelevant := ParallelIrrelevant;
       ctl.CanvasW := (FLastRect.Right - FLastRect.Left) / v.S;
       ctl.CanvasH := (FLastRect.Bottom - FLastRect.Top) / v.S;
       ctl.SetPanels(pn, True);
@@ -2875,7 +2875,7 @@ begin
   if FParExpTimer = nil then
   begin
     FParExpTimer := TTimer.Create(nil);
-    FParExpTimer.OnTimer := @ParExpTimerFired;
+    FParExpTimer.OnTimer := ParExpTimerFired;
   end;
   FParExpTimer.Enabled := False;
   FParExpTimer.Interval := Math.Max(1, Ceil(due - ParExpClock));

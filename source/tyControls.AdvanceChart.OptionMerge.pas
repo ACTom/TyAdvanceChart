@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.OptionMerge;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 (* TTyAdvanceChart -- upstream's MERGE setOption, on the option tree.
   [Batch 95, A10 / MG1]
 

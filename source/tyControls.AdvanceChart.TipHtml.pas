@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.TipHtml;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { [R2-I8] A TOOLTIP'S HTML, read the way a browser would read it.
 
   WHY THIS EXISTS. Upstream picks its tooltip renderer with

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Data;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The columnar data store -- one array per dimension, not one record per datum.
 
   WHY COLUMNAR. Twenty of ECharts' twenty-three series types cannot be expressed
@@ -1250,10 +1250,10 @@ begin
   GTzLoaded := True;
   k32 := LoadLibrary('kernel32.dll');
   if k32 = NilHandle then Exit;
-  Pointer(GGetDynTzi) := GetProcedureAddress(k32, 'GetDynamicTimeZoneInformation');
-  Pointer(GGetTzi) := GetProcedureAddress(k32, 'GetTimeZoneInformation');
-  Pointer(GGetTziForYear) := GetProcedureAddress(k32, 'GetTimeZoneInformationForYear');
-  Pointer(GSysToTzLocal) := GetProcedureAddress(k32, 'SystemTimeToTzSpecificLocalTime');
+  GGetDynTzi := TTyGetDynTzi(GetProcedureAddress(k32, 'GetDynamicTimeZoneInformation'));
+  GGetTzi := TTyGetTzi(GetProcedureAddress(k32, 'GetTimeZoneInformation'));
+  GGetTziForYear := TTyGetTziForYear(GetProcedureAddress(k32, 'GetTimeZoneInformationForYear'));
+  GSysToTzLocal := TTySysToTzLocal(GetProcedureAddress(k32, 'SystemTimeToTzSpecificLocalTime'));
   if Assigned(GGetDynTzi) then
   begin
     FillChar(GDynTzi, SizeOf(GDynTzi), 0);
@@ -3043,7 +3043,7 @@ var
   keep: array of Integer;
   i, raw, n: Integer;
 begin
-  if AFunc = nil then Exit;
+  if not Assigned(AFunc) then Exit;
   SetLength(keep, FCount);
   n := 0;
   for i := 0 to FCount - 1 do

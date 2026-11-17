@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Convert;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The public coordinate conversions' ground floor -- upstream's
   util/model.ts parseFinder and the JavaScript value rules the conversions
   read their input with. [Batch 110, C2]

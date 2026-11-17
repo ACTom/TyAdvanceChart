@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Progressive;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { PROGRESSIVE RENDERING: a series drawn a chunk a frame [Batch 119, C9].
 
   Upstream's scheduler (core/Scheduler.ts, core/task.ts) runs every series

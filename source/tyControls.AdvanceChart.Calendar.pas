@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Calendar;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The calendar: a coordinate system of days, and the component that draws it.
 
   EVERY DATE IS A LOCAL CIVIL DAY. Upstream reads a date through the local

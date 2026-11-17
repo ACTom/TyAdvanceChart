@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.DataZoomAct;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { dataZoom interaction, the arithmetic: a slider's handle ends moved by a
   pointer delta (_updateInterval), the inside dataZoom's wheel zoom about the
   pointer and its drag pan (InsideZoomView over RoamController), the wheel's

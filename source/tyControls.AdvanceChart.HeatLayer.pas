@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.HeatLayer;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { THE HEATMAP LAYER [Batch 152, D14 GE4] -- a heatmap on a geo, upstream's
   chart/heatmap/HeatmapLayer.ts and HeatmapView._renderOnGeo.
 

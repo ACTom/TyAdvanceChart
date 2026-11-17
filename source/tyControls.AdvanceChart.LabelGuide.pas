@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.LabelGuide;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { LABEL-LINE ROUTING -- upstream's label/labelGuideHelper.ts, the part that
   decides where a label line goes once the labels are laid out.
   [Batch 112, roadmap B14]

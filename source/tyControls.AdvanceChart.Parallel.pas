@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Parallel;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the parallel coordinate system, its axes and the rows of
   a parallel series. [Batch 128, C19]
 

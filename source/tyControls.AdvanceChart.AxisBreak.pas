@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.AxisBreak;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- AXIS BREAKS, the option and the view (batch 132).
 
   UPSTREAM'S scale/breakImpl.ts (the parsing) and

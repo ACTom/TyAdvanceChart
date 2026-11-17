@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.TextPatch;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Writing an edited option tree back into the TEXT it was read from,
   changing only what changed. [Batch 143]
 

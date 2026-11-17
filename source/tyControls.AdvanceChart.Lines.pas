@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Lines;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { THE LINES SERIES [Batch 121, C12]: what ECharts 6.1's chart/lines and the
   line helpers it draws with (LineDraw, Line, LinePath, Polyline, EffectLine,
   EffectPolyline, LargeLineDraw) compute, as numbers -- the control draws and
@@ -321,7 +321,7 @@ function TyLinesSymbolRotation(const AG: TTyLinesGeom; AAtEnd: Boolean): Double;
 procedure TyLinesLabelPlace(const AG: TTyLinesGeom; APercent: Double;
   APos: TTyLinesLabelPos; ADistX, ADistY: Double;
   out AX, AY, AOX, AOY, ARot, AAnchorX, AAnchorY: Double;
-  out AAH: TTyTextAnchorH; out AAV: TTyTextAnchorV);
+  out AAH: TTyTextAnchorH; out AAV: TTyTextAnchorV); overload;
 { [spec 242] the same with the label's textConfig over it -- zrender's
   updateInnerText: the rotation where `rotate` is written (ARot then out of
   it, `rotation && rotate`: a not-a-number turns nothing), the offset added

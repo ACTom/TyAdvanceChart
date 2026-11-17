@@ -6,7 +6,7 @@ unit tyControls.AdvanceChart.Theme;
   by scripts/gen-advchart-theme.ps1 - do NOT edit by hand; edit advchart.tycss and re-run the
   generator. Sync-tested byte-identical to advchart.tycss (test.advchart.theme). }
 
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 
 interface
 

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.LabelOpt;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Reading `series.label` off an option, and turning a formatter into words.
 
   SPLIT FROM AdvanceChart.Labels ON PURPOSE. That unit is the geometry and it knows

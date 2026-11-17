@@ -470,6 +470,10 @@ Homepage: https://github.com/ACTom/TyAdvanceChart"/>
         <UnitName Value="tyControls.AdvanceChart"/>
       </Item>
       <Item>
+        <Filename Value="source/tyControls.AdvanceChart.Compiler.inc"/>
+        <Type Value="Include"/>
+      </Item>
+      <Item>
         <Filename Value="source/tyControls.AdvanceChart.Control.Actions.inc"/>
         <Type Value="Include"/>
       </Item>

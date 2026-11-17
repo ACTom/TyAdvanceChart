@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Marker;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 (* SERIES MARKERS -- markPoint, markLine and markArea -- as numbers: which
   items survive, where their ends and corners land, and what each one reads
   from the option chain. Nothing here paints.

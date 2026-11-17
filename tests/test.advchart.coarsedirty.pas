@@ -25,7 +25,7 @@ uses Classes, SysUtils, Math, TypInfo, fpcunit, testregistry, fpjson, jsonparser
      Controls, Graphics, Forms, BGRABitmap, BGRABitmapTypes,
      tyControls.Types, tyControls.Controller,
      tyControls.AdvanceChart.Types, tyControls.AdvanceChart.Shape, tyControls.AdvanceChart.Paint,
-     tyControls.AdvanceChart.Events, tyControls.AdvanceChart.DirtyRect,
+     tyControls.AdvanceChart.Events, tyControls.AdvanceChart.DirtyRect, tyControls.AdvanceChart.Export,
      tyControls.AdvanceChart,
      test.advchart.gridbounds, test.advchart.categoryminmax;
 type
@@ -107,6 +107,7 @@ type
     procedure TestAHoverRepaintsAroundTheBarOnly;
     procedure TestALayoutChangeRepaintsEverything;
     procedure TestTheDiffRules;
+    procedure TestTheDiffReadsEnumsAndSetsWhole;
     procedure TestAnElementsPaintRect;
     procedure TestTheInkTiles;
     procedure TestAWindowFlushesOnceAndInvalidatesTheRects;
@@ -1209,6 +1210,44 @@ begin
   b := a;
   SetLength(b.Caption.RtPieces, 1);
   AssertFalse('a rich caption', TyElementPaintRect(b, 96, s2[0].Rect));
+end;
+
+{ The RTTI diff compares an enumeration or a set over the size its type
+  information gives: every value of either, the last one too, takes part. }
+procedure TAdvChartCoarseDirtyTest.TestTheDiffReadsEnumsAndSetsWhole;
+var
+  a, b: TTyChartElement;
+  k: TTyChartShapeKind;
+  va, vb: TTyChartViews;
+  v: TTyChartView;
+begin
+  a := TyChartElement(TyShapePolyline([TyPointF(10, 10), TyPointF(40, 30)]));
+  for k := Low(TTyChartShapeKind) to High(TTyChartShapeKind) do
+  begin
+    b := a;
+    b.Shape.Kind := k;
+    AssertEquals('the shape kind ' + IntToStr(Ord(k)), k = a.Shape.Kind, TyElementsSame(a, b));
+  end;
+  b := a;
+  b.Shape.Kind := cskLarge;
+  a.Shape.Kind := cskLarge;
+  AssertTrue('the last kind on both sides', TyElementsSame(a, b));
+  va := [];
+  vb := [];
+  AssertTrue('two empty sets', TyDeepSame(@va, @vb, TypeInfo(TTyChartViews)));
+  for v := Low(TTyChartView) to High(TTyChartView) do
+  begin
+    vb := [v];
+    AssertFalse('one member ' + IntToStr(Ord(v)), TyDeepSame(@va, @vb, TypeInfo(TTyChartViews)));
+    va := [v];
+    AssertTrue('the same member ' + IntToStr(Ord(v)), TyDeepSame(@va, @vb, TypeInfo(TTyChartViews)));
+    va := [];
+  end;
+  va := [Low(TTyChartView)..High(TTyChartView)];
+  vb := va;
+  AssertTrue('every member', TyDeepSame(@va, @vb, TypeInfo(TTyChartViews)));
+  Exclude(vb, High(TTyChartView));
+  AssertFalse('all but the last member', TyDeepSame(@va, @vb, TypeInfo(TTyChartViews)));
 end;
 
 procedure TAdvChartCoarseDirtyTest.TestAnElementsPaintRect;

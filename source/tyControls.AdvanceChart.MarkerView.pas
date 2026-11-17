@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.MarkerView;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 (* WHAT A MARKER DRAWS. The Marker unit decides which items survive and where
   their ends land; this one turns a surviving markLine into upstream's
   picture -- the segment (chart/helper/Line.ts createLine, zrender's Line

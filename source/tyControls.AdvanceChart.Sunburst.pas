@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Sunburst;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The sunburst series: a hierarchy drawn as rings of sectors, the roots
   innermost, each node's angle its share of the whole.
 

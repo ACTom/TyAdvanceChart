@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Anim;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- zrender's animation engine: Clip, Track, Animator,
   Animation and Element.animateTo, transcribed. [Batch 87, AN1]
 
@@ -1654,8 +1654,8 @@ begin
     begin
       FOwnedClip := TTyAnimClip.Create(mt, FDelay, FLoop);
       FClip := FOwnedClip;
-      FClip.OnFrame := @ClipFrame;
-      FClip.OnDestroy := @ClipDestroy;
+      FClip.OnFrame := ClipFrame;
+      FClip.OnDestroy := ClipDestroy;
       if FAnimation <> nil then FAnimation.AddClip(FClip);
       if AEasing.Kind <> ekNone then FClip.SetEasing(AEasing);
     end
@@ -2449,8 +2449,8 @@ begin
     begin
       a := TTyAnimator(list[i]);
       a.AddGroup(group);
-      a.Done(@group.AnimDone);
-      a.Aborted(@group.AnimAborted);
+      a.Done(group.AnimDone);
+      a.Aborted(group.AnimAborted);
       if ACfg.Force then a.Duration(ACfg.Duration, ACfg.HasDuration);
       a.Start(ACfg.Easing);
     end;

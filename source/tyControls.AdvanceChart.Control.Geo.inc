@@ -274,7 +274,7 @@ begin
   for i := 0 to n - 1 do
   begin
     FGeos[i] := TTyGeo.Create(FOption, i);
-    FGeos[i].SvgMeasure := @GeoSvgMeasure;
+    FGeos[i].SvgMeasure := GeoSvgMeasure;
     { [Batch 150] the model's option holds what a roam wrote back }
     if (i <= High(FGeoRoam)) and FGeoRoam[i].Valid then
       FGeos[i].SetRoamOption(FGeoRoam[i].Centre, FGeoRoam[i].Zoom);
@@ -1719,7 +1719,7 @@ begin
       nameMap.Free;
     end;
     FMapGeos[g] := geo;
-    geo.SvgMeasure := @GeoSvgMeasure;
+    geo.SvgMeasure := GeoSvgMeasure;
     { [spec 242] setGeoCoords: every series of the group, in order, its
       `geoCoord` (ECharts 2's) -- each name's coordinate as written }
     for k := 0 to High(FMapGroups[g].R) do

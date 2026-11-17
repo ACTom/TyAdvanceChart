@@ -370,7 +370,7 @@ begin
     begin
       FTlTimer := TTimer.Create(nil);
       FTlTimer.Enabled := False;
-      FTlTimer.OnTimer := @TlTimerFired;
+      FTlTimer.OnTimer := TlTimerFired;
     end;
     ms := due - TyAnimClockMs;
     if ms < 1 then ms := 1;
@@ -770,7 +770,7 @@ begin
   { prepareAndUpdate: an update whose models were merged -- armed as a
     merge's when a frame was merged; without one the same models render
     again, every series updating from where it stands }
-  if FOption.TimelineReset(rep, @MergeBefore, @MergePass) then
+  if FOption.TimelineReset(rep, MergeBefore, MergePass) then
   begin
     { [R7-AH] prepareAndUpdate's prepare: the views the frame's new models
       make, after every one there is [was: none recorded] }

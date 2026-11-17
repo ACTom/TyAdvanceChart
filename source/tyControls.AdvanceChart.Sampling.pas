@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Sampling;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { `series.sampling`: a line's or a bar's rows thinned to about one per pixel
   of the base axis. A PORT OF src/processor/dataSample.ts and of DataStore.ts
   lttbDownSample / minmaxDownSample / downSample, read off the ECharts 6.1.0

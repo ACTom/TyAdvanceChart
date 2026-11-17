@@ -450,7 +450,7 @@ begin
   { (and models with no zlevel allocated into them) }
   if FZAlloc <> nil then FZAlloc.Clear;
   FZAllocOn := False;
-  FOption.SetOptionText(AValue, AReplace, @NotMergePass);
+  FOption.SetOptionText(AValue, AReplace, NotMergePass);
   { no media merge reached the thumbnails: their init's optionUpdated
     [Batch 140] }
   if FThumbFresh then ThumbInitAll;
@@ -636,7 +636,7 @@ begin
   MediaViewSize;
   { THE MERGES: the base, then every media unit that applies, each
     reported to MergePass [Batch 107] }
-  if not FOption.MergeOptionText(AJson, AReplace, @MergeBefore, @MergePass, rep) then
+  if not FOption.MergeOptionText(AJson, AReplace, MergeBefore, MergePass, rep) then
     Exit(False);
   { A PIECE THAT CARRIES `dataset` marks every dataset dirty: their
     transforms run again from where the chart's stream stands [Batch 134] }
@@ -850,7 +850,7 @@ begin
   FMergeFirst := True;
   FMergeResize := True;
   try
-    Result := FOption.MediaRecheck(@MergeBefore, @MergePass);
+    Result := FOption.MediaRecheck(MergeBefore, MergePass);
   finally
     FMergeResize := False;
   end;
@@ -1383,7 +1383,7 @@ begin
     if not FDrQueued and (Application <> nil) then
     begin
       FDrQueued := True;
-      Application.QueueAsyncCall(@DrFlushAsync, 0);
+      Application.QueueAsyncCall(DrFlushAsync, 0);
     end;
     Exit;
   end;

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.RichStyle;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { FROM AN ECHARTS TEXT OPTION TO ZRENDER'S TEXT BLOCK, and the block laid
   out where a site hangs it.
 

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Gauge;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The gauge: a dial, a needle and a reading.
 
   IT IS THE ONE SERIES THAT IS NOT LAID OUT IN A BOX. A pie and a funnel both

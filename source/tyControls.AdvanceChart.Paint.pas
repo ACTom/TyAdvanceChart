@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Paint;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart — the paint list: what gets drawn, in what order, and which
   datum the pointer is over.
 

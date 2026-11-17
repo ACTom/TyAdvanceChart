@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Polar;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the polar coordinate system and its two axis views.
   [Batch 111, C3]
 

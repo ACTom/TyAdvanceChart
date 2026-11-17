@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Symbol;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The symbol a datum is drawn as: ECharts' symbol / symbolSize / symbolRotate /
   symbolOffset / symbolKeepAspect.
 

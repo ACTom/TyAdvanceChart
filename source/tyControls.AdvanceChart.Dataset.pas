@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Dataset;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 (* `dataset` and `encode` -- the other way data reaches a chart.
 
   A series' `data` says WHAT the values are and, by position, which coordinate
@@ -705,7 +705,7 @@ begin
     exOverflow, exUnderflow, exPrecision]);
   try
     cmp.Vals := Copy(A);
-    TyJsArraySort(idx, @cmp.Compare);
+    TyJsArraySort(idx, cmp.Compare);
     for i := 0 to High(idx) do A[i] := cmp.Vals[idx[i]];
   finally
     ClearExceptions(False);

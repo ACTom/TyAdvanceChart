@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Events;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Chart-level mouse events and the query that filters them -- upstream's
   `chart.on(type, [query], handler)`.
 

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.DataZoom;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { dataZoom: a window onto an axis -- which axes a dataZoom drives, the window
   it asks for in percents or in values, and that window clamped, spanned and
   rounded the way ECharts' AxisProxy.calculateDataWindow does it.

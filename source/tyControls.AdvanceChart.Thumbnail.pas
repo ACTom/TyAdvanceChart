@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Thumbnail;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the thumbnail, a small copy of a graph with the window
   the canvas shows. [Batch 140, D7]
 
@@ -137,10 +137,10 @@ type
 function TyThumbModelOf(ANode: TJSONObject): TTyThumbModel;
 { the box: mergeLayoutParam at init over right 1, bottom 1, 25% x 25%, then
   getLayoutRect on the viewport }
-function TyThumbBox(ANode: TJSONObject; const AViewport: TTyRectF): TTyXYWH;
+function TyThumbBox(ANode: TJSONObject; const AViewport: TTyRectF): TTyXYWH; overload;
 { [Batch 154] the same in createBoxLayoutReference's container (a matrix
   cell or a calendar day; the canvas as x / y / width / height) }
-function TyThumbBox(ANode: TJSONObject; const ARef: TTyXYWH): TTyXYWH;
+function TyThumbBox(ANode: TJSONObject; const ARef: TTyXYWH): TTyXYWH; overload;
 { the content rect: the box shrunk by half the rim }
 function TyThumbContent(const ABox: TTyXYWH; ABorderWidth: Double): TTyXYWH;
 { the path an item builds (SymbolClz / ECLinePath.buildPath) }

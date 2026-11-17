@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Catalog;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { GENERATED FILE -- DO NOT EDIT BY HAND.
 
   The Apache ECharts 6.1.0 option vocabulary, as a deduplicated DAG.
@@ -59,7 +59,7 @@ const
   { SHA-1 over tools/advchart/gen-catalog.js with CRLF normalised to LF, so a
     checkout with a different core.autocrlf does not turn the guard red for
     no reason. }
-  TyOptGeneratorDigest = '02F4541CE90BF4D9AE5F1CE240726DB2829CC3F7';
+  TyOptGeneratorDigest = '7F5167CCA54170FD7EDAF2F2A40797F7A6F161D8';
   { SHA-1 over everything below the DATA marker further down.
     The two digests above pin the INPUT and the TRANSFORMATION, which is what
     tyControls.Icons.Lucide does -- but neither can see a hand-edit of the

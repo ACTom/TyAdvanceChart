@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.AxisName;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- where a cartesian axis' NAME goes.
 
   UPSTREAM'S AxisBuilder axisName, transcribed operation for operation. The

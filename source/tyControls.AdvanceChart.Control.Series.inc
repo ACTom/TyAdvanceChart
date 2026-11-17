@@ -2757,7 +2757,7 @@ begin
       sol.IsLarge := True;
       sol.Large := Default(TTyLargeGeom);
       sol.Large.Kind := lgkLines;
-      sol.Large.Pts := TyLinesLargeSegs(sol.Raws, sol.Poly, @LinesProject);
+      sol.Large.Pts := TyLinesLargeSegs(sol.Raws, sol.Poly, LinesProject);
       sol.Large.LinesPoly := sol.Poly;
       sol.Large.LinesCurve := TyLinesJsNum(LnNode(node, ['lineStyle', 'curveness']));
       if IsNan(sol.Large.LinesCurve) then sol.Large.LinesCurve := 0;
@@ -2794,7 +2794,7 @@ begin
     SetLength(FLinesSpecs[i], n);
     for k := 0 to n - 1 do
       sol.Geoms[k] := TyLinesLayoutRow(sol.Raws[k], k, sol.Poly,
-        TyLinesCurvenessOf(sol.Raws[k], node), @LinesProject);
+        TyLinesCurvenessOf(sol.Raws[k], node), LinesProject);
     for k := 0 to n - 1 do
     begin
       { [R5-B] the per-datum palette's colour where the row asked

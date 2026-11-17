@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Media;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- upstream's media queries. [Batch 107, B12]
 
   An option may carry `media`: a list of `(query, option)` units, plus one

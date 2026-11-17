@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.DataTransform;
-{$mode objfpc}{$H+}{$goto on}
+{$I tyControls.AdvanceChart.Compiler.inc}{$IFDEF FPC}{$goto on}{$ENDIF}
 { `dataset.transform` -- the registry, the two transforms ECharts installs
   with its transform component ('filter' and 'sort'), and the one the boxplot
   series installs ('boxplot'). [Batch 133, roadmap D2]
@@ -1190,7 +1190,7 @@ var
   builtIn: Boolean;
 begin
   Result := False;
-  if (AType = '') or (AFunc = nil) then Exit;
+  if (AType = '') or not Assigned(AFunc) then Exit;
   { `type.split(':')` must give exactly two parts }
   p := Pos(':', AType);
   if (p = 0) or (Pos(':', Copy(AType, p + 1, MaxInt)) > 0) then Exit;
@@ -1842,7 +1842,7 @@ begin
           ctx.Vals[k][i] := TyApplyRawParser(ctx.Keys[k].Parser, ctx.Vals[k][i]);
       end;
     end;
-    TyJsArraySort(idx, @ctx.Compare);
+    TyJsArraySort(idx, ctx.Compare);
     outRows := TJSONArray.Create;
     try
       for i := 0 to n - 1 do

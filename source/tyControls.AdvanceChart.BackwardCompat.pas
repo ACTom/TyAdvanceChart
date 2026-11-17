@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.BackwardCompat;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the old option spellings, rewritten as ECharts 6.1
   rewrites them. [R3-A]
 

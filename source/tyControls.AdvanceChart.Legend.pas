@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Legend;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 (* The legend -- the component that names the series and, once it can be
   clicked, decides which of them are drawn.
 

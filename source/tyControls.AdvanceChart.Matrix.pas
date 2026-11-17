@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Matrix;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The matrix: a coordinate system of header trees, and the component that
   draws it. ECharts 6.1's coord/matrix (MatrixModel, MatrixDim, Matrix,
   matrixCoordHelper) and component/matrix/MatrixView, part one (D12 MX1,

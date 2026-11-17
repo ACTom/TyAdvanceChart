@@ -2353,7 +2353,7 @@ begin
     { [F3c] a series that transitions makes its items anew }
     view.UtRecreate := TyUtEnabled(node) or AnimUtNamed(si);
     try
-      view.Render(ids, raws, @CustomCall, z, zl, anim);
+      view.Render(ids, raws, CustomCall, z, zl, anim);
     finally
       FreeAndNil(FCustomParams.Context);
       FreeAndNil(FCustomParams.Encode);

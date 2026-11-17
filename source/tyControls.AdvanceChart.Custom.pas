@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Custom;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- THE CUSTOM SERIES: a host's renderItem draws every data
   item. [Batch 123, C14]
 

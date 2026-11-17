@@ -199,7 +199,7 @@ function TTyCustomAdvanceChart.RenderToBitmap(const AOptsJson: string): TBGRABit
 var prev: TComponent; prevRes: TTyChartImageUrlResolver;
 begin
   prev := TyChartImageScopeEnter(Owner);
-  prevRes := TyChartImageResolverEnter(@ResolveImageUrl);
+  prevRes := TyChartImageResolverEnter(ResolveImageUrl);
   try
     Result := RenderToBitmapBody(AOptsJson);
   finally

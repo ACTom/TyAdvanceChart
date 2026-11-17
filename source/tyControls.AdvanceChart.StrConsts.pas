@@ -1,6 +1,6 @@
 unit tyControls.AdvanceChart.StrConsts;
 
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 
 interface
 

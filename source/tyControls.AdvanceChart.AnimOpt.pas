@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.AnimOpt;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 (* TTyAdvanceChart -- which animation an option asks for, and ECharts'
   initProps / updateProps / removeElement over the engine. [Batch 87, AN1]
 

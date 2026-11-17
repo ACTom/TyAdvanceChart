@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.ZrPath;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { zrender's PathProxy as a component's static picture reads it: the command
   list a path element holds, built the way Rect.buildPath, the symbol makers
   and createPathProxyFromString build it, and the bounding rect

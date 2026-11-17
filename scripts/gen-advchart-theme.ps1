@@ -24,7 +24,7 @@ $sb = New-Object System.Text.StringBuilder
 [void]$sb.Append("  style model's base layer carries it after light.tycss. GENERATED from themes/advchart.tycss`r`n")
 [void]$sb.Append("  by scripts/gen-advchart-theme.ps1 - do NOT edit by hand; edit advchart.tycss and re-run the`r`n")
 [void]$sb.Append("  generator. Sync-tested byte-identical to advchart.tycss (test.advchart.theme). }`r`n`r`n")
-[void]$sb.Append("{`$mode objfpc}{`$H+}`r`n`r`ninterface`r`n`r`n")
+[void]$sb.Append("{`$I tyControls.AdvanceChart.Compiler.inc}`r`n`r`ninterface`r`n`r`n")
 [void]$sb.Append("function TyAdvChartCss: string;`r`n`r`n")
 [void]$sb.Append("implementation`r`n`r`n")
 [void]$sb.Append("uses`r`n  tyControls.Css.AddOns;`r`n`r`n")

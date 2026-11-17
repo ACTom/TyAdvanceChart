@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Color;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 (* A colour the AUTHOR wrote, and the palette a series gets when it wrote none.
 
   Until this unit every colour in the chart came from the .tycss theme, and an

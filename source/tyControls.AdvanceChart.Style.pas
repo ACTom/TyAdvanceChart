@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Style;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The four states, and what a datum's style resolves to in each of them.
 
   FOUR STATES, TWO SLOTS. normal / emphasis / blur / select is NOT a four-value

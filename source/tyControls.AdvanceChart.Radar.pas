@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Radar;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The radar: a coordinate system made of spokes, and the series drawn on it.
 
   IT IS THE FIRST COORDINATE SYSTEM IN THIS PORT THAT IS NOT A RECTANGLE, and
@@ -409,14 +409,14 @@ function TyRadarAngle(AStartRad: Double; AIndex, ACount: Integer;
     * a range of no width is expanded rather than left flat, and HOW depends on
       whether zero was included. }
 procedure TyRadarIndicatorExtent(const AInd: TTyRadarIndicator;
-  ADataLo, ADataHi: Double; AScale: Boolean; out ALo, AHi: Double);
+  ADataLo, ADataHi: Double; AScale: Boolean; out ALo, AHi: Double); overload;
 { THE SAME, with which ends the author fixed (after the pre-pass) and whether
   zero is included -- what the alignment needs. The flags stay BY INDEX when
   a reversed pair is swapped: `min: 3` over data at 1 is [1, 3] with the LOW
   end fixed. }
 procedure TyRadarIndicatorExtent(const AInd: TTyRadarIndicator;
   ADataLo, ADataHi: Double; AScale: Boolean; out ALo, AHi: Double;
-  out AFixLo, AFixHi, AIncl0: Boolean);
+  out AFixLo, AFixHi, AIncl0: Boolean); overload;
 
 (* The value token -- spelt with braces in the option -- substituted into an
    axis name's formatter, FIRST OCCURRENCE ONLY.

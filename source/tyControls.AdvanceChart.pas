@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the control the whole AdvanceChart layer exists under.
 
   WINDOWED, not graphic, and that decision was made on day one: focus, keyboard,

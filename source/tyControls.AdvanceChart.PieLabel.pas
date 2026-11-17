@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.PieLabel;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Where a pie slice's label goes, and the line that points at it.
 
   A PIE LABEL IS NOT PLACED BY THE THIRTEEN POSITIONS. PieView hands the label
@@ -1763,7 +1763,7 @@ begin
     hasRotate := (lastRot <> 0) and not IsNan(lastRot);
     if (not hasRotate) and (not ASpec.NoAvoidOverlap) and (na > 0) then
       TyPieAvoidOverlap(items, lastCX, lastCY, ALayout.R1,
-        TyXYWHOfRect(ALayout.ViewRect), @fit.RectOf);
+        TyXYWHOfRect(ALayout.ViewRect), fit.RectOf);
 
     { ---- the marks ---- }
     for k := 0 to nl - 1 do
@@ -1800,8 +1800,8 @@ begin
         pts[2] := place.P3;
         { THE LAST PASS BENDS EVERY LINE, moved or not: the turn, then the
           angle to the slice's surface (labelLayout.ts:579-583) [Batch 112] }
-        TyLimitTurnAngle(pts, sp.MinTurnAngle);
-        TyLimitSurfaceAngle(pts, place.NX, place.NY, sp.MaxSurfaceAngle);
+        TyLimitTurnAngle(TTyGuidePoints(pts), sp.MinTurnAngle);
+        TyLimitSurfaceAngle(TTyGuidePoints(pts), place.NX, place.NY, sp.MaxSurfaceAngle);
         el := TyChartElement(TyShapePolyline(pts));
         el.Shape.Cmds := TyLabelLineCmds(pts, sp.Smooth);
         el.Caption.LgSmooth := sp.Smooth;

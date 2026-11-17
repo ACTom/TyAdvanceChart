@@ -3986,7 +3986,7 @@ begin
   begin
     FTipTimer := TTimer.Create(nil);
     FTipTimer.Enabled := False;
-    FTipTimer.OnTimer := @TipTimerFired;
+    FTipTimer.OnTimer := TipTimerFired;
   end;
   ms := due - TipClock;
   if ms < 1 then ms := 1;

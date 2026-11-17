@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Export;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the export options: what getDataURL / renderToCanvas
   take and how upstream resolves them, read off echarts.ts, zrender
   canvas/Painter.ts getRenderedCanvas and canvas/Layer.ts clear, and held to

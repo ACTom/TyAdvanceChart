@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.LabelLayout;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { SERIES LABEL LAYOUT -- upstream's LabelManager over the labels of every
   series that writes a `labelLayout`. [Batch 103, roadmap B8]
 
@@ -803,7 +803,7 @@ begin
       tl := nil;
       SetLength(tl, len);
       for i := 0 to len - 1 do tl[i] := list[i];
-      TyJsArraySort(tl, @cmp.Compare);
+      TyJsArraySort(tl, cmp.Compare);
       for i := 0 to len - 1 do list[i] := tl[i];
     finally
       cmp.Free;

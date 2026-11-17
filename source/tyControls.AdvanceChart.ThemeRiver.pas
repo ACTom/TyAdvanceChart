@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.ThemeRiver;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- the themeRiver series. [Batch 118, C10]
 
   UPSTREAM'S chart/themeRiver (ThemeRiverSeries.ts, themeRiverLayout.ts,
@@ -347,7 +347,7 @@ begin
   mask := MaskFP;
   try
     c.Key := AKey;
-    TyJsArraySort(AItems, @c.Compare);
+    TyJsArraySort(AItems, c.Compare);
   finally
     UnmaskFP(mask);
     c.Free;

@@ -1350,7 +1350,7 @@ begin
       SetLength(FAnimPrev.UtStale, Length(FAnimPrev.UtStale) + 1);
       FAnimPrev.UtStale[High(FAnimPrev.UtStale)] := FUtStale[i];
     end;
-  FAnimPrev.ToOldPoint := @AnimToOldPoint;
+  FAnimPrev.ToOldPoint := AnimToOldPoint;
   { [R2-C] the map views as drawn }
   FAnimPrev.GeoOld := AnimGeoViews(False);
   { THE OLD BUILD STAYS ALIVE for its coordinate systems; Rebuild's
@@ -1633,10 +1633,10 @@ begin
       FAnimPending := False;
       if FAnim = nil then FAnim := NewAnimDriver;
       if FAnimSet = nil then FAnimSet := TTyChartAnimSet.Create(FAnim);
-      FAnimSet.OnEndLabelText := @EndLabelTextOf;
-      FAnimSet.OnEndLabelPieces := @EndLabelPiecesOf;
-      FAnimSet.OnGaugeDetailAt := @GaugeDetailAt;
-      FAnimSet.OnUtStop := @AnimUtStopCustom;
+      FAnimSet.OnEndLabelText := EndLabelTextOf;
+      FAnimSet.OnEndLabelPieces := EndLabelPiecesOf;
+      FAnimSet.OnGaugeDetailAt := GaugeDetailAt;
+      FAnimSet.OnUtStop := AnimUtStopCustom;
       { AN UPDATE when there was a render before, an entry otherwise
         [Batch 90] }
       if FAnimPrev.Valid then
@@ -1747,7 +1747,7 @@ begin
       FAnimTimer := TTimer.Create(nil);
       FAnimTimer.Enabled := False;
       FAnimTimer.Interval := 16;
-      FAnimTimer.OnTimer := @AnimTimerFired;
+      FAnimTimer.OnTimer := AnimTimerFired;
     end;
     FAnimTimer.Enabled := True;
   end
@@ -2079,7 +2079,7 @@ begin
       FRtLens[k] := st.Get(valCol, k);
       idx[k] := k;
     end;
-    TyJsArraySort(idx, @RtCompare);
+    TyJsArraySort(idx, RtCompare);
     SetLength(FRtQueue, Length(FRtQueue) + 1);
     FRtQueue[High(FRtQueue)] := '{"type":"changeAxisOrder","componentType":"'
       + base.MainType + '","isInitSort":true,"axisId":' + IntToStr(base.ComponentIndex)
@@ -2209,7 +2209,7 @@ begin
       FRtLens[i] := byRow[i];
       idx[i] := i;
     end;
-    TyJsArraySort(idx, @RtCompare);
+    TyJsArraySort(idx, RtCompare);
     { _isOrderDifferentInView: inside the extent, a tick whose ordinal
       changed }
     differs := False;

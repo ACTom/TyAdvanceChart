@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Stack;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { Values that accumulate: `stack`, `stackStrategy`, `stackOrder`.
 
   A PORT OF src/processor/dataStack.ts, read off the ECharts 6.1.0 source.

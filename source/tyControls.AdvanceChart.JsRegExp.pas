@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.JsRegExp;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart -- JavaScript's `new RegExp(source).test(text)`, for the
   dataset filter's `reg` operator (util/conditionalExpression.ts:
   RegExpEvaluator). [spec 242]

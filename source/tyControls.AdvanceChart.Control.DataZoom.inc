@@ -236,7 +236,7 @@ begin
               FWfLo := win.Value[0];
               FWfHi := win.Value[1];
               try
-                FStores[si].FilterSelf(@WeakKeep);
+                FStores[si].FilterSelf(WeakKeep);
               finally
                 FWfStore := nil;
               end;
@@ -1579,7 +1579,7 @@ begin
   if FDzTimer = nil then
   begin
     FDzTimer := TTimer.Create(nil);
-    FDzTimer.OnTimer := @DzTimerFired;
+    FDzTimer.OnTimer := DzTimerFired;
   end;
   now_ := DzClock;
   FDzTimer.Enabled := False;

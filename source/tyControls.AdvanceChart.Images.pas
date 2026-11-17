@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Images;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { [F6a] THE PICTURES A CHART OPTION NAMES: a `data:` URL, and an image of
   a TImageList named `image://<list>/<index>`.
 
@@ -222,7 +222,7 @@ begin
   for i := 0 to FLinks.Count - 1 do
     if TChangeLink(FLinks[i]).Sender = AList then Exit;
   lk := TChangeLink.Create;
-  lk.OnChange := @ListChanged;
+  lk.OnChange := ListChanged;
   AList.RegisterChanges(lk);
   FLinks.Add(lk);
   AList.FreeNotification(Self);

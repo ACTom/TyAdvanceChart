@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Toolbox;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The toolbox, the arithmetic and the text: what ECharts 6.1's
   component/toolbox does between the option and the pixels, and between a
   click and the option it merges -- held to the real dist by
@@ -241,13 +241,13 @@ function TyToolboxIconRect(const ASpec: TTyToolboxSpec; const AIcon: TTyTbIcon;
   AW, AH: the chart, CSS px; ATitleW / ATitleH: every icon's title in the
   default font. }
 function TyToolboxLayoutOf(var ASpec: TTyToolboxSpec; AW, AH, APrevX,
-  APrevY: Double; const ATitleW, ATitleH: array of Double): TTyToolboxLayout;
+  APrevY: Double; const ATitleW, ATitleH: array of Double): TTyToolboxLayout; overload;
 { [Batch 154] the same in createBoxLayoutReference's container ARef (CSS px
   from the canvas' corner) -- a matrix cell or a calendar day; the titles'
   adjustment still reads the canvas (api.getWidth / getHeight) }
 function TyToolboxLayoutOf(var ASpec: TTyToolboxSpec; AW, AH: Double;
   const ARef: TTyXYWH; APrevX, APrevY: Double;
-  const ATitleW, ATitleH: array of Double): TTyToolboxLayout;
+  const ATitleW, ATitleH: array of Double): TTyToolboxLayout; overload;
 { The title of icon AIcon under the pointer. The adjustment lives in the
   emphasis state, and what of it shows depends on when the state was
   entered: APosAdjusted -- the hover entered it (the frame after the

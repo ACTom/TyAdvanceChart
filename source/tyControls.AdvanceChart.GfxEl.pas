@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.GfxEl;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 (* TTyAdvanceChart -- ZRENDER'S ELEMENTS AS AN OPTION WRITES THEM: the element
   model the graphic component builds its scene from, and the one the custom
   series' renderItem will hand back. [Batch 122, C13]
@@ -871,7 +871,7 @@ begin
   s.El := Self;
   s.Spec := UserDuring;
   DuringScopes.Add(s);
-  Result := @s.Call;
+  Result := s.Call;
 end;
 
 function DuringName(const ASpec: string): string;

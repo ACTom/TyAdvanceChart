@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.RichText;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { ZRENDER'S TEXT BLOCK: rich text and the plain text box.
 
   A zrender Text draws its words as a BLOCK -- lines of tokens, each token a

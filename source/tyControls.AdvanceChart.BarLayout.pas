@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.BarLayout;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { How wide a bar is, and where in its band it sits.
 
   A PORT OF calcBarWidthAndOffset, read off the ECharts 6.1.0 source rather
@@ -80,14 +80,14 @@ type
   approximate band and every bar comes out slightly wrong, silently. }
 function TySolveBarLayout(AOption: TTyChartOption; ABuild: TTyChartBuild;
   const ABindings: TTySeriesBindingArray; const AStores: array of TTyDataStore;
-  AIndex: TTyAxisSeriesIndex): TTyBarColumnArray;
+  AIndex: TTyAxisSeriesIndex): TTyBarColumnArray; overload;
 { The same, told which slots draw in LARGE MODE: their barMinWidth defaults
   to half a pixel, not one (barGrid.ts: `get('barMinWidth') ||
   (isInLargeMode ? 0.5 : 1)`) [Batch 117] }
 function TySolveBarLayout(AOption: TTyChartOption; ABuild: TTyChartBuild;
   const ABindings: TTySeriesBindingArray; const AStores: array of TTyDataStore;
   AIndex: TTyAxisSeriesIndex; const ALarge: TTyBoolArray;
-  APxScale: Double = 1): TTyBarColumnArray;
+  APxScale: Double = 1): TTyBarColumnArray; overload;
 
 { The answer for ONE default bar series in a band of ABandWidth.
 

@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Funnel;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The funnel: a stack of trapezoids whose widths are the data.
 
   IT IS NOT A PIE WITH STRAIGHT EDGES, and the difference is where the values

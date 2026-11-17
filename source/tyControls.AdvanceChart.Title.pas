@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Title;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The chart's title and subtitle -- the first component that is neither a
   coordinate system nor a series.
 

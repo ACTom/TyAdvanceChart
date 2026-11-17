@@ -1,5 +1,5 @@
 unit tyControls.AdvanceChart.Measure;
-{$mode objfpc}{$H+}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { TTyAdvanceChart — the bridge between the pure layout layer and the painter.
 
   This is the ONLY AdvanceChart unit allowed to reach the painter, and therefore the

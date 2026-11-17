@@ -1,6 +1,5 @@
 unit tyControls.AdvanceChart.Sankey;
-{$mode objfpc}{$H+}
-{$modeswitch nestedprocvars}
+{$I tyControls.AdvanceChart.Compiler.inc}
 { The sankey series: nodes in columns, links as bands whose width is their
   value, the whole drawn in a box (5% round, 20% right for the labels).
 
