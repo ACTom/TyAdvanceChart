@@ -212,7 +212,8 @@ function TyInvalidPointF: TTyPointF;
 function TyInvalidRectF: TTyRectF;
 
 { An integer as a Double: the value. Not Double(AnInteger), which FPC in Delphi mode reads as the integer's bits
-  when it has 8 bytes and rejects when it has 4. }
+  when it has 8 bytes and rejects when it has 4. An unsigned 64-bit value above High(Int64) must not be passed:
+  it would be read as negative. }
 function TyIntToDouble(const AValue: Int64): Double; inline;
 
 implementation

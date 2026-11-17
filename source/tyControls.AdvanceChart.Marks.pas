@@ -838,7 +838,7 @@ begin
 
   d := area.Find('opacity');
   if (d <> nil) and (d.JSONType = jtNumber) then
-    { Double(0)/Double(1), NOT 0/1: an integer beside a Double picks Math's
+    { Double(0.0)/Double(1.0), NOT 0/1: an integer beside a Double picks Math's
       SINGLE overload and quietly rounds the result to a 24-bit mantissa. It
       would not matter for an alpha; the shape is what matters, because the
       next thing clamped this way might be a coordinate. }

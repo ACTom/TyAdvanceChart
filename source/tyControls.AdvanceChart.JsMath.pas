@@ -53,7 +53,7 @@ function TyJsFround(AX: Double): Double;
   axis' mapping end, every pixel taken back to a value on one. }
 function TyJsLog(AX: Double): Double;
 function TyJsPow(AX, AY: Double): Double;
-{ JavaScript's >>: the signed right shift. }
+{ JavaScript's >>: the signed right shift. AShift must be 0..31. }
 function TySar32(AValue: Integer; AShift: Byte): Integer; inline;
 
 implementation
