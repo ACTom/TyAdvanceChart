@@ -85,6 +85,8 @@ type
     Negate: Boolean;
   end;
 
+  TTyJsReIntArray = array of Integer;
+
   TTyJsRegExp = class
   private
     FProg: array of TTyJsReInst;
@@ -95,7 +97,7 @@ type
     { the match }
     FText: UnicodeString;
     FLen: Integer;
-    FCaps: array of Integer;
+    FCaps: TTyJsReIntArray;
     FLoopCount_: array of Integer;
     FLoopStart: array of Integer;
     FSteps: Int64;
@@ -1074,7 +1076,7 @@ var
   pc, pos, i, len, s0, e0, l, cnt, endPos: Integer;
   ok: Boolean;
   ch: WideChar;
-  snap: array of Integer;
+  snap: TTyJsReIntArray;
 
   procedure Push(AKind: TTrailKind; ASlot, AValue, APc2, APos2: Integer);
   begin
