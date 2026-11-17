@@ -583,7 +583,7 @@ var
   GBusy: Integer = 0;
   GGrave: TFPList = nil;
   GClockBase: Double = 0;
-  GClockTick: QWord = 0;
+  GClockTick: UInt64 = 0;
   GClockInited: Boolean = False;
 
 { ==================== floating point and the graveyard ==================== }
@@ -634,7 +634,7 @@ begin
   begin
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
   end;
   SetExceptionMask(AGuard.Mask);
@@ -785,7 +785,7 @@ begin
 end;
 
 function TyAnimClockMs: Double;
-var t: QWord;
+var t: UInt64;
 begin
   t := GetTickCount64;
   if not GClockInited then

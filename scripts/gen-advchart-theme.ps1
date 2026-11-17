@@ -32,7 +32,7 @@ $sb = New-Object System.Text.StringBuilder
 for ($i = 0; $i -lt $lines.Count; $i++) {
   $escd = $lines[$i] -replace "'", "''"
   if ($i -lt $lines.Count - 1) { $term = ' +' } else { $term = ';' }
-  [void]$sb.Append("    '" + $escd + "' + LineEnding" + $term + "`r`n")
+  [void]$sb.Append("    '" + $escd + "' + sLineBreak" + $term + "`r`n")
 }
 [void]$sb.Append("end;`r`n`r`n")
 [void]$sb.Append("initialization`r`n  TyRegisterAddOnCss('advchart', TyAdvChartCss);`r`n`r`nend.`r`n")

@@ -1398,7 +1398,7 @@ type
       gradient, or no colour, the canvas refuses); its transform the one the
       canvas had (cTyCanvasTransformLeft: a scale that is not a number, the
       transform refused) }
-    CanvasFlags: LongWord;
+    CanvasFlags: Cardinal;
     CanvasShadow: TTyChartColor;
     { [R7-V] THE TRANSFORM IT HANDS THE CANVAS (zrender's setTransform of its
       own transform), device px, [a, b, c, d, e, f], where it is not read

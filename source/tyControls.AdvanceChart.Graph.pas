@@ -602,8 +602,8 @@ function TyGraphLinearMap(AValue, ADomain0, ADomain1, ARange0,
   So this is a xorshift32 -- tiny, and exactly reproducible in JavaScript,
   which is what lets tools/advchart-oracle hold the port to upstream's own
   output by giving upstream THESE numbers. }
-function TyGraphForceSeed(ASeriesIndex: Integer): LongWord;
-function TyGraphRandom(var AState: LongWord): Double;
+function TyGraphForceSeed(ASeriesIndex: Integer): Cardinal;
+function TyGraphRandom(var AState: Cardinal): Double;
 
 type
   { WHAT A FORCE LAYOUT LEAVES FOR THE NEXT PASS over the same option --
@@ -647,7 +647,7 @@ type
     InstEIgn: array of Boolean;
     InstE1, InstE2: TTyIntegerArray;
     InstFriction0, InstGravity, InstCX, InstCY: Double;
-    InstRng: LongWord;
+    InstRng: Cardinal;
     { [F3b] layoutAnimation (the default): the instance's friction NOW, and
       whether its iteration is running -- a step every 16 ms
       (TyGraphForceFrame) until the friction is under a hundredth; the
@@ -686,7 +686,7 @@ function TyGraphForceSteps(AFriction: Double): Integer;
   the view into PX and PY. }
 procedure TyGraphLayoutForce(var ANodes: TTyGraphNodeArray;
   const AEdges: TTyGraphEdgeArray; AView: TTyGraphView;
-  const ASpec: TTyGraphSpec; ASeed: LongWord;
+  const ASpec: TTyGraphSpec; ASeed: Cardinal;
   var AState: TTyGraphForceState);
 
 { Entry i of upstream's curveness table.
@@ -2067,7 +2067,7 @@ begin
       body := Copy(S, start, n - start);
     end;
   end;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   if not TryStrToFloat(body, Result, fs) then Result := NaN;
 end;
@@ -3767,7 +3767,7 @@ begin
     standing, the invalid-operation flag the masked arithmetic raised stays
     sticky, and the NEXT trap anywhere in the host -- a plain division by zero
     -- is reported as an invalid operation instead. }
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;
@@ -3837,10 +3837,10 @@ begin
   end;
 end;
 
-function TyGraphForceSeed(ASeriesIndex: Integer): LongWord;
+function TyGraphForceSeed(ASeriesIndex: Integer): Cardinal;
 begin
   {$I tyControls.AdvanceChart.ChecksOff.inc}
-  Result := LongWord(2463534242 + LongWord(ASeriesIndex) * 2654435769);
+  Result := Cardinal(2463534242 + Cardinal(ASeriesIndex) * 2654435769);
   {$I tyControls.AdvanceChart.ChecksBack.inc}
   { xorshift has one state it can never leave. }
   if Result = 0 then Result := 2463534242;
@@ -3849,14 +3849,14 @@ end;
 const
   cTwo32: Double = 4294967296.0;
 
-function TyGraphRandom(var AState: LongWord): Double;
-var x: LongWord;
+function TyGraphRandom(var AState: Cardinal): Double;
+var x: Cardinal;
 begin
   {$I tyControls.AdvanceChart.ChecksOff.inc}
   x := AState;
-  x := x xor LongWord(x shl 13);
+  x := x xor Cardinal(x shl 13);
   x := x xor (x shr 17);
-  x := x xor LongWord(x shl 5);
+  x := x xor Cardinal(x shl 5);
   {$I tyControls.AdvanceChart.ChecksBack.inc}
   AState := x;
   { A TYPED CONSTANT, so the division is a Double one. An untyped real constant
@@ -4177,7 +4177,7 @@ end;
 
 procedure TyGraphLayoutForce(var ANodes: TTyGraphNodeArray;
   const AEdges: TTyGraphEdgeArray; AView: TTyGraphView;
-  const ASpec: TTyGraphSpec; ASeed: LongWord;
+  const ASpec: TTyGraphSpec; ASeed: Cardinal;
   var AState: TTyGraphForceState);
 var
   n, ne, i, k, steps, total: Integer;

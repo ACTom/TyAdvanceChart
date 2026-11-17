@@ -469,7 +469,7 @@ var
 
   function H(A: Double): string;
   begin
-    Result := FloatToStrF(A, ffGeneral, 17, 0, DefaultFormatSettings);
+    Result := FloatToStrF(A, ffGeneral, 17, 0, FormatSettings);
   end;
 
 begin
@@ -481,14 +481,14 @@ begin
     + ',' + H(FTipSnap.FrozenY) + '|' + FTipSnap.PosJson;
   for i := 0 to High(FTipSnap.Hits) do
   begin
-    Result := Result + '|s' + IntToHex(PtrUInt(FTipSnap.Hits[i].Axis), 16) + H(FTipSnap.Hits[i].Value)
+    Result := Result + '|s' + IntToHex(UIntPtr(FTipSnap.Hits[i].Axis), 16) + H(FTipSnap.Hits[i].Value)
       + ',' + H(FTipSnap.Hits[i].SnapValue);
     for k := 0 to High(FTipSnap.Hits[i].Rows) do
       Result := Result + ',' + IntToStr(FTipSnap.Hits[i].Slots[k]) + ':' + IntToStr(FTipSnap.Hits[i].Rows[k]);
   end;
   for i := 0 to High(FTipHits) do
   begin
-    Result := Result + '|p' + IntToHex(PtrUInt(FTipHits[i].Axis), 16) + H(FTipHits[i].Value)
+    Result := Result + '|p' + IntToHex(UIntPtr(FTipHits[i].Axis), 16) + H(FTipHits[i].Value)
       + ',' + H(FTipHits[i].SnapValue) + BoolToStr(FTipHits[i].Cross, 'c', '');
     for k := 0 to High(FTipHits[i].Rows) do
       Result := Result + ',' + IntToStr(FTipHits[i].Slots[k]) + ':' + IntToStr(FTipHits[i].Rows[k]);

@@ -552,7 +552,7 @@ begin
   {$IFDEF CPUX64}
   { the SSE flags too: ClearExceptions clears the x87 status word only, and
     a sticky invalid-operation flag would be reported by the next trap }
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;

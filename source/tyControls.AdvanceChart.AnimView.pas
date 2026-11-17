@@ -1078,7 +1078,7 @@ begin
 end;
 
 function SameBitsD(A, B: Double): Boolean;
-var qa, qb: QWord;
+var qa, qb: UInt64;
 begin
   Move(A, qa, SizeOf(qa));
   Move(B, qb, SizeOf(qb));
@@ -1367,7 +1367,7 @@ begin
         lists.Add(l);
         map.Add(key, l);
       end;
-      l.Add(Pointer(PtrInt(i)));
+      l.Add(Pointer(IntPtr(i)));
     end;
     for i := 0 to High(AOld) do
     begin
@@ -1375,7 +1375,7 @@ begin
       if (l <> nil) and (l.Count > 0) then
       begin
         { the first left of the key: `shift()` on a list, the one itself }
-        j := PtrInt(l[0]);
+        j := IntPtr(l[0]);
         l.Delete(0);
         Push(ddkUpdate, j, i);
       end
@@ -1388,7 +1388,7 @@ begin
     begin
       l := TList(map.Find(KeyOfS(ANew[i])));
       if l = nil then Continue;
-      for j := 0 to l.Count - 1 do Push(ddkAdd, PtrInt(l[j]), -1);
+      for j := 0 to l.Count - 1 do Push(ddkAdd, IntPtr(l[j]), -1);
       l.Clear;
     end;
   finally
@@ -3030,7 +3030,7 @@ var
   begin
     v := prevIdx.Find(KeyOf(AOld, ARow, ARole));
     Result := v <> nil;
-    if Result then AEl := APrev.Elements[PtrInt(v) - 1]
+    if Result then AEl := APrev.Elements[IntPtr(v) - 1]
     else AEl := Default(TTyChartElement);
   end;
 
@@ -3126,7 +3126,7 @@ var
         if (e.Anim.TwKind = 0) or (e.Anim.Series <> AOld) then Continue;
         if e.Anim.TwKey <> '' then key := IntToStr(e.Anim.TwKind) + 'k' + e.Anim.TwKey
         else key := IntToStr(e.Anim.TwKind) + 'r' + IntToStr(e.Anim.TwRow);
-        if olds.Find(key) = nil then olds.Add(key, Pointer(PtrInt(i + 1)));
+        if olds.Find(key) = nil then olds.Add(key, Pointer(IntPtr(i + 1)));
       end;
       for i := 0 to AList.Count - 1 do
       begin
@@ -3145,7 +3145,7 @@ var
         v := olds.Find(key);
         if v = nil then Continue;
         if taken.Find(key) = nil then taken.Add(key, Pointer(1));
-        oe := APrev.Elements[PtrInt(v) - 1];
+        oe := APrev.Elements[IntPtr(v) - 1];
         if Length(oe.Anim.TwVals) <> Length(e.Anim.TwVals) then Continue;
         { A LINE THAT TURNS STRAIGHT OR CURVED: setLinePoints writes the
           control point at once (undefined on the straight side, which
@@ -5558,11 +5558,11 @@ begin
         transition finds it by its own [Batch 138] }
       if (el.Anim.Role = carTmRect) and (UtHostRole(el) <> '')
         and (prevIdx.Find(KeyOf(el.Anim.Series, el.Anim.Index, 'tmRect')) = nil) then
-        prevIdx.Add(KeyOf(el.Anim.Series, el.Anim.Index, 'tmRect'), Pointer(PtrInt(i + 1)));
+        prevIdx.Add(KeyOf(el.Anim.Series, el.Anim.Index, 'tmRect'), Pointer(IntPtr(i + 1)));
       role := TyChartAnimRoleKey(el);
       if role = '' then Continue;
       if prevIdx.Find(KeyOf(el.Anim.Series, KeyIndexOf(el), role)) = nil then
-        prevIdx.Add(KeyOf(el.Anim.Series, KeyIndexOf(el), role), Pointer(PtrInt(i + 1)));
+        prevIdx.Add(KeyOf(el.Anim.Series, KeyIndexOf(el), role), Pointer(IntPtr(i + 1)));
     end;
     { THE OLD ITEM ELEMENTS AS THEY ARE, before a tween of this update sets a
       carried proxy to the new layout [Batch 136] }
@@ -10690,11 +10690,11 @@ var
   function ItemOf(const AEl: TTyChartElement): Integer;
   begin
     v := AIdx.Find(KeyOf(AEl.Anim.Series, UtRowOf(AEl), 'ut'));
-    if v <> nil then Exit(PtrInt(v) - 1);
+    if v <> nil then Exit(IntPtr(v) - 1);
     Result := Length(AItems);
     SetLength(AItems, Result + 1);
     AItems[Result] := nil;
-    AIdx.Add(KeyOf(AEl.Anim.Series, UtRowOf(AEl), 'ut'), Pointer(PtrInt(Result + 1)));
+    AIdx.Add(KeyOf(AEl.Anim.Series, UtRowOf(AEl), 'ut'), Pointer(IntPtr(Result + 1)));
   end;
 
   { a path of the item, in getPathList's order (a path already there of the
@@ -10965,7 +10965,7 @@ var
     Result := nil;
     if (ASer < 0) or (ASer > High(ASeries)) then Exit;
     v2 := newIdx.Find(KeyOf(ASer, ARow, 'ut'));
-    if v2 <> nil then Result := newItems[PtrInt(v2) - 1];
+    if v2 <> nil then Result := newItems[IntPtr(v2) - 1];
   end;
 
   { THE OLD ITEM'S PATHS (AOld, ARow) as they were before this update: snap
@@ -10976,7 +10976,7 @@ var
     Result := nil;
     if (AOld < 0) or (AOld > High(APrev.Series)) then Exit;
     v2 := AUtIdx.Find(KeyOf(AOld, ARow, 'ut'));
-    if v2 <> nil then Result := AUtItems[PtrInt(v2) - 1];
+    if v2 <> nil then Result := AUtItems[IntPtr(v2) - 1];
   end;
 
   { THE SAME ELEMENT: the new series kept the old one's view, its diff paired
@@ -11750,13 +11750,13 @@ var
           g := Length(AOrder);
           SetLength(AOrder, g + 1);
           AOrder[g] := x;
-          AMap.Add('_ec_' + AKeys[x], Pointer(PtrInt(g + 1)));
+          AMap.Add('_ec_' + AKeys[x], Pointer(IntPtr(g + 1)));
           SetLength(AGroups[g], 1);
           AGroups[g][0] := x;
         end
         else
         begin
-          g := PtrInt(v2) - 1;
+          g := IntPtr(v2) - 1;
           c2 := Length(AGroups[g]);
           SetLength(AGroups[g], c2 + 1);
           AGroups[g][c2] := x;
@@ -11817,7 +11817,7 @@ var
       begin
         v2 := newMap.Find('_ec_' + oldKeys[oldOrder[g]]);
         if v2 = nil then Continue;
-        ng := PtrInt(v2) - 1;
+        ng := IntPtr(v2) - 1;
         if (Length(oldGroups[g]) > 1) and (Length(newGroups[ng]) = 1) then
           ManyToOne(newGroups[ng][0], oldGroups[g])
         else if (Length(oldGroups[g]) = 1) and (Length(newGroups[ng]) > 1) then
@@ -12055,10 +12055,10 @@ begin
         SetLength(newOrders, it + 1);
         newItems[it] := nil;
         newOrders[it] := nil;
-        newIdx.Add(KeyOf(el.Anim.Series, UtRowOf(el), 'ut'), Pointer(PtrInt(it + 1)));
+        newIdx.Add(KeyOf(el.Anim.Series, UtRowOf(el), 'ut'), Pointer(IntPtr(it + 1)));
       end
       else
-        it := PtrInt(v) - 1;
+        it := IntPtr(v) - 1;
       { a place already taken keeps its first }
       at := -1;
       for q := 0 to High(newOrders[it]) do

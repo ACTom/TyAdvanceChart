@@ -266,9 +266,9 @@ begin
               { A TRANSPARENT CATEGORY IS SHOWN AT A FIFTH, not as nothing --
                 upstream's legend rescues an alpha of zero to 0.2 so the item
                 can still be found. The nodes stay transparent. }
-              if (LongWord(Result[i].Colour) shr 24) = 0 then
+              if (Cardinal(Result[i].Colour) shr 24) = 0 then
                 Result[i].Colour := TTyChartColor(
-                  (LongWord(Result[i].Colour) and $00FFFFFF) or $33000000);
+                  (Cardinal(Result[i].Colour) and $00FFFFFF) or $33000000);
             end
             else if (si <= High(FGraphCatColours))
               and (k <= High(FGraphCatColours[si].Base))
@@ -335,9 +335,9 @@ begin
             above is -- but the swatch still carries the datum's own opacity,
             so a slice a visualMap put out of range (colour and opacity both
             nought) stays invisible there too. }
-          if (LongWord(Result[i].Colour) shr 24) = 0 then
+          if (Cardinal(Result[i].Colour) shr 24) = 0 then
             Result[i].Colour := TTyChartColor(
-              (LongWord(Result[i].Colour) and $00FFFFFF) or $33000000);
+              (Cardinal(Result[i].Colour) and $00FFFFFF) or $33000000);
           if (j <= High(FVisualRows)) and (k <= High(FVisualRows[j]))
             and FVisualRows[j][k].OpacitySet
             and not IsNan(FVisualRows[j][k].Opacity) then

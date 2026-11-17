@@ -1565,7 +1565,7 @@ begin
   if AData.JSONType <> jtString then Exit;
   txt := Trim(AData.AsString);
   if (txt = '') or (txt[Length(txt)] <> '%') then Exit;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   if not TryStrToFloat(Copy(txt, 1, Length(txt) - 1), pct, fs) then Exit;
   Result := ASpan * pct / 100;
@@ -2011,7 +2011,7 @@ begin
     ClearExceptions(False);
     {$IFDEF CPUX64}
     { And the SSE flags, which ClearExceptions leaves standing on this CPU. }
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;

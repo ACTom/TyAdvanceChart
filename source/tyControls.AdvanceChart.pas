@@ -1073,9 +1073,9 @@ type
       build, so every build runs the transforms again from FTransformSeed
       (the same clusters on a resize); only the first build after an
       option that brought datasets in moves the chart's stream on. }
-    FTransformSeed: LongWord;
+    FTransformSeed: Cardinal;
     FTransformSeedTaken: Boolean;
-    FTransformRandom: LongWord;
+    FTransformRandom: Cardinal;
     { THE SCATTER JITTER'S PASS: the random state and every category axis'
       placed points, started again by every BuildSeriesList [Batch 110] }
     FJitter: TTyJitterPass;
@@ -4565,7 +4565,7 @@ type
     { the window's paint: composite the clip, preparing first unless a
       flush already did }
     procedure DrPaintWindow;
-    procedure DrFlushAsync(AData: PtrInt);
+    procedure DrFlushAsync(AData: IntPtr);
     function DrCanPartial(AW, AH: Integer): Boolean;
     function DrStaticPartial(const R: TRect; APPI: Integer;
       var APool: TTyRepaintPool): Boolean;
@@ -6647,7 +6647,7 @@ begin
   end;
   i := GTyConnected.IndexOf(AGroup);
   if i < 0 then i := GTyConnected.Add(AGroup);
-  if AOn then GTyConnected.Objects[i] := TObject(PtrUInt(1))
+  if AOn then GTyConnected.Objects[i] := TObject(UIntPtr(1))
   else GTyConnected.Objects[i] := nil;
 end;
 
@@ -6730,7 +6730,7 @@ procedure GeoUnmaskFpu(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
   {$IFDEF CPUX64}
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;
@@ -6966,7 +6966,7 @@ begin
   ClearExceptions(False);
   {$IFDEF CPUX64}
   { the SSE flags too, which ClearExceptions leaves standing on this CPU }
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;

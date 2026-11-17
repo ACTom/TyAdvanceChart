@@ -1070,7 +1070,7 @@ begin
   finally
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;
@@ -1451,7 +1451,7 @@ begin
   finally
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;
@@ -1889,7 +1889,7 @@ const
     another step; taken from the engine upstream runs in, it cannot. The
     whole range a Double holds, because a log axis' extent is read back
     through the same power. }
-  cJsPow10: array[-323..308] of QWord = (
+  cJsPow10: array[-323..308] of UInt64 = (
     $0000000000000002, $0000000000000014, $00000000000000CA, $00000000000007E8,
     $0000000000004F10, $00000000000316A2, $00000000001EE257, $000000000134D761,
     $000000000C1069CD, $0000000078A42205, $00000004B6695433, $0000002F201D49FB,
@@ -2054,7 +2054,7 @@ const
   cSafeTickLimit = 3000;
 
 function TyJsPow10(AExp: Integer): Double;
-var q: QWord;
+var q: UInt64;
 begin
   if (AExp >= Low(cJsPow10)) and (AExp <= High(cJsPow10)) then
   begin
@@ -2087,16 +2087,16 @@ end;
   times ten to the twentieth, shifted far enough left to divide into a
   64-bit quotient. }
 type
-  TJsWide = array[0..7] of LongWord;
+  TJsWide = array[0..7] of Cardinal;
 
-procedure WideMulSmall(var AN: TJsWide; AFactor: LongWord);
-var i: Integer; t, carry: QWord;
+procedure WideMulSmall(var AN: TJsWide; AFactor: Cardinal);
+var i: Integer; t, carry: UInt64;
 begin
   carry := 0;
   for i := 0 to High(AN) do
   begin
-    t := QWord(AN[i]) * AFactor + carry;
-    AN[i] := LongWord(t and $FFFFFFFF);
+    t := UInt64(AN[i]) * AFactor + carry;
+    AN[i] := Cardinal(t and $FFFFFFFF);
     carry := t shr 32;
   end;
 end;
@@ -2110,7 +2110,7 @@ end;
 procedure WideSetBit(var AN: TJsWide; ABit: Integer);
 begin
   if (ABit < 0) or (ABit >= 32 * Length(AN)) then Exit;
-  AN[ABit div 32] := AN[ABit div 32] or (LongWord(1) shl (ABit mod 32));
+  AN[ABit div 32] := AN[ABit div 32] or (Cardinal(1) shl (ABit mod 32));
 end;
 
 function WideBitLen(const AN: TJsWide): Integer;
@@ -2123,22 +2123,22 @@ end;
 
 { Adds 2^ABit, which is where the half-up of a right shift by ABit + 1 comes from. }
 procedure WideAddBit(var AN: TJsWide; ABit: Integer);
-var i: Integer; t, carry: QWord;
+var i: Integer; t, carry: UInt64;
 begin
   if (ABit < 0) or (ABit >= 32 * Length(AN)) then Exit;
   i := ABit div 32;
-  carry := QWord(1) shl (ABit mod 32);
+  carry := UInt64(1) shl (ABit mod 32);
   while (carry <> 0) and (i <= High(AN)) do
   begin
-    t := QWord(AN[i]) + carry;
-    AN[i] := LongWord(t and $FFFFFFFF);
+    t := UInt64(AN[i]) + carry;
+    AN[i] := Cardinal(t and $FFFFFFFF);
     carry := t shr 32;
     Inc(i);
   end;
 end;
 
 procedure WideShr(var AN: TJsWide; ACount: Integer);
-var i, w, b: Integer; lo, hi: QWord;
+var i, w, b: Integer; lo, hi: UInt64;
 begin
   if ACount >= 32 * Length(AN) then
   begin
@@ -2151,8 +2151,8 @@ begin
   begin
     if i + w <= High(AN) then lo := AN[i + w] else lo := 0;
     if i + w + 1 <= High(AN) then hi := AN[i + w + 1] else hi := 0;
-    if b = 0 then AN[i] := LongWord(lo)
-    else AN[i] := LongWord(((lo shr b) or (hi shl (32 - b))) and $FFFFFFFF);
+    if b = 0 then AN[i] := Cardinal(lo)
+    else AN[i] := Cardinal(((lo shr b) or (hi shl (32 - b))) and $FFFFFFFF);
   end;
 end;
 
@@ -2181,7 +2181,7 @@ begin
     end
     else
       borrow := 0;
-    A[i] := LongWord(t);
+    A[i] := Cardinal(t);
   end;
 end;
 
@@ -2201,7 +2201,7 @@ function WideDivToDouble(const ANum, ADen: TJsWide): Double;
 var
   q, r, top: TJsWide;
   ln, ld, s, i, lq, sh, k: Integer;
-  mant: QWord;
+  mant: UInt64;
   lower, up: Boolean;
 begin
   ln := WideBitLen(ANum);
@@ -2226,7 +2226,7 @@ begin
   sh := lq - 53;
   top := q;
   WideShr(top, sh);
-  mant := (QWord(top[1]) shl 32) or top[0];
+  mant := (UInt64(top[1]) shl 32) or top[0];
   lower := False;
   for k := 0 to sh - 2 do
     if WideBit(q, k) then
@@ -2244,17 +2244,17 @@ begin
 end;
 
 { x = m * 2^e for a finite, non-negative x: m under 2^53, e from -1074. }
-procedure SplitDouble(AValue: Double; out AMant: QWord; out AExp: Integer);
-var bits: QWord;
+procedure SplitDouble(AValue: Double; out AMant: UInt64; out AExp: Integer);
+var bits: UInt64;
 begin
   bits := 0;
   Move(AValue, bits, SizeOf(bits));
   AExp := Integer((bits shr 52) and $7FF);
-  AMant := bits and QWord($000FFFFFFFFFFFFF);
+  AMant := bits and UInt64($000FFFFFFFFFFFFF);
   if AExp = 0 then AExp := -1074
   else
   begin
-    AMant := AMant or (QWord(1) shl 52);
+    AMant := AMant or (UInt64(1) shl 52);
     AExp := AExp - 1075;
   end;
 end;
@@ -2263,12 +2263,12 @@ end;
   under 1e21. A fraction: (m*10^p + 2^(k-1)) shifted right by k. A whole
   number: m shifted left by e, times 10^p -- under 2^70 times 10^20. }
 procedure FixedDigits(AAbs: Double; APrecision: Integer; out AN: TJsWide);
-var m: QWord; e, i: Integer;
+var m: UInt64; e, i: Integer;
 begin
   SplitDouble(AAbs, m, e);
   FillChar(AN, SizeOf(AN), 0);
-  AN[0] := LongWord(m and $FFFFFFFF);
-  AN[1] := LongWord(m shr 32);
+  AN[0] := Cardinal(m and $FFFFFFFF);
+  AN[1] := Cardinal(m shr 32);
   if e >= 0 then
   begin
     for i := 1 to e do WideShl1(AN);
@@ -2292,7 +2292,7 @@ end;
 
 { The decimal digits, most significant first; '0' for zero. }
 function WideToDecimal(AN: TJsWide): string;
-var i: Integer; rem, t: QWord;
+var i: Integer; rem, t: UInt64;
 begin
   Result := '';
   repeat
@@ -2300,7 +2300,7 @@ begin
     for i := High(AN) downto 0 do
     begin
       t := (rem shl 32) or AN[i];
-      AN[i] := LongWord(t div 10);
+      AN[i] := Cardinal(t div 10);
       rem := t mod 10;
     end;
     Result := Char(Ord('0') + rem) + Result;
@@ -2310,7 +2310,7 @@ end;
 function TyJsToFixed(AValue: Double; APrecision: Integer): Double;
 var
   x: Double;
-  m: QWord;
+  m: UInt64;
   e, i: Integer;
   neg: Boolean;
   n, den: TJsWide;
@@ -2341,7 +2341,7 @@ begin
     there, only slower. Longer answers go through it. }
   if (n[7] = 0) and (n[6] = 0) and (n[5] = 0) and (n[4] = 0) and (n[3] = 0)
     and (n[2] = 0) and (n[1] < $200000) then
-    Result := ((QWord(n[1]) shl 32) or n[0]) / TyJsPow10(APrecision)
+    Result := ((UInt64(n[1]) shl 32) or n[0]) / TyJsPow10(APrecision)
   else
   begin
     FillChar(den, SizeOf(den), 0);
@@ -2376,7 +2376,7 @@ type
   { An unsigned integer of any size, least significant word first, no
     leading zero words. For a Double's decimal digits: a denormal is a
     thousand bits below one, and 10^17 more on top. }
-  TJsBig = array of LongWord;
+  TJsBig = array of Cardinal;
 
 procedure BigTrim(var A: TJsBig);
 var n: Integer;
@@ -2386,29 +2386,29 @@ begin
   SetLength(A, n);
 end;
 
-function BigOf(AValue: QWord): TJsBig;
+function BigOf(AValue: UInt64): TJsBig;
 begin
   Result := nil;
   SetLength(Result, 2);
-  Result[0] := LongWord(AValue and $FFFFFFFF);
-  Result[1] := LongWord(AValue shr 32);
+  Result[0] := Cardinal(AValue and $FFFFFFFF);
+  Result[1] := Cardinal(AValue shr 32);
   BigTrim(Result);
 end;
 
-procedure BigMulSmall(var A: TJsBig; AFactor: LongWord);
-var i: Integer; t, carry: QWord;
+procedure BigMulSmall(var A: TJsBig; AFactor: Cardinal);
+var i: Integer; t, carry: UInt64;
 begin
   carry := 0;
   for i := 0 to High(A) do
   begin
-    t := QWord(A[i]) * AFactor + carry;
-    A[i] := LongWord(t and $FFFFFFFF);
+    t := UInt64(A[i]) * AFactor + carry;
+    A[i] := Cardinal(t and $FFFFFFFF);
     carry := t shr 32;
   end;
   if carry <> 0 then
   begin
     SetLength(A, Length(A) + 1);
-    A[High(A)] := LongWord(carry);
+    A[High(A)] := Cardinal(carry);
   end;
 end;
 
@@ -2437,8 +2437,8 @@ begin
   for i := 0 to High(r) do r[i] := 0;
   for i := 0 to High(A) do
   begin
-    r[i + w] := r[i + w] or LongWord((QWord(A[i]) shl b) and $FFFFFFFF);
-    if b > 0 then r[i + w + 1] := LongWord(QWord(A[i]) shr (32 - b));
+    r[i + w] := r[i + w] or Cardinal((UInt64(A[i]) shl b) and $FFFFFFFF);
+    if b > 0 then r[i + w + 1] := Cardinal(UInt64(A[i]) shr (32 - b));
   end;
   BigTrim(r);
   A := r;
@@ -2475,13 +2475,13 @@ begin
     end
     else
       borrow := 0;
-    A[i] := LongWord(t);
+    A[i] := Cardinal(t);
   end;
   BigTrim(A);
 end;
 
 function BigBitLen(const A: TJsBig): Integer;
-var top: LongWord;
+var top: Cardinal;
 begin
   if Length(A) = 0 then Exit(0);
   Result := 32 * (Length(A) - 1);
@@ -2495,7 +2495,7 @@ end;
 
 { ANum div ADen for a quotient under 2^62; ANum is left holding the
   remainder. }
-function BigDivSmall(var ANum: TJsBig; const ADen: TJsBig): QWord;
+function BigDivSmall(var ANum: TJsBig; const ADen: TJsBig): UInt64;
 var j: Integer; t: TJsBig;
 begin
   Result := 0;
@@ -2508,14 +2508,14 @@ begin
     if BigCmp(t, ANum) <= 0 then
     begin
       BigSub(ANum, t);
-      Result := Result or (QWord(1) shl j);
+      Result := Result or (UInt64(1) shl j);
     end;
     Dec(j);
   end;
 end;
 
 { Is m * 2^e at least 10^t? }
-function AtLeastPow10(AMant: QWord; AExp, ATen: Integer): Boolean;
+function AtLeastPow10(AMant: UInt64; AExp, ATen: Integer): Boolean;
 var a, b: TJsBig;
 begin
   a := BigOf(AMant);
@@ -2527,8 +2527,8 @@ begin
   Result := BigCmp(a, b) >= 0;
 end;
 
-procedure BigAddSmall(var A: TJsBig; AValue: LongWord);
-var i: Integer; t: QWord;
+procedure BigAddSmall(var A: TJsBig; AValue: Cardinal);
+var i: Integer; t: UInt64;
 begin
   t := AValue;
   i := 0;
@@ -2540,7 +2540,7 @@ begin
       A[i] := 0;
     end;
     t := t + A[i];
-    A[i] := LongWord(t and $FFFFFFFF);
+    A[i] := Cardinal(t and $FFFFFFFF);
     t := t shr 32;
     Inc(i);
   end;
@@ -2551,7 +2551,7 @@ var
   i, d, first, chunk, cnt: Integer;
   num, den, a, b: TJsBig;
   s: Integer;
-  q, mant, bits: QWord;
+  q, mant, bits: UInt64;
   sticky: Boolean;
   e2: Integer;
 
@@ -2598,7 +2598,7 @@ begin
     by, the rest of the remainder sticky. }
   s := 54 - (BigBitLen(num) - BigBitLen(den));
   Quot;
-  if q >= QWord(1) shl 54 then
+  if q >= UInt64(1) shl 54 then
   begin
     Dec(s);
     Quot;
@@ -2613,15 +2613,15 @@ begin
   mant := q shr 1;
   if ((q and 1) <> 0) and (sticky or ((mant and 1) <> 0)) then Inc(mant);
   e2 := 1 - s;
-  if mant = QWord(1) shl 53 then
+  if mant = UInt64(1) shl 53 then
   begin
     mant := mant shr 1;
     Inc(e2);
   end;
-  if mant >= QWord(1) shl 52 then
+  if mant >= UInt64(1) shl 52 then
   begin
     if e2 + 52 + 1023 >= 2047 then Exit(Infinity);
-    bits := (QWord(e2 + 52 + 1023) shl 52) or (mant and ((QWord(1) shl 52) - 1));
+    bits := (UInt64(e2 + 52 + 1023) shl 52) or (mant and ((UInt64(1) shl 52) - 1));
   end
   else
     bits := mant; // a denormal: e2 is -1074
@@ -2632,12 +2632,12 @@ end;
 function TyJsDecimalIsNearest(const ADigits: string; AExp10: Int64;
   AValue: Double): Boolean;
 var
-  bits, mant, hi, lo: QWord;
+  bits, mant, hi, lo: UInt64;
   be, e2, i, first, cnt, chunk: Integer;
   num: TJsBig;
 
   { the sign of num x 10^AExp10 - AK x 2^AF }
-  function Cmp(AK: QWord; AF: Integer): Integer;
+  function Cmp(AK: UInt64; AF: Integer): Integer;
   var a, b: TJsBig;
   begin
     a := Copy(num);
@@ -2654,7 +2654,7 @@ begin
   Move(AValue, bits, SizeOf(bits));
   be := Integer((bits shr 52) and $7FF);
   if be = 0 then Exit;
-  mant := (bits and ((QWord(1) shl 52) - 1)) or (QWord(1) shl 52);
+  mant := (bits and ((UInt64(1) shl 52) - 1)) or (UInt64(1) shl 52);
   e2 := be - 1075;
   first := 1;
   while (first <= Length(ADigits)) and (ADigits[first] = '0') do Inc(first);
@@ -2673,7 +2673,7 @@ begin
     (4m - 1) 2^(e2 - 2) at the bottom of a binade, where the spacing below
     halves }
   hi := 2 * mant + 1;
-  if (mant = QWord(1) shl 52) and (be > 1) then
+  if (mant = UInt64(1) shl 52) and (be > 1) then
   begin
     lo := 4 * mant - 1;
     if Cmp(lo, e2 - 2) <= 0 then Exit;
@@ -2688,7 +2688,7 @@ end;
 
 function TyJsNumberToString(AValue: Double): string;
 var
-  m, lowBound, qf, qc, q: QWord;
+  m, lowBound, qf, qc, q: UInt64;
   e, n, k, t, c, nnf, nnc, nn: Integer;
   num, den, rem2: TJsBig;
   okF, okC: Boolean;
@@ -2700,10 +2700,10 @@ var
     in units of 2^(e-2): x is 4m, the upper bound 4m + 2, the lower one 4m - 2,
     or 4m - 1 at the bottom of a binade, where the spacing below halves. A
     bound itself reads back as x only when m is even. }
-  function ReadsBack(var AQ: QWord; var ANn: Integer): Boolean;
+  function ReadsBack(var AQ: UInt64; var ANn: Integer): Boolean;
   var
     a, bh, bl: TJsBig;
-    lim: QWord;
+    lim: UInt64;
     i, tt, ch, cl: Integer;
   begin
     lim := 1;
@@ -2746,7 +2746,7 @@ begin
   n := Floor(Log10(AValue)) + 1;
   while not AtLeastPow10(m, e, n - 1) do Dec(n);
   while AtLeastPow10(m, e, n) do Inc(n);
-  if (m = QWord(1) shl 52) and (e > -1074) then lowBound := 4 * m - 1
+  if (m = UInt64(1) shl 52) and (e > -1074) then lowBound := 4 * m - 1
   else lowBound := 4 * m - 2;
   for k := 1 to 17 do
   begin
@@ -3259,7 +3259,7 @@ begin
   finally
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;
@@ -3342,7 +3342,7 @@ begin
     ClearExceptions(False);
     {$IFDEF CPUX64}
     { And the SSE flags, which ClearExceptions leaves standing on this CPU. }
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;
@@ -3606,7 +3606,7 @@ begin
   finally
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;

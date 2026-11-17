@@ -80,7 +80,7 @@ var
   pw_cp, pw_cp_h, pw_cp_l, pw_ivln2, pw_ivln2_h, pw_ivln2_l, pw_thrd: Double;
 
 const
-  npio2_hw: array[0..31] of LongInt = (
+  npio2_hw: array[0..31] of Integer = (
     $3FF921FB, $400921FB, $4012D97C, $401921FB, $401F6A7A, $4022D97C,
     $4025FDBB, $402921FB, $402C463A, $402F6A7A, $4031475C, $4032D97C,
     $40346B9C, $4035FDBB, $40378FDB, $403921FB, $403AB41B, $403C463A,
@@ -88,30 +88,30 @@ const
     $4043A28C, $40446B9C, $404534AC, $4045FDBB, $4046C6CB, $40478FDB,
     $404858EB, $404921FB);
 
-function FromBits(AQ: QWord): Double;
+function FromBits(AQ: UInt64): Double;
 begin
   Move(AQ, Result, SizeOf(Result));
 end;
 
 { GET_HIGH_WORD / GET_LOW_WORD / INSERT_WORDS }
-function HighWord(AX: Double): LongInt;
-var q: QWord;
+function HighWord(AX: Double): Integer;
+var q: UInt64;
 begin
   Move(AX, q, SizeOf(q));
-  Result := LongInt(LongWord(q shr 32));
+  Result := Integer(Cardinal(q shr 32));
 end;
 
-function LowWord(AX: Double): LongWord;
-var q: QWord;
+function LowWord(AX: Double): Cardinal;
+var q: UInt64;
 begin
   Move(AX, q, SizeOf(q));
-  Result := LongWord(q and $FFFFFFFF);
+  Result := Cardinal(q and $FFFFFFFF);
 end;
 
-function FromWords(AHigh: LongInt; ALow: LongWord): Double;
-var q: QWord;
+function FromWords(AHigh: Integer; ALow: Cardinal): Double;
+var q: UInt64;
 begin
-  q := (QWord(LongWord(AHigh)) shl 32) or ALow;
+  q := (UInt64(Cardinal(AHigh)) shl 32) or ALow;
   Move(q, Result, SizeOf(Result));
 end;
 
@@ -119,7 +119,7 @@ end;
   two pieces. False past the medium range. }
 function RemPio2(AX: Double; out AN: Integer; out Y0, Y1: Double): Boolean;
 var
-  hx, ix, j, i, n: LongInt;
+  hx, ix, j, i, n: Integer;
   z, t, r, w, fn: Double;
 begin
   Result := True;
@@ -182,7 +182,7 @@ begin
     begin
       j := ix shr 20;
       Y0 := r - w;
-      i := j - LongInt((LongWord(HighWord(Y0)) shr 20) and $7FF);
+      i := j - Integer((Cardinal(HighWord(Y0)) shr 20) and $7FF);
       if i > 16 then
       begin
         t := r;
@@ -190,7 +190,7 @@ begin
         r := t - w;
         w := fn * pio2_2t - ((t - r) - w);
         Y0 := r - w;
-        i := j - LongInt((LongWord(HighWord(Y0)) shr 20) and $7FF);
+        i := j - Integer((Cardinal(HighWord(Y0)) shr 20) and $7FF);
         if i > 49 then
         begin
           t := r;
@@ -217,7 +217,7 @@ end;
 
 { __kernel_sin }
 function KSin(AX, AY: Double; AIY: Integer): Double;
-var ix: LongInt;
+var ix: Integer;
   z, v, r: Double;
 begin
   ix := HighWord(AX) and $7FFFFFFF;
@@ -233,7 +233,7 @@ end;
 
 { __kernel_cos }
 function KCos(AX, AY: Double): Double;
-var ix: LongInt;
+var ix: Integer;
   z, r, qx, hz, a: Double;
 begin
   ix := HighWord(AX) and $7FFFFFFF;
@@ -254,8 +254,8 @@ end;
 function KTan(AX, AY: Double; AIY: Integer): Double;
 var
   z, r, v, w, s, a, t: Double;
-  ix, hx: LongInt;
-  low: LongWord;
+  ix, hx: Integer;
+  low: Cardinal;
 begin
   hx := HighWord(AX);
   ix := hx and $7FFFFFFF;
@@ -263,7 +263,7 @@ begin
   begin
     { x < 2^-28 }
     low := LowWord(AX);
-    if ((LongWord(ix) or low) or LongWord(AIY + 1)) = 0 then
+    if ((Cardinal(ix) or low) or Cardinal(AIY + 1)) = 0 then
       Exit(1 / Abs(AX));
     if AIY = 1 then Exit(AX);
     z := AX + AY;
@@ -313,7 +313,7 @@ end;
 
 function TyJsTan(AX: Double): Double;
 var
-  ix: LongInt;
+  ix: Integer;
   n: Integer;
   y0, y1: Double;
 begin
@@ -346,7 +346,7 @@ begin
 end;
 
 function TyJsSin(AX: Double): Double;
-var ix: LongInt;
+var ix: Integer;
   n: Integer;
   y0, y1: Double;
 begin
@@ -364,7 +364,7 @@ begin
 end;
 
 function TyJsCos(AX: Double): Double;
-var ix: LongInt;
+var ix: Integer;
   n: Integer;
   y0, y1: Double;
 begin
@@ -383,7 +383,7 @@ end;
 
 function TyJsAtan(AX: Double): Double;
 var
-  hx, ix: LongInt;
+  hx, ix: Integer;
   id: Integer;
   z, w, s1_, s2_: Double;
 begin
@@ -441,29 +441,29 @@ end;
 
 function TyJsAcos(AX: Double): Double;
 var
-  hx, ix: LongInt;
+  hx, ix: Integer;
   z, p, q, r, w, s, c, df, pi_, pio2Hi, pio2Lo: Double;
 
   function PQ(AZ: Double): Double;
   begin
-    p := AZ * (FromBits(QWord($3FC5555555555555)) + AZ * (FromBits(QWord($BFD4D61203EB6F7D))
-      + AZ * (FromBits(QWord($3FC9C1550E884455)) + AZ * (FromBits(QWord($BFA48228B5688F3B))
-      + AZ * (FromBits(QWord($3F49EFE07501B288)) + AZ * FromBits(QWord($3F023DE10DFDF709)))))));
-    q := 1.0 + AZ * (FromBits(QWord($C0033A271C8A2D4B)) + AZ * (FromBits(QWord($40002AE59C598AC8))
-      + AZ * (FromBits(QWord($BFE6066C1B8D0159)) + AZ * FromBits(QWord($3FB3B8C5B12E9282)))));
+    p := AZ * (FromBits(UInt64($3FC5555555555555)) + AZ * (FromBits(UInt64($BFD4D61203EB6F7D))
+      + AZ * (FromBits(UInt64($3FC9C1550E884455)) + AZ * (FromBits(UInt64($BFA48228B5688F3B))
+      + AZ * (FromBits(UInt64($3F49EFE07501B288)) + AZ * FromBits(UInt64($3F023DE10DFDF709)))))));
+    q := 1.0 + AZ * (FromBits(UInt64($C0033A271C8A2D4B)) + AZ * (FromBits(UInt64($40002AE59C598AC8))
+      + AZ * (FromBits(UInt64($BFE6066C1B8D0159)) + AZ * FromBits(UInt64($3FB3B8C5B12E9282)))));
     Result := p / q;
   end;
 
 begin
-  pi_ := FromBits(QWord($400921FB54442D18));
-  pio2Hi := FromBits(QWord($3FF921FB54442D18));
-  pio2Lo := FromBits(QWord($3C91A62633145C07));
+  pi_ := FromBits(UInt64($400921FB54442D18));
+  pio2Hi := FromBits(UInt64($3FF921FB54442D18));
+  pio2Lo := FromBits(UInt64($3C91A62633145C07));
   hx := HighWord(AX);
   ix := hx and $7FFFFFFF;
   if ix >= $3FF00000 then
   begin
     { |x| = 1 exactly, or past it: not a number }
-    if ((ix - $3FF00000) or LongInt(LowWord(AX))) = 0 then
+    if ((ix - $3FF00000) or Integer(LowWord(AX))) = 0 then
     begin
       if hx > 0 then Exit(0.0);
       Exit(pi_ + 2.0 * pio2Lo);
@@ -497,28 +497,28 @@ end;
 
 function TyJsAsin(AX: Double): Double;
 var
-  hx, ix: LongInt;
+  hx, ix: Integer;
   t, w, p, q, c, r, s, pio2Hi, pio2Lo, pio4Hi: Double;
 
   procedure PQ(AT: Double);
   begin
-    p := AT * (FromBits(QWord($3FC5555555555555)) + AT * (FromBits(QWord($BFD4D61203EB6F7D))
-      + AT * (FromBits(QWord($3FC9C1550E884455)) + AT * (FromBits(QWord($BFA48228B5688F3B))
-      + AT * (FromBits(QWord($3F49EFE07501B288)) + AT * FromBits(QWord($3F023DE10DFDF709)))))));
-    q := 1.0 + AT * (FromBits(QWord($C0033A271C8A2D4B)) + AT * (FromBits(QWord($40002AE59C598AC8))
-      + AT * (FromBits(QWord($BFE6066C1B8D0159)) + AT * FromBits(QWord($3FB3B8C5B12E9282)))));
+    p := AT * (FromBits(UInt64($3FC5555555555555)) + AT * (FromBits(UInt64($BFD4D61203EB6F7D))
+      + AT * (FromBits(UInt64($3FC9C1550E884455)) + AT * (FromBits(UInt64($BFA48228B5688F3B))
+      + AT * (FromBits(UInt64($3F49EFE07501B288)) + AT * FromBits(UInt64($3F023DE10DFDF709)))))));
+    q := 1.0 + AT * (FromBits(UInt64($C0033A271C8A2D4B)) + AT * (FromBits(UInt64($40002AE59C598AC8))
+      + AT * (FromBits(UInt64($BFE6066C1B8D0159)) + AT * FromBits(UInt64($3FB3B8C5B12E9282)))));
   end;
 
 begin
-  pio2Hi := FromBits(QWord($3FF921FB54442D18));
-  pio2Lo := FromBits(QWord($3C91A62633145C07));
-  pio4Hi := FromBits(QWord($3FE921FB54442D18));
+  pio2Hi := FromBits(UInt64($3FF921FB54442D18));
+  pio2Lo := FromBits(UInt64($3C91A62633145C07));
+  pio4Hi := FromBits(UInt64($3FE921FB54442D18));
   hx := HighWord(AX);
   ix := hx and $7FFFFFFF;
   if ix >= $3FF00000 then
   begin
     { |x| = 1: plus or minus a quarter turn; past it: not a number }
-    if ((ix - $3FF00000) or LongInt(LowWord(AX))) = 0 then
+    if ((ix - $3FF00000) or Integer(LowWord(AX))) = 0 then
       Exit(AX * pio2Hi + AX * pio2Lo);
     Exit(NaN);
   end;
@@ -554,8 +554,8 @@ end;
 
 function TyJsAtan2(AY, AX: Double): Double;
 var
-  hx, ix, hy, iy, k: LongInt;
-  lx, ly: LongWord;
+  hx, ix, hy, iy, k: Integer;
+  lx, ly: Cardinal;
   m: Integer;
   z: Double;
 begin
@@ -666,12 +666,12 @@ end;
 
 {$I tyControls.AdvanceChart.ChecksOff.inc}
 
-function WithHigh(AX: Double; AHigh: LongInt): Double;
+function WithHigh(AX: Double; AHigh: Integer): Double;
 begin
   Result := FromWords(AHigh, LowWord(AX));
 end;
 
-function WithLow(AX: Double; ALow: LongWord): Double;
+function WithLow(AX: Double; ALow: Cardinal): Double;
 begin
   Result := FromWords(HighWord(AX), ALow);
 end;
@@ -689,7 +689,7 @@ begin
   finally
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;
@@ -708,8 +708,8 @@ end;
 function TyJsLog(AX: Double): Double;
 var
   hfsq, f, s, z, R, w, t1, t2, dk, x: Double;
-  k, hx, i, j: LongInt;
-  lx: LongWord;
+  k, hx, i, j: Integer;
+  lx: Cardinal;
 begin
   x := AX;
   hx := HighWord(x);
@@ -717,7 +717,7 @@ begin
   k := 0;
   if hx < $00100000 then                         { x < 2**-1022 }
   begin
-    if ((hx and $7FFFFFFF) or LongInt(lx)) = 0 then
+    if ((hx and $7FFFFFFF) or Integer(lx)) = 0 then
       Exit(NegInfinity);                         { log(+-0) = -inf }
     if hx < 0 then Exit(NaN);                    { log(-#) = NaN }
     k := k - 54;
@@ -765,10 +765,10 @@ begin
 end;
 
 { s_scalbn.c, reached only for a result below the normal range }
-function ScalbN(AX: Double; AN: LongInt): Double;
+function ScalbN(AX: Double; AN: Integer): Double;
 var
-  k, hx: LongInt;
-  lx: LongWord;
+  k, hx: Integer;
+  lx: Cardinal;
   x: Double;
 begin
   x := AX;
@@ -777,7 +777,7 @@ begin
   k := (hx and $7FF00000) shr 20;
   if k = 0 then
   begin
-    if (LongInt(lx) or (hx and $7FFFFFFF)) = 0 then Exit(x);
+    if (Integer(lx) or (hx and $7FFFFFFF)) = 0 then Exit(x);
     x := x * lg_two54;
     hx := HighWord(x);
     k := ((hx and $7FF00000) shr 20) - 54;
@@ -786,14 +786,14 @@ begin
   if k = $7FF then Exit(x + x);
   k := k + AN;
   if k > $7FE then Exit(SignedInf(x < 0));
-  if k > 0 then Exit(WithHigh(x, (hx and LongInt($800FFFFF)) or (k shl 20)));
+  if k > 0 then Exit(WithHigh(x, (hx and Integer($800FFFFF)) or (k shl 20)));
   if k <= -54 then
   begin
     if AN > 50000 then Exit(SignedInf(x < 0));
     Exit(SignedZero(x < 0));
   end;
   k := k + 54;
-  x := WithHigh(x, (hx and LongInt($800FFFFF)) or (k shl 20));
+  x := WithHigh(x, (hx and Integer($800FFFFF)) or (k shl 20));
   Result := x * pw_twom54;
 end;
 
@@ -801,8 +801,8 @@ function TyJsPow(AX, AY: Double): Double;
 var
   z, absx, z_h, z_l, p_h, p_l, y1, t1, t2, r, s, t, u, v, w: Double;
   ss, s2, s_h, s_l, t_h, t_l: Double;
-  i, j, k, yisint, n, hx, hy, ix, iy: LongInt;
-  lx, ly, uj: LongWord;
+  i, j, k, yisint, n, hx, hy, ix, iy: Integer;
+  lx, ly, uj: Cardinal;
   bpk, dphk, dplk: Double;
 begin
   hx := HighWord(AX);
@@ -813,7 +813,7 @@ begin
   iy := hy and $7FFFFFFF;
 
   { y == zero: x**0 = 1 }
-  if (iy or LongInt(ly)) = 0 then Exit(1.0);
+  if (iy or Integer(ly)) = 0 then Exit(1.0);
   { +-NaN return x + y }
   if (ix > $7FF00000) or ((ix = $7FF00000) and (lx <> 0))
     or (iy > $7FF00000) or ((iy = $7FF00000) and (ly <> 0)) then
@@ -830,7 +830,7 @@ begin
       if k > 20 then
       begin
         uj := ly shr (52 - k);
-        if LongWord(uj shl (52 - k)) = ly then yisint := 2 - LongInt(uj and 1);
+        if Cardinal(uj shl (52 - k)) = ly then yisint := 2 - Integer(uj and 1);
       end
       else if ly = 0 then
       begin
@@ -845,7 +845,7 @@ begin
   begin
     if iy = $7FF00000 then                       { y is +-inf }
     begin
-      if ((ix - $3FF00000) or LongInt(lx)) = 0 then
+      if ((ix - $3FF00000) or Integer(lx)) = 0 then
         Exit(NaN)                                { (+-1)**+-inf is NaN }
       else if ix >= $3FF00000 then               { (|x|>1)**+-inf = inf, 0 }
       begin
@@ -890,7 +890,7 @@ begin
       Exit(z);
     end;
 
-  n := LongInt(LongWord(hx) shr 31) - 1;        { 0 when x < 0, -1 otherwise }
+  n := Integer(Cardinal(hx) shr 31) - 1;        { 0 when x < 0, -1 otherwise }
   { (x<0)**(non-int) is NaN }
   if (n or yisint) = 0 then Exit(NaN);
   s := 1.0;
@@ -1006,7 +1006,7 @@ begin
   p_h := y1 * t1;
   z := p_l + p_h;
   j := HighWord(z);
-  i := LongInt(LowWord(z));
+  i := Integer(LowWord(z));
   if j >= $40900000 then                         { z >= 1024 }
   begin
     if ((j - $40900000) or i) <> 0 then
@@ -1016,7 +1016,7 @@ begin
   end
   else if (j and $7FFFFFFF) >= $4090CC00 then    { z <= -1075 }
   begin
-    if ((j - LongInt($C090CC00)) or i) <> 0 then
+    if ((j - Integer($C090CC00)) or i) <> 0 then
       Exit(SignedZero(s < 0))                    { underflow }
     else if p_l <= z - p_h then
       Exit(SignedZero(s < 0));
@@ -1058,98 +1058,98 @@ end;
 {$I tyControls.AdvanceChart.ChecksBack.inc}
 
 initialization
-  invpio2 := FromBits(QWord($3FE45F306DC9C883));
-  pio2_1 := FromBits(QWord($3FF921FB54400000));
-  pio2_1t := FromBits(QWord($3DD0B4611A626331));
-  pio2_2 := FromBits(QWord($3DD0B4611A600000));
-  pio2_2t := FromBits(QWord($3BA3198A2E037073));
-  pio2_3 := FromBits(QWord($3BA3198A2E000000));
-  pio2_3t := FromBits(QWord($397B839A252049C1));
-  S1 := FromBits(QWord($BFC5555555555549));
-  S2 := FromBits(QWord($3F8111111110F8A6));
-  S3 := FromBits(QWord($BF2A01A019C161D5));
-  S4 := FromBits(QWord($3EC71DE357B1FE7D));
-  S5 := FromBits(QWord($BE5AE5E68A2B9CEB));
-  S6 := FromBits(QWord($3DE5D93A5ACFD57C));
-  C1 := FromBits(QWord($3FA555555555554C));
-  C2 := FromBits(QWord($BF56C16C16C15177));
-  C3 := FromBits(QWord($3EFA01A019CB1590));
-  C4 := FromBits(QWord($BE927E4F809C52AD));
-  C5 := FromBits(QWord($3E21EE9EBDB4B1C4));
-  C6 := FromBits(QWord($BDA8FAE9BE8838D4));
-  TT[0] := FromBits(QWord($3FD5555555555563));
-  TT[1] := FromBits(QWord($3FC111111110FE7A));
-  TT[2] := FromBits(QWord($3FABA1BA1BB341FE));
-  TT[3] := FromBits(QWord($3F9664F48406D637));
-  TT[4] := FromBits(QWord($3F8226E3E96E8493));
-  TT[5] := FromBits(QWord($3F6D6D22C9560328));
-  TT[6] := FromBits(QWord($3F57DBC8FEE08315));
-  TT[7] := FromBits(QWord($3F4344D8F2F26501));
-  TT[8] := FromBits(QWord($3F3026F71A8D1068));
-  TT[9] := FromBits(QWord($3F147E88A03792A6));
-  TT[10] := FromBits(QWord($3F12B80F32F0A7E9));
-  TT[11] := FromBits(QWord($BEF375CBDB605373));
-  TT[12] := FromBits(QWord($3EFB2A7074BF7AD4));
-  atanhi[0] := FromBits(QWord($3FDDAC670561BB4F));
-  atanhi[1] := FromBits(QWord($3FE921FB54442D18));
-  atanhi[2] := FromBits(QWord($3FEF730BD281F69B));
-  atanhi[3] := FromBits(QWord($3FF921FB54442D18));
-  atanlo[0] := FromBits(QWord($3C7A2B7F222F65E2));
-  atanlo[1] := FromBits(QWord($3C81A62633145C07));
-  atanlo[2] := FromBits(QWord($3C7007887AF0CBBD));
-  atanlo[3] := FromBits(QWord($3C91A62633145C07));
-  aT[0] := FromBits(QWord($3FD555555555550D));
-  aT[1] := FromBits(QWord($BFC999999998EBC4));
-  aT[2] := FromBits(QWord($3FC24924920083FF));
-  aT[3] := FromBits(QWord($BFBC71C6FE231671));
-  aT[4] := FromBits(QWord($3FB745CDC54C206E));
-  aT[5] := FromBits(QWord($BFB3B0F2AF749A6D));
-  aT[6] := FromBits(QWord($3FB10D66A0D03D51));
-  aT[7] := FromBits(QWord($BFADDE2D52DEFD9A));
-  aT[8] := FromBits(QWord($3FA97B4B24760DEB));
-  aT[9] := FromBits(QWord($BFA2B4442C6A6C2F));
-  aT[10] := FromBits(QWord($3F90AD3AE322DA11));
-  pi_o_4 := FromBits(QWord($3FE921FB54442D18));
-  pi_o_2 := FromBits(QWord($3FF921FB54442D18));
-  pi_ := FromBits(QWord($400921FB54442D18));
-  pi_lo := FromBits(QWord($3CA1A62633145C07));
-  tiny := FromBits(QWord($01A56E1FC2F8F359));
-  negZero := FromBits(QWord($8000000000000000));
-  lg_ln2_hi := FromBits(QWord($3FE62E42FEE00000));
-  lg_ln2_lo := FromBits(QWord($3DEA39EF35793C76));
-  lg_two54 := FromBits(QWord($4350000000000000));
-  lg_third := FromBits(QWord($3FD5555555555555));
-  Lg1 := FromBits(QWord($3FE5555555555593));
-  Lg2 := FromBits(QWord($3FD999999997FA04));
-  Lg3 := FromBits(QWord($3FD2492494229359));
-  Lg4 := FromBits(QWord($3FCC71C51D8E78AF));
-  Lg5 := FromBits(QWord($3FC7466496CB03DE));
-  Lg6 := FromBits(QWord($3FC39A09D078C69F));
-  Lg7 := FromBits(QWord($3FC2F112DF3E5244));
-  pw_dp_h1 := FromBits(QWord($3FE2B80340000000));
-  pw_dp_l1 := FromBits(QWord($3E4CFDEB43CFD006));
-  pw_two53 := FromBits(QWord($4340000000000000));
-  pw_twom54 := FromBits(QWord($3C90000000000000));
-  pw_L1 := FromBits(QWord($3FE3333333333303));
-  pw_L2 := FromBits(QWord($3FDB6DB6DB6FABFF));
-  pw_L3 := FromBits(QWord($3FD55555518F264D));
-  pw_L4 := FromBits(QWord($3FD17460A91D4101));
-  pw_L5 := FromBits(QWord($3FCD864A93C9DB65));
-  pw_L6 := FromBits(QWord($3FCA7E284A454EEF));
-  pw_P1 := FromBits(QWord($3FC555555555553E));
-  pw_P2 := FromBits(QWord($BF66C16C16BEBD93));
-  pw_P3 := FromBits(QWord($3F11566AAF25DE2C));
-  pw_P4 := FromBits(QWord($BEBBBD41C5D26BF1));
-  pw_P5 := FromBits(QWord($3E66376972BEA4D0));
-  pw_lg2 := FromBits(QWord($3FE62E42FEFA39EF));
-  pw_lg2_h := FromBits(QWord($3FE62E4300000000));
-  pw_lg2_l := FromBits(QWord($BE205C610CA86C39));
-  pw_ovt := FromBits(QWord($3C971547652B82FE));
-  pw_cp := FromBits(QWord($3FEEC709DC3A03FD));
-  pw_cp_h := FromBits(QWord($3FEEC709E0000000));
-  pw_cp_l := FromBits(QWord($BE3E2FE0145B01F5));
-  pw_ivln2 := FromBits(QWord($3FF71547652B82FE));
-  pw_ivln2_h := FromBits(QWord($3FF7154760000000));
-  pw_ivln2_l := FromBits(QWord($3E54AE0BF85DDF44));
-  pw_thrd := FromBits(QWord($3FD5555555555555));
+  invpio2 := FromBits(UInt64($3FE45F306DC9C883));
+  pio2_1 := FromBits(UInt64($3FF921FB54400000));
+  pio2_1t := FromBits(UInt64($3DD0B4611A626331));
+  pio2_2 := FromBits(UInt64($3DD0B4611A600000));
+  pio2_2t := FromBits(UInt64($3BA3198A2E037073));
+  pio2_3 := FromBits(UInt64($3BA3198A2E000000));
+  pio2_3t := FromBits(UInt64($397B839A252049C1));
+  S1 := FromBits(UInt64($BFC5555555555549));
+  S2 := FromBits(UInt64($3F8111111110F8A6));
+  S3 := FromBits(UInt64($BF2A01A019C161D5));
+  S4 := FromBits(UInt64($3EC71DE357B1FE7D));
+  S5 := FromBits(UInt64($BE5AE5E68A2B9CEB));
+  S6 := FromBits(UInt64($3DE5D93A5ACFD57C));
+  C1 := FromBits(UInt64($3FA555555555554C));
+  C2 := FromBits(UInt64($BF56C16C16C15177));
+  C3 := FromBits(UInt64($3EFA01A019CB1590));
+  C4 := FromBits(UInt64($BE927E4F809C52AD));
+  C5 := FromBits(UInt64($3E21EE9EBDB4B1C4));
+  C6 := FromBits(UInt64($BDA8FAE9BE8838D4));
+  TT[0] := FromBits(UInt64($3FD5555555555563));
+  TT[1] := FromBits(UInt64($3FC111111110FE7A));
+  TT[2] := FromBits(UInt64($3FABA1BA1BB341FE));
+  TT[3] := FromBits(UInt64($3F9664F48406D637));
+  TT[4] := FromBits(UInt64($3F8226E3E96E8493));
+  TT[5] := FromBits(UInt64($3F6D6D22C9560328));
+  TT[6] := FromBits(UInt64($3F57DBC8FEE08315));
+  TT[7] := FromBits(UInt64($3F4344D8F2F26501));
+  TT[8] := FromBits(UInt64($3F3026F71A8D1068));
+  TT[9] := FromBits(UInt64($3F147E88A03792A6));
+  TT[10] := FromBits(UInt64($3F12B80F32F0A7E9));
+  TT[11] := FromBits(UInt64($BEF375CBDB605373));
+  TT[12] := FromBits(UInt64($3EFB2A7074BF7AD4));
+  atanhi[0] := FromBits(UInt64($3FDDAC670561BB4F));
+  atanhi[1] := FromBits(UInt64($3FE921FB54442D18));
+  atanhi[2] := FromBits(UInt64($3FEF730BD281F69B));
+  atanhi[3] := FromBits(UInt64($3FF921FB54442D18));
+  atanlo[0] := FromBits(UInt64($3C7A2B7F222F65E2));
+  atanlo[1] := FromBits(UInt64($3C81A62633145C07));
+  atanlo[2] := FromBits(UInt64($3C7007887AF0CBBD));
+  atanlo[3] := FromBits(UInt64($3C91A62633145C07));
+  aT[0] := FromBits(UInt64($3FD555555555550D));
+  aT[1] := FromBits(UInt64($BFC999999998EBC4));
+  aT[2] := FromBits(UInt64($3FC24924920083FF));
+  aT[3] := FromBits(UInt64($BFBC71C6FE231671));
+  aT[4] := FromBits(UInt64($3FB745CDC54C206E));
+  aT[5] := FromBits(UInt64($BFB3B0F2AF749A6D));
+  aT[6] := FromBits(UInt64($3FB10D66A0D03D51));
+  aT[7] := FromBits(UInt64($BFADDE2D52DEFD9A));
+  aT[8] := FromBits(UInt64($3FA97B4B24760DEB));
+  aT[9] := FromBits(UInt64($BFA2B4442C6A6C2F));
+  aT[10] := FromBits(UInt64($3F90AD3AE322DA11));
+  pi_o_4 := FromBits(UInt64($3FE921FB54442D18));
+  pi_o_2 := FromBits(UInt64($3FF921FB54442D18));
+  pi_ := FromBits(UInt64($400921FB54442D18));
+  pi_lo := FromBits(UInt64($3CA1A62633145C07));
+  tiny := FromBits(UInt64($01A56E1FC2F8F359));
+  negZero := FromBits(UInt64($8000000000000000));
+  lg_ln2_hi := FromBits(UInt64($3FE62E42FEE00000));
+  lg_ln2_lo := FromBits(UInt64($3DEA39EF35793C76));
+  lg_two54 := FromBits(UInt64($4350000000000000));
+  lg_third := FromBits(UInt64($3FD5555555555555));
+  Lg1 := FromBits(UInt64($3FE5555555555593));
+  Lg2 := FromBits(UInt64($3FD999999997FA04));
+  Lg3 := FromBits(UInt64($3FD2492494229359));
+  Lg4 := FromBits(UInt64($3FCC71C51D8E78AF));
+  Lg5 := FromBits(UInt64($3FC7466496CB03DE));
+  Lg6 := FromBits(UInt64($3FC39A09D078C69F));
+  Lg7 := FromBits(UInt64($3FC2F112DF3E5244));
+  pw_dp_h1 := FromBits(UInt64($3FE2B80340000000));
+  pw_dp_l1 := FromBits(UInt64($3E4CFDEB43CFD006));
+  pw_two53 := FromBits(UInt64($4340000000000000));
+  pw_twom54 := FromBits(UInt64($3C90000000000000));
+  pw_L1 := FromBits(UInt64($3FE3333333333303));
+  pw_L2 := FromBits(UInt64($3FDB6DB6DB6FABFF));
+  pw_L3 := FromBits(UInt64($3FD55555518F264D));
+  pw_L4 := FromBits(UInt64($3FD17460A91D4101));
+  pw_L5 := FromBits(UInt64($3FCD864A93C9DB65));
+  pw_L6 := FromBits(UInt64($3FCA7E284A454EEF));
+  pw_P1 := FromBits(UInt64($3FC555555555553E));
+  pw_P2 := FromBits(UInt64($BF66C16C16BEBD93));
+  pw_P3 := FromBits(UInt64($3F11566AAF25DE2C));
+  pw_P4 := FromBits(UInt64($BEBBBD41C5D26BF1));
+  pw_P5 := FromBits(UInt64($3E66376972BEA4D0));
+  pw_lg2 := FromBits(UInt64($3FE62E42FEFA39EF));
+  pw_lg2_h := FromBits(UInt64($3FE62E4300000000));
+  pw_lg2_l := FromBits(UInt64($BE205C610CA86C39));
+  pw_ovt := FromBits(UInt64($3C971547652B82FE));
+  pw_cp := FromBits(UInt64($3FEEC709DC3A03FD));
+  pw_cp_h := FromBits(UInt64($3FEEC709E0000000));
+  pw_cp_l := FromBits(UInt64($BE3E2FE0145B01F5));
+  pw_ivln2 := FromBits(UInt64($3FF71547652B82FE));
+  pw_ivln2_h := FromBits(UInt64($3FF7154760000000));
+  pw_ivln2_l := FromBits(UInt64($3E54AE0BF85DDF44));
+  pw_thrd := FromBits(UInt64($3FD5555555555555));
 end.

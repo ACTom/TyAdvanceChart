@@ -554,7 +554,7 @@ begin
 end;
 
 function HexOf(A: Double): string;
-var q: QWord;
+var q: UInt64;
 begin
   Move(A, q, SizeOf(q));
   Result := IntToHex(q, 16);

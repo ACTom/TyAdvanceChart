@@ -1097,7 +1097,7 @@ var
 begin
   Result := NaN;
   if AData = nil then Exit;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   case AData.JSONType of
     jtNumber: Result := AData.AsFloat;
@@ -1574,7 +1574,7 @@ end;
 { ==================== the selection model ==================== }
 
 function TyJsIsIndexKey(const AKey: string): Boolean;
-var i: Integer; v: QWord;
+var i: Integer; v: UInt64;
 begin
   Result := False;
   if (AKey = '') or (Length(AKey) > 10) then Exit;
@@ -1583,10 +1583,10 @@ begin
   for i := 1 to Length(AKey) do
   begin
     if not (AKey[i] in ['0'..'9']) then Exit;
-    v := v * 10 + QWord(Ord(AKey[i]) - Ord('0'));
+    v := v * 10 + UInt64(Ord(AKey[i]) - Ord('0'));
   end;
   { an array index is below 2^32 - 1 }
-  Result := v < QWord(4294967295);
+  Result := v < UInt64(4294967295);
 end;
 
 function KeyIndexOf(const AKeys: TTyStringArray; const AKey: string): Integer;
@@ -1600,13 +1600,13 @@ end;
 { where a NEW key goes in JavaScript's own order: an index key among the
   index keys by value, any other key at the end }
 function InsertPos(const AKeys: TTyStringArray; const AKey: string): Integer;
-var i: Integer; v: QWord;
+var i: Integer; v: UInt64;
 begin
   Result := Length(AKeys);
   if not TyJsIsIndexKey(AKey) then Exit;
-  v := StrToQWord(AKey);
+  v := StrToUInt64(AKey);
   for i := 0 to High(AKeys) do
-    if not TyJsIsIndexKey(AKeys[i]) or (StrToQWord(AKeys[i]) > v) then Exit(i);
+    if not TyJsIsIndexKey(AKeys[i]) or (StrToUInt64(AKeys[i]) > v) then Exit(i);
 end;
 
 procedure MapSetBool(var AKeys: TTyStringArray; var AVals: TTyBoolArray;
@@ -1852,7 +1852,7 @@ begin
 end;
 
 initialization
-  GStFmt := DefaultFormatSettings;
+  GStFmt := FormatSettings;
   GStFmt.DecimalSeparator := '.';
   GStFmt.ThousandSeparator := #0;
 

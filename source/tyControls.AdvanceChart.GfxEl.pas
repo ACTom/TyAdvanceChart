@@ -411,7 +411,7 @@ begin
     jtNull: Result := 0;
     jtString:
       begin
-        fs := DefaultFormatSettings;
+        fs := FormatSettings;
         fs.DecimalSeparator := '.';
         s := Trim(A.AsString);
         if s = '' then Result := 0
@@ -1936,7 +1936,7 @@ var
   v: Double;
   parts: TStringArray;
 begin
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   f := AFont;
   if f = '' then f := '12px sans-serif';
@@ -2471,7 +2471,7 @@ end;
 function JsParsePercent(A: TJSONData; AMax: Double): Double;
 var s: string; fs: TFormatSettings; v: Double; i: Integer;
 begin
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   if (A <> nil) and (A.JSONType = jtString) then
   begin

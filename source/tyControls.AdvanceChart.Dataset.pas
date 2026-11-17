@@ -244,7 +244,7 @@ type
     FOwned: TFPList;
     { THE Math.random the transforms draw from [Batch 134]: FRandom when
       nobody lent one, reseeded with TyJitterSeed on every reset }
-    FRandom: LongWord;
+    FRandom: Cardinal;
     FRandomPtr: PLongWord;
     function GetRandomState: PLongWord;
     procedure Reset(AOption: TTyChartOption);
@@ -613,12 +613,12 @@ begin
       end;
       if seenNames.Find(Result[i].Name, j) then
       begin
-        k := PtrInt(seenNames.Objects[j]);
-        seenNames.Objects[j] := TObject(PtrInt(k + 1));
+        k := IntPtr(seenNames.Objects[j]);
+        seenNames.Objects[j] := TObject(IntPtr(k + 1));
         Result[i].Name := Result[i].Name + '-' + IntToStr(k);
       end
       else
-        seenNames.AddObject(Result[i].Name, TObject(PtrInt(1)));
+        seenNames.AddObject(Result[i].Name, TObject(IntPtr(1)));
     end;
   finally
     seenNames.Free;
@@ -650,7 +650,7 @@ begin
   else if B > A then Result := B
   else if (A = 0) and (B = 0) then
   begin
-    if (PQWord(@A)^ shr 63 = 0) then Result := A else Result := B;
+    if (PUInt64(@A)^ shr 63 = 0) then Result := A else Result := B;
   end
   else Result := A;
 end;
@@ -662,7 +662,7 @@ begin
   else if B < A then Result := B
   else if (A = 0) and (B = 0) then
   begin
-    if (PQWord(@A)^ shr 63 = 1) then Result := A else Result := B;
+    if (PUInt64(@A)^ shr 63 = 1) then Result := A else Result := B;
   end
   else Result := A;
 end;
@@ -2285,7 +2285,7 @@ begin
   s := Trim(ACell.AsString);
   { `-` is a gap and says nothing either way. }
   if (s = '') or (s = '-') then Exit;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   AKnown := True;
   Result := not TryStrToFloat(s, v, fs);

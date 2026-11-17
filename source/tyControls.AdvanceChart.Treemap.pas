@@ -876,11 +876,11 @@ begin
       if hasName then
       begin
         if counts.Find(nm, k) then
-          counts.Objects[k] := TObject(PtrInt(counts.Objects[k]) + 1)
+          counts.Objects[k] := TObject(IntPtr(counts.Objects[k]) + 1)
         else
-          k := counts.AddObject(nm, TObject(PtrInt(1)));
-        if PtrInt(counts.Objects[k]) > 1 then
-          Result[row] := nm + '__ec__' + IntToStr(PtrInt(counts.Objects[k]))
+          k := counts.AddObject(nm, TObject(IntPtr(1)));
+        if IntPtr(counts.Objects[k]) > 1 then
+          Result[row] := nm + '__ec__' + IntToStr(IntPtr(counts.Objects[k]))
         else
           Result[row] := nm;
       end
@@ -1368,9 +1368,9 @@ var
   function IdIndex(const AId: string): Integer;
   var q: Integer;
   begin
-    if AIds.Find(AId, q) then Exit(PtrInt(AIds.Objects[q]));
+    if AIds.Find(AId, q) then Exit(IntPtr(AIds.Objects[q]));
     Result := AIds.Count;
-    AIds.AddObject(AId, TObject(PtrInt(Result)));
+    AIds.AddObject(AId, TObject(IntPtr(Result)));
   end;
 
   function Own(AObj: TJSONObject; const AKey: string = 'color'): TJSONData;

@@ -275,7 +275,7 @@ begin
   num := Copy(s, 1, i - 1);
   unitS := Trim(Copy(s, i, MaxInt));
   if num = '' then Exit;
-  if not TryStrToFloat(num, v, DefaultFormatSettings) then Exit;
+  if not TryStrToFloat(num, v, FormatSettings) then Exit;
   if (unitS = 'px') or (unitS = '') then APx := v
   else if unitS = 'pt' then APx := v * 96 / 72
   else if (unitS = 'em') or (unitS = 'rem') then APx := v * AEmPx
@@ -816,7 +816,7 @@ begin
     else if prop = 'line-height' then
     begin
       if low = 'normal' then AStyle.LineHeight := 0
-      else if TryStrToFloat(low, px, DefaultFormatSettings) then
+      else if TryStrToFloat(low, px, FormatSettings) then
         AStyle.LineHeight := px * AStyle.SizePx
       else if CssLength(val, AStyle.SizePx, AStyle.SizePx, px) then
         AStyle.LineHeight := px;
@@ -855,7 +855,7 @@ begin
         if (Length(words[0]) > 1) and (words[0][Length(words[0])] = '%') then
         begin
           ABox.RadiusPct := TryStrToFloat(Copy(words[0], 1, Length(words[0]) - 1),
-            ABox.Radius, DefaultFormatSettings);
+            ABox.Radius, FormatSettings);
           if not ABox.RadiusPct then ABox.Radius := 0;
         end
         else if CssLength(words[0], AStyle.SizePx, -1, px) then

@@ -135,7 +135,7 @@ type
 var
   GEasings: array of TEasingEntry;
 
-function FromBits(AQ: QWord): Double;
+function FromBits(AQ: UInt64): Double;
 begin
   Move(AQ, Result, SizeOf(Result));
 end;
@@ -151,7 +151,7 @@ begin
   ClearExceptions(False);
   {$IFDEF CPUX64}
   { the SSE sticky flags too: ClearExceptions only clears the x87 word here }
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;

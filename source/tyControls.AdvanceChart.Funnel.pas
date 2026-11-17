@@ -292,7 +292,7 @@ begin
   if (s = 'center') or (s = 'middle') then Exit(TyBoxPercent(50));
   if (s = 'left') or (s = 'top') then Exit(TyBoxPercent(0));
   if (s = 'right') or (s = 'bottom') then Exit(TyBoxPercent(100));
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   if s[Length(s)] = '%' then
   begin
@@ -483,7 +483,7 @@ begin
   finally
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;
@@ -501,7 +501,7 @@ begin
   finally
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;
@@ -916,7 +916,7 @@ begin
   finally
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;

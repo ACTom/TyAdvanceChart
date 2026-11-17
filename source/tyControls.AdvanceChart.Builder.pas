@@ -280,7 +280,7 @@ type
   private
     FItems: array of TTyAxisMemory;
     FRandomSeeded: Boolean;
-    FRandomState: LongWord;
+    FRandomState: Cardinal;
   public
     { THE CHART'S Math.random [Batch 132]: the xorshift32 the oracle hands
       upstream, seeded once with TyJitterSeed and never reset -- not by a
@@ -884,12 +884,12 @@ begin
   if (s = 'center') or (s = 'centre') or (s = 'middle') then Exit(TyBoxCentre);
   if s[Length(s)] = '%' then
   begin
-    fs := DefaultFormatSettings;
+    fs := FormatSettings;
     fs.DecimalSeparator := '.';
     if TryStrToFloat(Copy(s, 1, Length(s) - 1), v, fs) then Exit(TyBoxPercent(v));
     Exit;
   end;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   if TryStrToFloat(s, v, fs) then Result := TyBoxPx(v);
 end;

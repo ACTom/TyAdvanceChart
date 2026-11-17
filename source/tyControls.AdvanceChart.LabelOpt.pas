@@ -261,7 +261,7 @@ begin
   if AData.JSONType <> jtString then Exit;
   s := Trim(AData.AsString);
   if s = '' then Exit;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   if s[Length(s)] = '%' then
   begin
@@ -367,7 +367,7 @@ begin
   Result := ABase;
   series := ASeries;
   node := ANode;
-  fwfs := DefaultFormatSettings;
+  fwfs := FormatSettings;
   fwfs.DecimalSeparator := '.';
   { A STATE THAT SHOWS THE LABEL, read whether or not the series writes a
     `label` of its own: needsCreateText [Batch 88] }

@@ -199,7 +199,7 @@ procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
   {$IFDEF CPUX64}
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;
@@ -222,7 +222,7 @@ begin
 end;
 
 function SignBit(A: Double): Boolean; inline;
-var q: QWord;
+var q: UInt64;
 begin
   Move(A, q, SizeOf(q));
   Result := (q shr 63) <> 0;
@@ -258,14 +258,14 @@ begin
 end;
 
 { ToInt32 }
-function ToInt32(A: Double): LongInt;
+function ToInt32(A: Double): Integer;
 var q: Int64;
 begin
   if IsNan(A) or IsInfinite(A) then Exit(0);
   A := Int(A);
   A := A - JsFloor(A / 4294967296.0) * 4294967296.0;
   q := Trunc(A);
-  Result := LongInt(LongWord(q));
+  Result := Integer(Cardinal(q));
 end;
 
 { array[i] -- undefined (not a number) outside it }
@@ -1190,7 +1190,7 @@ end;
 
 function TyMorphHilbert(AX, AY, AMinX, AMinY, AMaxX, AMaxY: Double): Double;
 var
-  x, y, s, rx, ry, tmp: LongInt;
+  x, y, s, rx, ry, tmp: Integer;
   d: Double;
 var mask: TFPUExceptionMask;
 begin

@@ -115,7 +115,7 @@ function TyChartImageStamp(const ASource: string): string;
   Change), so a cache keyed by the list alone would keep the old picture;
   a cache that asks this when it is consulted sees the new one. A few
   hundred multiplications for a 32 x 32 picture. Out of range: a constant. }
-function TyChartImagePrint(AList: TCustomImageList; AIndex: Integer): QWord;
+function TyChartImagePrint(AList: TCustomImageList; AIndex: Integer): UInt64;
 
 { [r2v] How many pictures of AList the cache holds (a query for the tests:
   a Replace makes a new picture of the slot and lets the old one go). }
@@ -172,7 +172,7 @@ end;
 
 function ListKeyPrefix(AList: TCustomImageList): string;
 begin
-  Result := IntToHex(PtrUInt(AList), SizeOf(Pointer) * 2) + '/';
+  Result := IntToHex(UIntPtr(AList), SizeOf(Pointer) * 2) + '/';
 end;
 
 { every cached bitmap of AList }
@@ -420,7 +420,7 @@ begin
   w := ARes.Width;
   h := ARes.Height;
   if (raw.Data = nil) or (w <= 0) or (h <= 0)
-    or (raw.DataSize < PtrUInt(w * h * SizeOf(TRGBAQuad))) then Exit;
+    or (raw.DataSize < UIntPtr(w * h * SizeOf(TRGBAQuad))) then Exit;
   Result := TBGRABitmap.Create(w, h);
   q := PRGBAQuad(raw.Data);
   for y := 0 to h - 1 do
@@ -449,26 +449,26 @@ begin
     if Copy(GListCache[i], 1, Length(pre)) = pre then Inc(Result);
 end;
 
-function TyChartImagePrint(AList: TCustomImageList; AIndex: Integer): QWord;
+function TyChartImagePrint(AList: TCustomImageList; AIndex: Integer): UInt64;
 const
-  cPrime = QWord($100000001B3);
+  cPrime = UInt64($100000001B3);
 var
   i, k, n: Integer;
   r: TCustomImageListResolution;
   raw: TRawImage;
-  q: PQWord;
+  q: PUInt64;
   b: PByte;
 begin
-  Result := QWord($CBF29CE484222325);
+  Result := UInt64($CBF29CE484222325);
   if (AList = nil) or (AIndex < 0) or (AIndex >= AList.Count) then Exit;
   for i := 0 to AList.ResolutionCount - 1 do
   begin
     r := AList.ResolutionByIndex[i];
     if (r = nil) or (AIndex >= r.Count) then Continue;
     r.GetRawImage(AIndex, raw);
-    Result := (Result xor QWord(r.Width)) * cPrime;
+    Result := (Result xor UInt64(r.Width)) * cPrime;
     if raw.Data = nil then Continue;
-    q := PQWord(raw.Data);
+    q := PUInt64(raw.Data);
     n := raw.DataSize div 8;
     for k := 1 to n do
     begin
@@ -477,7 +477,7 @@ begin
       Inc(q);
     end;
     b := PByte(q);
-    for k := 1 to raw.DataSize - PtrUInt(n) * 8 do
+    for k := 1 to raw.DataSize - UIntPtr(n) * 8 do
     begin
       Result := (Result xor b^) * cPrime;
       Inc(b);

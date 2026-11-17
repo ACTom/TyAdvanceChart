@@ -1757,7 +1757,7 @@ end;
 
 
 initialization
-  Fmt := DefaultFormatSettings;
+  Fmt := FormatSettings;
   Fmt.DecimalSeparator := '.';
 
 end.

@@ -38,7 +38,7 @@ uses SysUtils, Math;
 
 const
   { TyGraphForceSeed(0): the oracle's seed }
-  TyJitterSeed: LongWord = 2463534242;
+  TyJitterSeed: Cardinal = 2463534242;
 
 type
   TTyJitterItem = record
@@ -69,7 +69,7 @@ type
   { The random state and every axis' points, for one pass. }
   TTyJitterPass = class
   private
-    FState: LongWord;
+    FState: Cardinal;
     FAxes: array of TTyJitterAxis;
   public
     constructor Create;
@@ -80,14 +80,14 @@ type
     { the axis under AKey, made with these options the first time }
     function AxisFor(const AKey: string; AJitter, AMargin: Double;
       AOverlap: Boolean; ABand: Double): TTyJitterAxis;
-    property State: LongWord read FState write FState;
+    property State: Cardinal read FState write FState;
   end;
 
 { the xorshift32 step: TyGraphRandom's, a new state and x / 2^32 }
-function TyJitterRandom(var AState: LongWord): Double;
+function TyJitterRandom(var AState: Cardinal): Double;
 { fixJitterIgnoreOverlaps on a category axis }
 function TyJitterIgnoreOverlaps(AFloat, AJitter, ABand, ARadius: Double;
-  var AState: LongWord): Double;
+  var AState: Cardinal): Double;
 { placeJitterOnDirection over the first ACount of AItems }
 function TyJitterPlace(const AItems: array of TTyJitterItem; ACount: Integer;
   AFixed, AFloat, ARadius, AJitter, AMargin: Double; ADir: Integer): Double;
@@ -110,7 +110,7 @@ begin
   {$IFDEF CPUX64}
   { the SSE flags too: ClearExceptions clears the x87 status word only, and
     a sticky invalid-operation flag would be reported by the next trap }
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;
@@ -126,21 +126,21 @@ begin
   Result := not (IsNan(A) or IsNan(B)) and (A > B);
 end;
 
-function TyJitterRandom(var AState: LongWord): Double;
-var x: LongWord;
+function TyJitterRandom(var AState: Cardinal): Double;
+var x: Cardinal;
 begin
   {$I tyControls.AdvanceChart.ChecksOff.inc}
   x := AState;
-  x := x xor LongWord(x shl 13);
+  x := x xor Cardinal(x shl 13);
   x := x xor (x shr 17);
-  x := x xor LongWord(x shl 5);
+  x := x xor Cardinal(x shl 5);
   {$I tyControls.AdvanceChart.ChecksBack.inc}
   AState := x;
   Result := x / cTwo32;
 end;
 
 function TyJitterIgnoreOverlaps(AFloat, AJitter, ABand, ARadius: Double;
-  var AState: LongWord): Double;
+  var AState: Cardinal): Double;
 var
   maxJitter, actual: Double;
 begin
@@ -201,7 +201,7 @@ end;
 function TTyJitterAxis.Fix(AFixed, AFloat, ARadius: Double): Double;
 var
   a, b, minFloat, distance: Double;
-  state: LongWord;
+  state: Cardinal;
   mask: TFPUExceptionMask;
 begin
   { jitter > 0, as a number: anything else leaves the point alone }

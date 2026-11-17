@@ -813,7 +813,7 @@ var
   end;
 
 begin
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   plainToo := AHasPlain and AInherit;
   { the fill: own, 'inherit' the site's; a free text's falls to the root

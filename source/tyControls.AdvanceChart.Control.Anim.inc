@@ -274,7 +274,7 @@ begin
     { the old group's leaves by anid (getElMap) }
     for i := 0 to High(oldEls) do
       if oldIdx.Find(oldKeys[i]) = nil then
-        oldIdx.Add(oldKeys[i], Pointer(PtrInt(i + 1)));
+        oldIdx.Add(oldKeys[i], Pointer(IntPtr(i + 1)));
     for i := 0 to High(newEls) do
     begin
       props := TyAxisAnimProps(newEls[i]);
@@ -292,7 +292,7 @@ begin
         Continue;
       end;
       { the old leaf's props as they are NOW: its proxy's, while it moves }
-      from := TyAxisAnimProps(oldEls[PtrInt(v) - 1]);
+      from := TyAxisAnimProps(oldEls[IntPtr(v) - 1]);
       q := TTyChartAnimProxy(oldMap.Find(newKeys[i]));
       if q <> nil then
         for k := 0 to High(from) do
@@ -341,17 +341,17 @@ begin
         idx := TFPHashList.Create;
         for k := 0 to High(FUtStale) do
           idx.Add(IntToStr(FUtStale[k].Anim.Series) + ':' + IntToStr(FUtStale[k].Anim.Index),
-            Pointer(PtrInt(k + 1)));
+            Pointer(IntPtr(k + 1)));
       end;
       key := IntToStr(pe^.Anim.Series) + ':' + IntToStr(pe^.Anim.Index);
       v := idx.Find(key);
       if v <> nil then
-        FUtStale[PtrInt(v) - 1] := pe^
+        FUtStale[IntPtr(v) - 1] := pe^
       else
       begin
         SetLength(FUtStale, Length(FUtStale) + 1);
         FUtStale[High(FUtStale)] := pe^;
-        idx.Add(key, Pointer(PtrInt(Length(FUtStale))));
+        idx.Add(key, Pointer(IntPtr(Length(FUtStale))));
       end;
     end;
   finally
@@ -931,11 +931,11 @@ begin
           sl.Duplicates := dupIgnore;
           sl.Sorted := True;
           for i := 0 to High(FPolarStyleMem[m].RowKeys) do
-            sl.AddObject(FPolarStyleMem[m].RowKeys[i], TObject(PtrInt(i + 1)));
+            sl.AddObject(FPolarStyleMem[m].RowKeys[i], TObject(IntPtr(i + 1)));
           for i := 0 to Math.Min(n, Length(keys)) - 1 do
             if sl.Find(keys[i], k) then
             begin
-              k := PtrInt(sl.Objects[k]) - 1;
+              k := IntPtr(sl.Objects[k]) - 1;
               if (k <= High(FPolarStyleMem[m].Has)) and FPolarStyleMem[m].Has[k] then
               begin
                 s := FPolarStyleMem[m].Rows[k];
@@ -1075,13 +1075,13 @@ begin
       k := counts.IndexOf(nm);
       if k < 0 then
       begin
-        counts.AddObject(nm, TObject(PtrInt(1)));
+        counts.AddObject(nm, TObject(IntPtr(1)));
         c := 1;
       end
       else
       begin
-        c := PtrInt(counts.Objects[k]) + 1;
-        counts.Objects[k] := TObject(PtrInt(c));
+        c := IntPtr(counts.Objects[k]) + 1;
+        counts.Objects[k] := TObject(IntPtr(c));
       end;
       if c > 1 then rawKeys[raw] := nm + '__ec__' + IntToStr(c)
       else rawKeys[raw] := nm;

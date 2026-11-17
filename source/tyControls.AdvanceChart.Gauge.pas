@@ -590,7 +590,7 @@ begin
   {$IFDEF CPUX64}
   { and the SSE flags, which ClearExceptions leaves on this CPU (Graph.pas
     UnmaskFP) }
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;

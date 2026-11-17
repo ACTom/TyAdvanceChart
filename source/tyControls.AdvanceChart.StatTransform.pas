@@ -56,7 +56,7 @@ var
   { Math.LN10, Math.LN2, Math.E, -1/3 and the three square roots, as bits }
   GLn10, GLn2, GE, GMinusThird, GSqrt50, GSqrt10, GSqrt2: Double;
 
-function FromBits(AQ: QWord): Double;
+function FromBits(AQ: UInt64): Double;
 begin
   Move(AQ, Result, SizeOf(Result));
 end;
@@ -1401,12 +1401,12 @@ begin
 end;
 
 initialization
-  GLn10 := FromBits(QWord($40026BB1BBB55516));
-  GLn2 := FromBits(QWord($3FE62E42FEFA39EF));
-  GE := FromBits(QWord($4005BF0A8B145769));
-  GMinusThird := FromBits(QWord($BFD5555555555555));
-  GSqrt50 := FromBits(QWord($401C48C6001F0AC0));
-  GSqrt10 := FromBits(QWord($40094C583ADA5B53));
-  GSqrt2 := FromBits(QWord($3FF6A09E667F3BCD));
+  GLn10 := FromBits(UInt64($40026BB1BBB55516));
+  GLn2 := FromBits(UInt64($3FE62E42FEFA39EF));
+  GE := FromBits(UInt64($4005BF0A8B145769));
+  GMinusThird := FromBits(UInt64($BFD5555555555555));
+  GSqrt50 := FromBits(UInt64($401C48C6001F0AC0));
+  GSqrt10 := FromBits(UInt64($40094C583ADA5B53));
+  GSqrt2 := FromBits(UInt64($3FF6A09E667F3BCD));
   TyRegisterEcStatTransforms;
 end.

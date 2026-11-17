@@ -112,7 +112,7 @@ implementation
 
 uses tyControls.AdvanceChart.JsMath;
 
-function FromBits(AQ: QWord): Double;
+function FromBits(AQ: UInt64): Double;
 begin
   Move(AQ, Result, SizeOf(Result));
 end;
@@ -647,5 +647,5 @@ begin
 end;
 
 initialization
-  cMagic := FromBits(QWord($3FF4CCCCCCCCCCCD));
+  cMagic := FromBits(UInt64($3FF4CCCCCCCCCCCD));
 end.

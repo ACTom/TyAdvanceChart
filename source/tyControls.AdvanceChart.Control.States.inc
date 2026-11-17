@@ -4530,7 +4530,7 @@ begin
     if FBindings[ASlot].XAxis <> nil then
       Result := 'grid' + IntToStr(FBindings[ASlot].XAxis.GridIndex)
     else
-      Result := 'cart' + IntToStr(PtrUInt(FBindings[ASlot].Cart));
+      Result := 'cart' + IntToStr(UIntPtr(FBindings[ASlot].Cart));
   end
   else if FBindings[ASlot].Polar <> nil then
     { a polar is its own master [Batch 113] }

@@ -2312,7 +2312,7 @@ begin
             if (Pos(needle, LowerCase(edges[i].Name)) > 0)
               and ((child < 0) or (child > High(seen)) or not seen[child]) then
             begin
-              found.AddObject(full, TObject(PtrInt(child)));
+              found.AddObject(full, TObject(IntPtr(child)));
               Inc(Result);
               if (ALimit > 0) and (Result >= ALimit) then Break;
             end;

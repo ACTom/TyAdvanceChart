@@ -1088,7 +1088,7 @@ var
 begin
   if IsNan(AValue) then Exit('');
   if IsInfinite(AValue) then Exit('');
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   fs.ThousandSeparator := #0;
   Result := FormatFloat('0.######', AValue, fs);

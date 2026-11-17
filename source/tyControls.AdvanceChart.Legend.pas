@@ -2081,9 +2081,9 @@ end;
 function TyJsKeyOrder(AObj: TJSONObject): TTyLegendNames;
 var
   i, j, n: Integer;
-  idx: array of QWord;
+  idx: array of UInt64;
   t: string;
-  v: QWord;
+  v: UInt64;
 begin
   Result := nil;
   if AObj = nil then Exit;
@@ -2095,7 +2095,7 @@ begin
   begin
     t := AObj.Names[i];
     if not TyJsIsIndexKey(t) then Continue;
-    v := StrToQWord(t);
+    v := StrToUInt64(t);
     SetLength(idx, n + 1);
     j := n;
     while (j > 0) and (idx[j - 1] > v) do

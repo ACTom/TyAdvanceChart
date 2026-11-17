@@ -569,7 +569,7 @@ begin
     begin
       { The alpha of rgba() is 0..1, not 0..255, and it is written with a '.'
         whatever the machine's locale says. }
-      fs := DefaultFormatSettings;
+      fs := FormatSettings;
       fs.DecimalSeparator := '.';
       if not TryStrToFloat(part, alphaF, fs) then Exit;
       if alphaF < 0 then alphaF := 0;

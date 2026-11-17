@@ -603,7 +603,7 @@ function TyDeepSame(A, B: Pointer; ATypeInfo: PTypeInfo): Boolean;
 var
   td: PTypeData;
   mf: PManagedField;
-  i, n, sz: SizeInt;
+  i, n, sz: IntPtr;
   ti: PTypeInfo;
   pa, pb: Pointer;
 begin

@@ -298,8 +298,8 @@ type
     Color: TBGRAPixel;
     Mode: TDrawMode;
     Ready: Boolean;
-    Keys: array[0..cRectMemoSize - 1] of QWord;
-    Res: array[0..cRectMemoSize - 1] of LongWord;
+    Keys: array[0..cRectMemoSize - 1] of UInt64;
+    Res: array[0..cRectMemoSize - 1] of Cardinal;
   end;
 
 function TyRectFillMemoNew: TObject;
@@ -330,19 +330,19 @@ var
   segAlpha: array[0..2] of Word;
   { the last pixel value each segment met and what it became: down a bar's
     column the same value comes back row after row }
-  segIn, segOut: array[0..2] of LongWord;
+  segIn, segOut: array[0..2] of Cardinal;
   segHas: array[0..2] of Boolean;
   pl: PLongWord;
-  v: LongWord;
+  v: Cardinal;
 
   { the brush on one pixel, through the memo }
   procedure PutOne(P: PLongWord; AAlpha: Word; AX, AY: Integer);
   var
-    key: QWord;
-    h: LongWord;
+    key: UInt64;
+    h: Cardinal;
   begin
-    key := QWord(P^) or (QWord(AAlpha) shl 32) or (QWord(1) shl 48);
-    h := (P^ xor (P^ shr 15) xor (LongWord(AAlpha) * 2654435761)) and (cRectMemoSize - 1);
+    key := UInt64(P^) or (UInt64(AAlpha) shl 32) or (UInt64(1) shl 48);
+    h := (P^ xor (P^ shr 15) xor (Cardinal(AAlpha) * 2654435761)) and (cRectMemoSize - 1);
     if memo.Keys[h] = key then
     begin
       P^ := memo.Res[h];
@@ -363,7 +363,7 @@ begin
   if (AMemo is TTyRectFillMemo) and (ABmp.Colorspace = TBGRAPixelColorspace) then
   begin
     memo := TTyRectFillMemo(AMemo);
-    if not memo.Ready or (LongWord(memo.Color) <> LongWord(AColor))
+    if not memo.Ready or (Cardinal(memo.Color) <> Cardinal(AColor))
       or (memo.Mode <> ABmp.AntialiasingDrawMode) then
     begin
       FillChar(memo.Keys, SizeOf(memo.Keys), 0);
@@ -1329,7 +1329,7 @@ begin
   Result := False;
   s := Trim(AType);
   if (s = '') or (s = 'solid') or not (AWidth > 0) then Exit;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   if s = 'dashed' then
   begin
@@ -1430,7 +1430,7 @@ const
   TraceKeptMaxBytes = 32 * 1024 * 1024;
 
 var
-  GTraceKept: specialize TDictionary<QWord, TTyTraceKept> = nil;
+  GTraceKept: specialize TDictionary<UInt64, TTyTraceKept> = nil;
   GTraceKeptCount: Integer = 0;
   GTraceKeptBytes: Int64 = 0;
   GTraceKeptHits: Integer = 0;
@@ -1508,10 +1508,10 @@ var
   b0, b1, b2, b3: Boolean;
   kTop, kRight, kBottom, kLeft: Integer;
   o: TTyHaloOutline;
-  rowOr: LongWord;
+  rowOr: Cardinal;
   px: PLongWord;
   keep: Boolean;
-  hk: QWord;
+  hk: UInt64;
   kt, kFirst: TTyTraceKept;
   ab: PByte;
 
@@ -1591,7 +1591,7 @@ begin
       rowOr := rowOr or px^;
       Inc(px);
     end;
-    if rowOr and (LongWord($80) shl TBGRAPixel_AlphaShift) = 0 then Continue;
+    if rowOr and (Cardinal($80) shl TBGRAPixel_AlphaShift) = 0 then Continue;
     for x := 0 to w - 1 do
     begin
       if row^.alpha >= 128 then
@@ -1647,16 +1647,16 @@ begin
     if keep then
     begin
       {$I tyControls.AdvanceChart.ChecksOff.inc}
-      hk := QWord($CBF29CE484222325);
-      hk := (hk xor QWord(LongWord(x0))) * QWord($100000001B3);
-      hk := (hk xor QWord(LongWord(y0))) * QWord($100000001B3);
-      hk := (hk xor QWord(LongWord(aw))) * QWord($100000001B3);
-      hk := (hk xor QWord(LongWord(ah))) * QWord($100000001B3);
-      hk := (hk xor QWord(LongWord(AScale))) * QWord($100000001B3);
+      hk := UInt64($CBF29CE484222325);
+      hk := (hk xor UInt64(Cardinal(x0))) * UInt64($100000001B3);
+      hk := (hk xor UInt64(Cardinal(y0))) * UInt64($100000001B3);
+      hk := (hk xor UInt64(Cardinal(aw))) * UInt64($100000001B3);
+      hk := (hk xor UInt64(Cardinal(ah))) * UInt64($100000001B3);
+      hk := (hk xor UInt64(Cardinal(AScale))) * UInt64($100000001B3);
       ab := al;
       for i := 0 to aw * ah - 1 do
       begin
-        hk := (hk xor ab^) * QWord($100000001B3);
+        hk := (hk xor ab^) * UInt64($100000001B3);
         Inc(ab);
       end;
       {$I tyControls.AdvanceChart.ChecksBack.inc}
@@ -1680,7 +1680,7 @@ begin
       end;
     end;
     { every slot empty; a crossing is written before it is read }
-    FillDWord(adj^, nKeys * 2, LongWord(-1));
+    FillDWord(adj^, nKeys * 2, Cardinal(-1));
     segA := nil;
     segB := nil;
     nSeg := 0;
@@ -1767,7 +1767,7 @@ begin
     if keep then
     begin
       if GTraceKept = nil then
-        GTraceKept := specialize TDictionary<QWord, TTyTraceKept>.Create;
+        GTraceKept := specialize TDictionary<UInt64, TTyTraceKept>.Create;
       if (GTraceKeptCount >= TraceKeptMaxCount) or (GTraceKeptBytes + aw * ah
         + 8 * Length(o.Pts) + 4 * Length(o.Starts) > TraceKeptMaxBytes) then
       begin
@@ -3582,7 +3582,7 @@ var
     { a row's polygon with BGRA's generator pinned (TyPinBgraRandom) }
     procedure PinnedPoly(AKind: Integer);
     var
-      saved: LongWord;
+      saved: Cardinal;
     begin
       saved := TyPinBgraRandom;
       try

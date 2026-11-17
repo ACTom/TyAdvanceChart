@@ -138,7 +138,7 @@ begin
   { the SSE flags too: ClearExceptions clears only the x87 status word here,
     and a sticky invalid-operation flag would make the host's next division
     by zero report as an invalid operation }
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;

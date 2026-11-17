@@ -327,7 +327,7 @@ end;
 function PctNum(const S: string): Double;
 var fs: TFormatSettings;
 begin
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   Result := StrToFloatDef(Trim(S), NaN, fs);
 end;

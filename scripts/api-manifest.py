@@ -35,8 +35,8 @@ CLASSES = ('TTyCustomAdvanceChart', 'TTyAdvanceChart')
 SECTIONS = ('public', 'published')
 
 ALIASES = {
-    'qword': 'UInt64', 'pqword': 'PUInt64', 'ptrint': 'NativeInt', 'ptruint': 'NativeUInt',
-    'sizeint': 'NativeInt', 'longword': 'Cardinal', 'longint': 'Integer',
+    'qword': 'UInt64', 'pqword': 'PUInt64', 'ptrint': 'IntPtr', 'ptruint': 'UIntPtr',
+    'sizeint': 'IntPtr', 'longword': 'Cardinal', 'longint': 'Integer',
 }
 ALIAS_RE = re.compile(r'\b(' + '|'.join(ALIASES) + r')\b', re.IGNORECASE)
 
@@ -229,7 +229,7 @@ def selftest():
     assert len(found['public']) == 3, found
     assert len(found['published']) == 1, found
     assert not any('Hide' in x or 'FHidden' in x for s in SECTIONS for x in found[s]), found
-    assert 'function Sum(const A: UInt64; B: NativeInt): Integer; overload;' in found['public'], found
+    assert 'function Sum(const A: UInt64; B: IntPtr): Integer; overload;' in found['public'], found
     assert 'FPlain, FOther: Integer;' in found['public'], found
     assert 'constructor Create(AOwner: TComponent); override;' in found['public'], found
     assert found['published'] == ['property Count: Cardinal read FCount write SetCount default 0;'], found

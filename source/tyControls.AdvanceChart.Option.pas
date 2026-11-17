@@ -394,7 +394,7 @@ var
 begin
   Result := ADefault;
   if AData = nil then Exit;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   fs.ThousandSeparator := #0;
   v := NaN;
@@ -449,7 +449,7 @@ var s, u: string; v: Double; fs: TFormatSettings; p, k: Integer;
 
 begin
   Result := False;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   if (AStyle <> nil) and (AStyle.JSONType = jtString) and (Trim(AStyle.AsString) <> '') then
   begin
@@ -1171,11 +1171,11 @@ var
     isInt, neg, expNeg, hasExp: Boolean;
     v: Int64;
     s: string;
-    qw: QWord;
+    qw: UInt64;
     i64: Int64;
     f: Double;
     code: Integer;
-    m: QWord;
+    m: UInt64;
   begin
     Result := False;
     AValue := nil;
@@ -1205,7 +1205,7 @@ var
         if digits < 18 then v := v * 10 + (Ord(p^) - Ord('0'));
         Inc(digits);
         Inc(sig);
-        if sig <= 15 then m := m * 10 + QWord(Ord(p^) - Ord('0'));
+        if sig <= 15 then m := m * 10 + UInt64(Ord(p^) - Ord('0'));
         Inc(p);
       end;
     isInt := True;
@@ -1219,7 +1219,7 @@ var
         if (sig > 0) or (p^ <> '0') then
         begin
           Inc(sig);
-          if sig <= 15 then m := m * 10 + QWord(Ord(p^) - Ord('0'));
+          if sig <= 15 then m := m * 10 + UInt64(Ord(p^) - Ord('0'));
         end;
         Inc(fracLen);
         Inc(p);
@@ -1256,7 +1256,7 @@ var
       { ParseNumber, as it is }
       if TryStrToQWord(s, qw) then
       begin
-        if qw > QWord(High(Int64)) then AValue := CreateJSON(qw)
+        if qw > UInt64(High(Int64)) then AValue := CreateJSON(qw)
         else if qw > MaxInt then AValue := CreateJSON(Int64(qw))
         else AValue := CreateJSON(Integer(qw));
         Exit(True);
@@ -1545,7 +1545,7 @@ function TyJsonTokenNumber(const AText: string; AStart, ALen: Integer;
 var
   p, stop, d, fracLen, ex, expo, intStart, intEnd, fracStart: Integer;
   neg, expNeg, seen: Boolean;
-  m: QWord;
+  m: UInt64;
 begin
   p := AStart;
   stop := AStart + ALen;
@@ -1566,7 +1566,7 @@ begin
     begin
       seen := True;
       Inc(d);
-      if d <= 15 then m := m * 10 + QWord(Ord(AText[p]) - Ord('0'));
+      if d <= 15 then m := m * 10 + UInt64(Ord(AText[p]) - Ord('0'));
     end;
     Inc(p);
   end;
@@ -1582,7 +1582,7 @@ begin
       begin
         seen := True;
         Inc(d);
-        if d <= 15 then m := m * 10 + QWord(Ord(AText[p]) - Ord('0'));
+        if d <= 15 then m := m * 10 + UInt64(Ord(AText[p]) - Ord('0'));
       end;
       Inc(p);
     end;

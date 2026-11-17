@@ -380,7 +380,7 @@ end;
 { ==================== small JavaScript ==================== }
 
 function IsIndexKey(const AKey: string): Boolean;
-var i: Integer; v: QWord;
+var i: Integer; v: UInt64;
 begin
   Result := False;
   if (AKey = '') or (Length(AKey) > 10) then Exit;
@@ -389,17 +389,17 @@ begin
   for i := 1 to Length(AKey) do
   begin
     if not (AKey[i] in ['0'..'9']) then Exit;
-    v := v * 10 + QWord(Ord(AKey[i]) - Ord('0'));
+    v := v * 10 + UInt64(Ord(AKey[i]) - Ord('0'));
   end;
-  Result := v < QWord(4294967295);
+  Result := v < UInt64(4294967295);
 end;
 
 function TyJsOrderedKeys(AObj: TJSONObject): TStringArray;
 var
   i, j, n: Integer;
-  idx: array of QWord;
+  idx: array of UInt64;
   t: string;
-  v: QWord;
+  v: UInt64;
 begin
   Result := nil;
   if AObj = nil then Exit;
@@ -410,7 +410,7 @@ begin
   begin
     t := AObj.Names[i];
     if not IsIndexKey(t) then Continue;
-    v := StrToQWord(t);
+    v := StrToUInt64(t);
     j := n;
     while (j > 0) and (idx[j - 1] > v) do
     begin
@@ -710,7 +710,7 @@ begin
     for i := 0 to ASource.Count - 1 do
     begin
       k := TJSONObject(ASource).Names[i];
-      if IsIndexKey(k) and (StrToQWord(k) < QWord(MaxInt)) then
+      if IsIndexKey(k) and (StrToUInt64(k) < UInt64(MaxInt)) then
         MergeArrayAt(TJSONArray(ATarget), StrToInt(k), ASource.Items[i]);
     end;
 end;

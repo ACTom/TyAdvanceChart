@@ -1677,7 +1677,7 @@ begin
   if not FZAllocOn or (FZAlloc = nil) then Exit;
   p := FZAlloc.Find(AMainType + '#' + IntToStr(AIndex));
   if p = nil then Exit;
-  ALevel := Integer(PtrInt(p) - cZAllocBias);
+  ALevel := Integer(IntPtr(p) - cZAllocBias);
   Result := True;
 end;
 
@@ -1889,7 +1889,7 @@ begin
     end;
     lastZl := zl;
     hasLast := True;
-    FZAlloc.Add(items[i].MainType + '#' + IntToStr(items[i].Index), Pointer(PtrInt(zl + cZAllocBias)));
+    FZAlloc.Add(items[i].MainType + '#' + IntToStr(items[i].Index), Pointer(IntPtr(zl + cZAllocBias)));
   end;
   FZAllocOn := True;
 end;
@@ -3417,7 +3417,7 @@ begin
     for j := 0 to High(pairs) do
       if pairs[j] < pv then Inc(FViews[i].Rank);
     mt := FViews[i].MainType + '#' + IntToStr(FViews[i].Index);
-    if FViewRank.Find(mt) = nil then FViewRank.Add(mt, Pointer(PtrInt(FViews[i].Rank + 1)));
+    if FViewRank.Find(mt) = nil then FViewRank.Add(mt, Pointer(IntPtr(FViews[i].Rank + 1)));
   end;
 end;
 
@@ -3427,7 +3427,7 @@ begin
   Result := 0;
   if FViewRank = nil then Exit;
   p := FViewRank.Find(AMainType + '#' + IntToStr(AIndex));
-  if p <> nil then Result := PtrInt(p) - 1;
+  if p <> nil then Result := IntPtr(p) - 1;
 end;
 
 function TTyCustomAdvanceChart.ViewNum(const AMainType: string; AIndex, ABase: Integer): Integer;
@@ -5923,7 +5923,7 @@ begin
   end;
 end;
 
-procedure TTyCustomAdvanceChart.DrFlushAsync(AData: PtrInt);
+procedure TTyCustomAdvanceChart.DrFlushAsync(AData: IntPtr);
 var
   i: Integer;
   px: TRect;

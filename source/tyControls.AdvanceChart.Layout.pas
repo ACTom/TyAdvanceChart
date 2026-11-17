@@ -1353,7 +1353,7 @@ begin
     The check says the rule where the rule belongs; it is not, today, the thing
     enforcing it. }
   if not seenDigit then Exit;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   Result := TryStrToFloat(Copy(AText, 1, i - 1), AValue, fs);
 end;
@@ -1565,7 +1565,7 @@ procedure TyUnmaskJs(AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
   {$IFDEF CPUX64}
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;
@@ -2112,7 +2112,7 @@ var fs: TFormatSettings;
   end;
 
 begin
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   fs.ThousandSeparator := #0;
   Result.Left := Raw(ASpec.Left);

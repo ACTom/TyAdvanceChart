@@ -937,7 +937,7 @@ end;
 
 function SignBit(A: Double): Boolean;
 begin
-  Result := (PQWord(@A)^ shr 63) = 1;
+  Result := (PUInt64(@A)^ shr 63) = 1;
 end;
 
 { Math.min / Math.max: a not-a-number wins, and -0 is below +0 }
@@ -1601,21 +1601,21 @@ begin
   inherited Destroy;
 end;
 
-function ToInt32(AValue: Double): LongInt;
+function ToInt32(AValue: Double): Integer;
 var t: Double;
 begin
   if IsNan(AValue) or IsInfinite(AValue) then Exit(0);
   t := Int(AValue);
   t := t - 4294967296.0 * Floor(t / 4294967296.0);
   if t >= 2147483648.0 then t := t - 4294967296.0;
-  Result := LongInt(Trunc(t));
+  Result := Integer(Trunc(t));
 end;
 
 function TyGeoDecodeRing(const AText: string; AOffX, AOffY, AScale: Double): TTyGeoRing;
 var
   u: UnicodeString;
   i, n, k: Integer;
-  xi, yi: LongInt;
+  xi, yi: Integer;
   x, y, prevX, prevY, cy: Double;
 begin
   Result := nil;

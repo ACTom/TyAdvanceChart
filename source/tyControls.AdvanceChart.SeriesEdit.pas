@@ -426,7 +426,7 @@ begin
       else
         Exit(TJSONInt64Number.Create(i64));
     end;
-    fs := DefaultFormatSettings;
+    fs := FormatSettings;
     fs.DecimalSeparator := '.';
     fs.ThousandSeparator := #0;
     if TryStrToFloat(t, f, fs) then Exit(TJSONFloatNumber.Create(f));

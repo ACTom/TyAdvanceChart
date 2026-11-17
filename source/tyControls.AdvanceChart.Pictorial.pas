@@ -261,7 +261,7 @@ end;
 function NumOf(const AText: string; out AValue: Double): Boolean;
 var fs: TFormatSettings;
 begin
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   Result := TryStrToFloat(Trim(AText), AValue, fs);
 end;
@@ -269,7 +269,7 @@ end;
 function NumToStr(AValue: Double): string;
 var fs: TFormatSettings;
 begin
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   fs.ThousandSeparator := #0;
   Result := FloatToStr(AValue, fs);

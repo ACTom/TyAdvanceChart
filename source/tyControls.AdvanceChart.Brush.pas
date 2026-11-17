@@ -609,7 +609,7 @@ procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
   {$IFDEF CPUX64}
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;

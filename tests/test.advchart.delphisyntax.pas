@@ -13,13 +13,13 @@ const
   // The expected counts. Edit these, nothing else, to ratchet.
   ExpNestedBraceComments = 0;
   ExpObjFpcMode = 114;
-  ExpFpcTypeNames = 506;
+  ExpFpcTypeNames = 0;
   ExpStringCaseLabels = 22;
   ExpCompoundAssignments = 0;
   ExpFpcOnlyKeywords = 5;
   ExpBarePushPop = 0;
   ExpConditionalSymbols = 0;
-  ExpFpcOnlyNames = 417;
+  ExpFpcOnlyNames = 5;
 
 type
   TPascalScanTest = class(TTestCase)

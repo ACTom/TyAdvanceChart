@@ -221,7 +221,7 @@ begin
   if d.JSONType <> jtString then Exit;
   s := Trim(d.AsString);
   if s = '' then Exit;
-  fs := DefaultFormatSettings;
+  fs := FormatSettings;
   fs.DecimalSeparator := '.';
   if s[Length(s)] = '%' then
   begin

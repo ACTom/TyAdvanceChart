@@ -78,7 +78,7 @@ function TyAxisBreakLineOn(ANode: TJSONObject): Boolean;
   and the spans are css px, the ends snapped on the css px grid }
 procedure TyBreakZigzag(AC0, AC1: Double; AHorizontal: Boolean;
   AZMin, AZMax, AAmplitude, AMinSpan, AMaxSpan: Double;
-  var ARandoms: TTyDoubleArray; var AState: LongWord;
+  var ARandoms: TTyDoubleArray; var AState: Cardinal;
   out AA, AB: TTyBreakPointArray; AScale: Double = 1);
 
 { THE AXIS LINE CUT AT THE BREAKS (buildAxisBreakLine). AFrame is the
@@ -277,7 +277,7 @@ begin
   finally
     ClearExceptions(False);
     {$IFDEF CPUX64}
-    SetMXCSR(GetMXCSR and not LongWord($3F));
+    SetMXCSR(GetMXCSR and not Cardinal($3F));
     {$ENDIF}
     SetExceptionMask(mask);
   end;
@@ -433,7 +433,7 @@ end;
 
 procedure TyBreakZigzag(AC0, AC1: Double; AHorizontal: Boolean;
   AZMin, AZMax, AAmplitude, AMinSpan, AMaxSpan: Double;
-  var ARandoms: TTyDoubleArray; var AState: LongWord;
+  var ARandoms: TTyDoubleArray; var AState: Cardinal;
   out AA, AB: TTyBreakPointArray; AScale: Double);
 var
   t, cur, pa, pb, rv, minS, maxS: Double;

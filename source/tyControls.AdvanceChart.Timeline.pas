@@ -247,7 +247,7 @@ procedure TyTlEmphasisDefault(AStyle: TJSONObject; const AFill, AStroke: TTyAnim
   begin
     if not TyTryParseChartColor(AText, c) then Exit(AText);
     c := TyChartLiftColor(c);
-    fs := DefaultFormatSettings;
+    fs := FormatSettings;
     fs.DecimalSeparator := '.';
     Result := Format('rgba(%d,%d,%d,%s)', [(c shr 16) and $FF, (c shr 8) and $FF, c and $FF,
       TyJsNumberToString(((c shr 24) and $FF) / 255)], fs);
@@ -358,7 +358,7 @@ begin
 end;
 
 function TyTlNumJson(AValue: Double): TJSONData;
-var q: QWord;
+var q: UInt64;
 begin
   { minus nought keeps its sign: the sign bit, not 1 / x (a trap) }
   Move(AValue, q, SizeOf(q));
@@ -1095,7 +1095,7 @@ procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
   {$IFDEF CPUX64}
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;

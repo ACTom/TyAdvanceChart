@@ -147,7 +147,7 @@ procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
   {$IFDEF CPUX64}
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;
@@ -253,7 +253,7 @@ end;
 { ==================== the key order ==================== }
 
 { whether AKey is an array index: canonical, below 2^32 - 1 }
-function IsArrayIndex(const AKey: string; out AValue: QWord): Boolean;
+function IsArrayIndex(const AKey: string; out AValue: UInt64): Boolean;
 var i: Integer;
 begin
   Result := False;
@@ -263,14 +263,14 @@ begin
   for i := 1 to Length(AKey) do
   begin
     if not (AKey[i] in ['0'..'9']) then Exit;
-    AValue := AValue * 10 + QWord(Ord(AKey[i]) - Ord('0'));
+    AValue := AValue * 10 + UInt64(Ord(AKey[i]) - Ord('0'));
   end;
-  Result := AValue < QWord(4294967295);
+  Result := AValue < UInt64(4294967295);
 end;
 
 function TyRiverKeyOrder(const AKeys: TTyStringArray): TTyIntegerArray;
 var
-  idx: array of QWord;
+  idx: array of UInt64;
   isIdx: array of Boolean;
   i, j, n, k: Integer;
   t: Integer;

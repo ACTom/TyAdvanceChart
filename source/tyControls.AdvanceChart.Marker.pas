@@ -312,10 +312,10 @@ begin
 end;
 
 function IsNegZero(A: Double): Boolean;
-var q: QWord;
+var q: UInt64;
 begin
   Move(A, q, SizeOf(q));
-  Result := q = QWord($8000000000000000);
+  Result := q = UInt64($8000000000000000);
 end;
 
 { Math.max / Math.min: NaN wins, and +0 beats -0 }

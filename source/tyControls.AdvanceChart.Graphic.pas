@@ -291,7 +291,7 @@ begin
     jtNull: Result := 0;
     jtString:
       begin
-        fs := DefaultFormatSettings;
+        fs := FormatSettings;
         fs.DecimalSeparator := '.';
         s := Trim(A.AsString);
         if s = '' then Result := 0

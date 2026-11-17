@@ -883,7 +883,7 @@ var
   bmp: TBGRABitmap;
   px: PBGRAPixel;
   el: TTyChartElement;
-  hash: QWord;
+  hash: UInt64;
   mask: TFPUExceptionMask;
 
   function Num(const AKey: string; ADefault: Double): Double;
@@ -1016,9 +1016,9 @@ begin
   FHeatLayers[ASlot] := lay;
   if (lay.PixW <= 0) or (lay.PixH <= 0) or (Length(lay.Bytes) = 0) then Exit;
   { the image: the bytes under a key of their own (FNV-1a over them) }
-  hash := QWord($cbf29ce484222325);
+  hash := UInt64($cbf29ce484222325);
   for k := 0 to High(lay.Bytes) do
-    hash := (hash xor lay.Bytes[k]) * QWord($100000001b3);
+    hash := (hash xor lay.Bytes[k]) * UInt64($100000001b3);
   key := Format('data:image/x-ty-heatmap;base64,%dx%d-%s', [lay.PixW, lay.PixH,
     IntToHex(hash, 16)]);
   bmp := TBGRABitmap.Create(lay.PixW, lay.PixH);
@@ -1457,10 +1457,10 @@ begin
           begin
             li := Length(lists);
             SetLength(lists, li + 1);
-            names.AddObject(nm, TObject(PtrInt(li)));
+            names.AddObject(nm, TObject(IntPtr(li)));
           end
           else
-            li := PtrInt(names.Objects[idx]);
+            li := IntPtr(names.Objects[idx]);
           if dimV >= 0 then v := st.GetByRaw(dimV, raw) else v := NaN;
           if not IsNan(v) then
           begin
@@ -1479,7 +1479,7 @@ begin
         idx := names.IndexOf(st.GetNameByRaw(raw));
         stats[raw] := NaN;
         if idx < 0 then Continue;
-        li := PtrInt(names.Objects[idx]);
+        li := IntPtr(names.Objects[idx]);
         n := Length(lists[li]);
         if n = 0 then Continue;
         sum := 0;
@@ -1791,12 +1791,12 @@ begin
           if idx < 0 then
           begin
             FMapGroups[g].SymOff[fi][raw] := 0;
-            counts.AddObject(nm, TObject(PtrInt(1)));
+            counts.AddObject(nm, TObject(IntPtr(1)));
           end
           else
           begin
-            FMapGroups[g].SymOff[fi][raw] := PtrInt(counts.Objects[idx]);
-            counts.Objects[idx] := TObject(PtrInt(counts.Objects[idx]) + 1);
+            FMapGroups[g].SymOff[fi][raw] := IntPtr(counts.Objects[idx]);
+            counts.Objects[idx] := TObject(IntPtr(counts.Objects[idx]) + 1);
           end;
         end;
       end;

@@ -256,16 +256,16 @@ type
       touches the map [was: the first ordinal, and the blind append put a
       new category into a map already built] }
     FSlots: array of Integer;
-    FHashes: array of LongWord;
+    FHashes: array of Cardinal;
     FUsed: Integer;
     FMapOn: Boolean;
     FNeedCollect: Boolean;
     FDeduplication: Boolean;
-    function MapFind(const ACategory: string; AHash: LongWord): Integer;
-    procedure MapPut(AOrdinal: Integer; AHash: LongWord);
+    function MapFind(const ACategory: string; AHash: Cardinal): Integer;
+    procedure MapPut(AOrdinal: Integer; AHash: Cardinal);
     { [R2-I6] HashMap.set: the category's slot takes AOrdinal, a new slot
       where it has none }
-    procedure MapSet(AOrdinal: Integer; AHash: LongWord);
+    procedure MapSet(AOrdinal: Integer; AHash: Cardinal);
     procedure EnsureMap;
     procedure Add(const ACategory: string; AToMap: Boolean);
   public
@@ -716,7 +716,7 @@ end;
 { ==================== JavaScript's numbers from text ==================== }
 
 { The code point at AText[AAt], and how many bytes it takes. }
-function CodePointAt(const AText: string; AAt: Integer; out ALen: Integer): LongWord;
+function CodePointAt(const AText: string; AAt: Integer; out ALen: Integer): Cardinal;
 var b: Byte;
 begin
   b := Ord(AText[AAt]);
@@ -743,7 +743,7 @@ begin
 end;
 
 { WhiteSpace and LineTerminator, as the specification lists them. }
-function IsJsSpace(ACode: LongWord): Boolean;
+function IsJsSpace(ACode: Cardinal): Boolean;
 begin
   case ACode of
     9, 10, 11, 12, 13, 32, $A0, $1680, $2000..$200A, $2028, $2029, $202F,
@@ -754,7 +754,7 @@ begin
 end;
 
 function TyJsTrim(const AText: string): string;
-var i, j, n, len, cpLen: Integer; cp: LongWord;
+var i, j, n, len, cpLen: Integer; cp: Cardinal;
 begin
   n := Length(AText);
   i := 1;
@@ -1203,13 +1203,13 @@ type
   end;
   { TIME_ZONE_INFORMATION }
   TTyWinTzi = record
-    Bias: LongInt;
+    Bias: Integer;
     StandardName: array[0..31] of WideChar;
     StandardDate: TTyWinSysTime;
-    StandardBias: LongInt;
+    StandardBias: Integer;
     DaylightName: array[0..31] of WideChar;
     DaylightDate: TTyWinSysTime;
-    DaylightBias: LongInt;
+    DaylightBias: Integer;
   end;
   { DYNAMIC_TIME_ZONE_INFORMATION }
   TTyWinDynTzi = record
@@ -1218,8 +1218,8 @@ type
     DynamicDaylightTimeDisabled: ByteBool;
   end;
   {$IFDEF FPC}{$POP}{$ENDIF}
-  TTyGetDynTzi = function(var ADtzi: TTyWinDynTzi): LongWord; stdcall;
-  TTyGetTzi = function(var ATzi: TTyWinTzi): LongWord; stdcall;
+  TTyGetDynTzi = function(var ADtzi: TTyWinDynTzi): Cardinal; stdcall;
+  TTyGetTzi = function(var ATzi: TTyWinTzi): Cardinal; stdcall;
   TTyGetTziForYear = function(AYear: Word; ADtzi: Pointer;
     var ATzi: TTyWinTzi): LongBool; stdcall;
   TTySysToTzLocal = function(ATzi: Pointer;
@@ -1621,7 +1621,7 @@ begin
   inherited Destroy;
 end;
 
-function OrdinalHash(const AText: string): LongWord;
+function OrdinalHash(const AText: string): Cardinal;
 var i: Integer;
 begin
   Result := 2166136261;
@@ -1631,13 +1631,13 @@ begin
   {$I tyControls.AdvanceChart.ChecksBack.inc}
 end;
 
-function TTyOrdinalMeta.MapFind(const ACategory: string; AHash: LongWord): Integer;
+function TTyOrdinalMeta.MapFind(const ACategory: string; AHash: Cardinal): Integer;
 var i, mask: Integer;
 begin
   Result := -1;
   if Length(FSlots) = 0 then Exit;
   mask := High(FSlots);
-  i := Integer(AHash and LongWord(mask));
+  i := Integer(AHash and Cardinal(mask));
   while FSlots[i] <> 0 do
   begin
     if (FHashes[i] = AHash) and (FCategories[FSlots[i] - 1] = ACategory) then
@@ -1648,11 +1648,11 @@ end;
 
 { the ordinal in, AHash its category's -- not looked for first: the caller
   knows it is not there }
-procedure TTyOrdinalMeta.MapPut(AOrdinal: Integer; AHash: LongWord);
+procedure TTyOrdinalMeta.MapPut(AOrdinal: Integer; AHash: Cardinal);
 var
   i, mask, k, n: Integer;
   oldSlots: array of Integer;
-  oldHashes: array of LongWord;
+  oldHashes: array of Cardinal;
 begin
   if (FUsed + 1) * 2 > Length(FSlots) then
   begin
@@ -1668,14 +1668,14 @@ begin
     for k := 0 to High(oldSlots) do
       if oldSlots[k] <> 0 then
       begin
-        i := Integer(oldHashes[k] and LongWord(mask));
+        i := Integer(oldHashes[k] and Cardinal(mask));
         while FSlots[i] <> 0 do i := (i + 1) and mask;
         FSlots[i] := oldSlots[k];
         FHashes[i] := oldHashes[k];
       end;
   end;
   mask := High(FSlots);
-  i := Integer(AHash and LongWord(mask));
+  i := Integer(AHash and Cardinal(mask));
   while FSlots[i] <> 0 do i := (i + 1) and mask;
   FSlots[i] := AOrdinal + 1;
   FHashes[i] := AHash;
@@ -1685,7 +1685,7 @@ end;
 procedure TTyOrdinalMeta.EnsureMap;
 var
   i: Integer;
-  h: LongWord;
+  h: Cardinal;
 begin
   if FMapOn then Exit;
   { by bytes, as upstream keys a name: the locale compare took
@@ -1701,13 +1701,13 @@ begin
   end;
 end;
 
-procedure TTyOrdinalMeta.MapSet(AOrdinal: Integer; AHash: LongWord);
+procedure TTyOrdinalMeta.MapSet(AOrdinal: Integer; AHash: Cardinal);
 var i, mask: Integer;
 begin
   if Length(FSlots) > 0 then
   begin
     mask := High(FSlots);
-    i := Integer(AHash and LongWord(mask));
+    i := Integer(AHash and Cardinal(mask));
     while FSlots[i] <> 0 do
     begin
       if (FHashes[i] = AHash)

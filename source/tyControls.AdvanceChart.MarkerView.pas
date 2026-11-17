@@ -1705,13 +1705,13 @@ begin
         idx0 := seen.IndexOf(nm0);
         if idx0 < 0 then
         begin
-          seen.AddObject(nm0, TObject(PtrInt(1)));
+          seen.AddObject(nm0, TObject(IntPtr(1)));
           pic.Id := nm0;
         end
         else
         begin
-          seen.Objects[idx0] := TObject(PtrInt(PtrInt(seen.Objects[idx0]) + 1));
-          pic.Id := nm0 + '__ec__' + IntToStr(PtrInt(seen.Objects[idx0]));
+          seen.Objects[idx0] := TObject(IntPtr(IntPtr(seen.Objects[idx0]) + 1));
+          pic.Id := nm0 + '__ec__' + IntToStr(IntPtr(seen.Objects[idx0]));
         end;
       end
       else
@@ -3293,13 +3293,13 @@ begin
         idx0 := seen.IndexOf(nm0);
         if idx0 < 0 then
         begin
-          seen.AddObject(nm0, TObject(PtrInt(1)));
+          seen.AddObject(nm0, TObject(IntPtr(1)));
           Result[n].Id := nm0;
         end
         else
         begin
-          seen.Objects[idx0] := TObject(PtrInt(PtrInt(seen.Objects[idx0]) + 1));
-          Result[n].Id := nm0 + '__ec__' + IntToStr(PtrInt(seen.Objects[idx0]));
+          seen.Objects[idx0] := TObject(IntPtr(IntPtr(seen.Objects[idx0]) + 1));
+          Result[n].Id := nm0 + '__ec__' + IntToStr(IntPtr(seen.Objects[idx0]));
         end;
       end
       else

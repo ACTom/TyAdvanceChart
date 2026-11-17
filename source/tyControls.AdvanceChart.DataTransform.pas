@@ -1361,7 +1361,7 @@ var
   ups, outs: TTySourceRefArray;
   i: Integer;
   mask: TFPUExceptionMask;
-  ownRandom: LongWord;
+  ownRandom: Cardinal;
 begin
   ownRandom := TyJitterSeed;
   if ARandom = nil then ARandom := @ownRandom;

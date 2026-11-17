@@ -198,7 +198,7 @@ procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
   {$IFDEF CPUX64}
-  SetMXCSR(GetMXCSR and not LongWord($3F));
+  SetMXCSR(GetMXCSR and not Cardinal($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
 end;
@@ -218,7 +218,7 @@ end;
 { minus nought: nought with the sign bit set }
 function IsNegZero(A: Double): Boolean; inline;
 begin
-  Result := (A = 0) and (PQWord(@A)^ <> 0);
+  Result := (A = 0) and (PUInt64(@A)^ <> 0);
 end;
 
 { Math.max / Math.min of two: a not-a-number wins, +0 is above -0 }
