@@ -13,7 +13,8 @@ function TyFclTextToFloat(const S: string; out AValue: Double): Boolean;
 { what FPC's TryStrToFloat(S, AValue) gives: the text read with the current locale's format settings }
 function TyFclLocaleTextToFloat(const S: string; out AValue: Double): Boolean;
 { what FPC's Str(AValue, S) gives for a Double, without the leading blank:
-  17 significant digits, 'E', a sign, three exponent digits; 'Nan', '+Inf', '-Inf' }
+  17 significant digits, 'E', a sign, three exponent digits; 'Nan', '+Inf', '-Inf' right-aligned in
+  23 characters (FPC's field of 24, less that blank) }
 function TyFclFloatToText(AValue: Double): string;
 { what FPC's FloatToStr(AValue) gives with the invariant format settings }
 function TyFclFloatToStr(AValue: Double): string;
@@ -36,6 +37,8 @@ begin
 end;
 
 function TyFclFloatToText(AValue: Double): string;
+const
+  cWidth = 23;
 begin
   if IsNan(AValue) then
     Result := 'Nan'
@@ -47,7 +50,8 @@ begin
       Result := '-Inf';
   end
   else
-    Result := FloatToStrF(AValue, ffExponent, 17, 3, TFormatSettings.Invariant);
+    Exit(FloatToStrF(AValue, ffExponent, 17, 3, TFormatSettings.Invariant));
+  Result := StringOfChar(' ', cWidth - Length(Result)) + Result;
 end;
 
 function TyFclFloatToStr(AValue: Double): string;

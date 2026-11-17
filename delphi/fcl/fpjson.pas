@@ -19,13 +19,20 @@
     is written UInt64;
   - an object's members are kept by TJSONMemberList (in the implementation): in order, by names
     of any length, in place of contnrs' TFPHashObjectList (names of at most 255 bytes); an
-    array's elements by System.Contnrs' TObjectList, sorted with FPC's QuickSort;
+    array's elements by System.Contnrs' TObjectList, sorted with FPC's QuickSort; the field
+    that holds the member table is declared TObject and cast in one place, MemberList;
   - the overload directives FPC's objfpc mode does without are added; a property's index
     parameter repeats its accessors' const; the UnicodeString overloads that would duplicate the
     string ones are left out; procedure variables are tested with Assigned; HexStr is IntToHex,
     StrToQWord is StrToUInt64, and a UInt64 is printed with UIntToStr (Delphi's IntToStr takes
     it for an Int64); array of const takes Delphi's kinds of string and character as well;
     AsUnicodeString converts nothing;
+  - JSONStringToString walks the string with PChar, not PAnsiChar; where FPC's appends the
+    UTF8Encode of the code units of escapes \uXXXX, this one appends the code units themselves
+    less the unpaired surrogates, which UTF8Encode drops (so that it gives what FPC's gives,
+    including the code unit FPC's appends twice before a pair of escapes); GetJSON(TStream)
+    without a stream parser handler reads the stream as UTF-8 (and returns nil, as FPC's does);
+    DumpJSON writes UTF-8, as FPC's does, not the bytes of the UTF-16 string;
   - floating-point numbers and text are converted by tyfclnum (TyFclTextToFloat for Val,
     TyFclLocaleTextToFloat for TryStrToFloat, TyFclFloatToText for Str, TyFclFloatToStr for
     FloatToStr);
@@ -768,10 +775,10 @@ end;
 function JSONStringToString(const S: TJSONStringType): TJSONStringType;
 
 
-    function BufferHexToInt(P : PAnsiChar): integer;
+    function BufferHexToInt(P : PChar): integer;
     var
       N, i: integer;
-      ch: AnsiChar;
+      ch: Char;
     begin
       Result:= 0;
       for i:= 1 to 4 do
@@ -792,6 +799,30 @@ function JSONStringToString(const S: TJSONStringType): TJSONStringType;
       end;
     end;
 
+    // What FPC's UTF8Encode keeps of W: W without its unpaired surrogates.
+    function KeptByUTF8Encode(const W : String): String;
+    var
+      i: integer;
+    begin
+      Result:='';
+      i:=1;
+      while i<=Length(W) do
+      begin
+        if (W[i]>=#$D800) and (W[i]<=#$DBFF) and (i<Length(W))
+          and (W[i+1]>=#$DC00) and (W[i+1]<=#$DFFF) then
+          begin
+          Result:=Result+Copy(W,i,2);
+          Inc(i,2);
+          end
+        else
+          begin
+          if (W[i]<#$D800) or (W[i]>#$DFFF) then
+            Result:=Result+W[i];
+          Inc(i);
+          end;
+      end;
+    end;
+
 Var
 
   I,J,L,U1,U2 : Integer;
@@ -805,7 +836,7 @@ Var
   begin
     if (U1<>0) then
       begin
-      U:=widechar(U1);
+      U:=KeptByUTF8Encode(widechar(U1));
       Result:=Result+U;
       U1:=0;
       end;
@@ -835,13 +866,13 @@ begin
           'f' : App:=#12;
           'r' : App:=#13;
           'u' : begin
-                U2:=BufferHexToInt(PAnsiChar(@S[I+1]));
+                U2:=BufferHexToInt(PChar(S)+I);
                 if U2=-1 then
                    Raise EJSON.Create('Invalid unicode hex code: '+Copy(S,I+1,4));
                 Inc(I,4);
                 if (U1<>0) then
                   begin
-                  App:=WideChar(U1)+WideChar(U2);
+                  App:=KeptByUTF8Encode(WideChar(U1)+WideChar(U2));
                   U2:=0;
                   end
                 else
@@ -941,6 +972,7 @@ function GetJSON(const JSON: TStream; const UseUTF8: Boolean): TJSONData;
 
 Var
   S : TJSONStringType;
+  B : TBytes;
 
 begin
   Result:=Nil;
@@ -950,10 +982,11 @@ begin
     TJSONData.DoError(SErrNoParserHandler)
   else
     begin
-    S:='';
-    Setlength(S{%H-},JSON.Size);
-    if Length(S)>0 then
-      JSON.ReadBuffer(S[1],Length(S));
+    B:=nil;
+    Setlength(B,JSON.Size);
+    if Length(B)>0 then
+      JSON.ReadBuffer(B[0],Length(B));
+    S:=TEncoding.UTF8.GetString(B);
     end;
 end;
 
@@ -1208,9 +1241,12 @@ end;
 procedure TJSONData.DumpJSON(S: TFPJSStream);
 
   Procedure W(T : String);
+  Var
+    B : TBytes;
   begin
     if T='' then exit;
-    S.WriteBuffer(T[1],Length(T)*SizeOf(Char));
+    B:=TEncoding.UTF8.GetBytes(T);
+    S.WriteBuffer(B[0],Length(B));
   end;
 
 Var
@@ -2672,6 +2708,13 @@ Type
     property OwnsObjects: Boolean read FOwnsObjects write FOwnsObjects;
   end;
 
+{ The member table of AObject. TJSONObject.FHash is declared TObject in the interface, where
+  TJSONMemberList is not known; this is the one place that casts it. }
+function MemberList(AObject: TJSONObject): TJSONMemberList; inline;
+begin
+  Result:=TJSONMemberList(AObject.FHash);
+end;
+
 { TJSONMemberList }
 
 constructor TJSONMemberList.Create(AOwnsObjects: Boolean);
@@ -2879,7 +2922,7 @@ end;
 
 function TJSONObject.GetElements(const AName: string): TJSONData;
 begin
-  Result:=TJSONData(TJSONMemberList(FHash).Find(AName));
+  Result:=TJSONData(MemberList(Self).Find(AName));
   If (Result=Nil) then
     DoError(SErrNonexistentElement,[AName]);
 end;
@@ -2933,7 +2976,7 @@ end;
 
 function TJSONObject.GetNameOf(Index: Integer): TJSONStringType;
 begin
-  Result:=TJSONMemberList(FHash).NameOfIndex(Index);
+  Result:=MemberList(Self).NameOfIndex(Index);
 end;
 
 function TJSONObject.GetObjects(const AName : String): TJSONObject;
@@ -2973,11 +3016,11 @@ Var
   Index : Integer;
 
 begin
-  Index:=TJSONMemberList(FHash).FindIndexOf(AName);
+  Index:=MemberList(Self).FindIndexOf(AName);
   If (Index=-1) then
-    TJSONMemberList(FHash).Add(AName,AValue)
+    MemberList(Self).Add(AName,AValue)
   else
-    TJSONMemberList(FHash).Items[Index]:=AValue; // Will free the previous value.
+    MemberList(Self).Items[Index]:=AValue; // Will free the previous value.
 end;
 
 procedure TJSONObject.SetFloats(const AName : String; const AValue: TJSONFloat);
@@ -3201,17 +3244,17 @@ end;
 
 function TJSONObject.GetCount: Integer;
 begin
-  Result:=TJSONMemberList(FHash).Count;
+  Result:=MemberList(Self).Count;
 end;
 
 function TJSONObject.GetItem(Index: Integer): TJSONData;
 begin
-  Result:=TJSONData(TJSONMemberList(FHash).Items[Index]);
+  Result:=TJSONData(MemberList(Self).Items[Index]);
 end;
 
 procedure TJSONObject.SetItem(Index: Integer; const AValue: TJSONData);
 begin
-  TJSONMemberList(FHash).Items[Index]:=AValue;
+  MemberList(Self).Items[Index]:=AValue;
 end;
 
 constructor TJSONObject.Create;
@@ -3358,7 +3401,7 @@ Var
 begin
   I:=0;
   Cont:=True;
-  While (I<TJSONMemberList(FHash).Count) and Cont do
+  While (I<MemberList(Self).Count) and Cont do
     begin
     Iterator(Names[I],Items[i],Data,Cont);
     Inc(I);
@@ -3367,12 +3410,12 @@ end;
 
 function TJSONObject.IndexOf(Item: TJSONData): Integer;
 begin
-  Result:=TJSONMemberList(FHash).IndexOf(Item);
+  Result:=MemberList(Self).IndexOf(Item);
 end;
 
 function TJSONObject.IndexOfName(const AName: TJSONStringType; CaseInsensitive : Boolean = False): Integer;
 begin
-  Result:=TJSONMemberList(FHash).FindIndexOf(AName);
+  Result:=MemberList(Self).FindIndexOf(AName);
   if (Result<0) and CaseInsensitive then
     begin
     Result:=Count-1;
@@ -3383,7 +3426,7 @@ end;
 
 procedure TJSONObject.Clear;
 begin
-  TJSONMemberList(FHash).Clear;
+  MemberList(Self).Clear;
 end;
 
 function TJSONObject.DoAdd(const AName: TJSONStringType; AValue: TJSONData; FreeOnError : Boolean = True): Integer;
@@ -3394,7 +3437,7 @@ begin
       FreeAndNil(AValue);
     DoError(SErrDuplicateValue,[aName]);
     end;
-  Result:=TJSONMemberList(FHash).Add(AName,AValue);
+  Result:=MemberList(Self).Add(AName,AValue);
 end;
 
 function TJSONObject.Add(const AName: TJSONStringType; AValue: TJSONData
@@ -3438,7 +3481,7 @@ end;
 
 procedure TJSONObject.Delete(Index: Integer);
 begin
-  TJSONMemberList(FHash).Delete(Index);
+  MemberList(Self).Delete(Index);
 end;
 
 procedure TJSONObject.Delete(const AName: string);
@@ -3453,14 +3496,14 @@ end;
 
 procedure TJSONObject.Remove(Item: TJSONData);
 begin
-  TJSONMemberList(FHash).Remove(Item);
+  MemberList(Self).Remove(Item);
 end;
 
 
 function TJSONObject.Extract(Index: Integer): TJSONData;
 begin
   Result:=Items[Index];
-  TJSONMemberList(FHash).Extract(Result);
+  MemberList(Self).Extract(Result);
 end;
 
 function TJSONObject.Extract(const AName: string): TJSONData;

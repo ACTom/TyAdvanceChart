@@ -20,8 +20,9 @@
     9  22-29   invalid inputs
     10 30-31   TJSONParser with the options of the chart's Option unit
     11 32      200 nested arrays
-    12 33-34   trees built by code: TJSONObject.Create(array of const), Add, Remove; TJSONArray's Insert,
-               Move, Remove, Extract, Delete and Sort *)
+    12 33-35   trees built by code: TJSONObject.Create(array of const), Add, Remove; TJSONArray's Insert,
+               Move, Remove, Extract, Delete and Sort; an object's members replaced through Elements[],
+               Strings[] and Integers[], Get with a default, FindPath, Delete(name), Clear *)
 
 { 'nil', or the value as AsJSON. }
 function JsonDataText(D: TJSONData): string;
@@ -359,6 +360,51 @@ begin
   end;
 end;
 
+{ The object's member table owns the values: setting a member through Elements[], Strings[] or Integers[]
+  frees the value it had, Delete and Clear free theirs; Get with a default; FindPath. }
+procedure JsonBuiltObjectMembers;
+var
+  o: TJSONObject;
+  defText: TJSONStringType;
+  defInt: Integer;
+begin
+  NextCase;
+  Line('input TJSONObject: Elements[], Strings[], Integers[], Get, FindPath, Delete(name), Clear');
+  o := TJSONObject(GetJSON('{"a":[1,2],"b":"x","c":{"d":true},"p":{"b":[10,20,30]}}'));
+  try
+    JsonDump(o);
+    o.Elements['a'] := TJSONString.Create('was an array');
+    Line('elements[a] ' + Esc(o.AsJSON));
+    o.Strings['c'] := 'was an object';
+    Line('strings[c] ' + Esc(o.AsJSON));
+    o.Integers['b'] := 7;
+    Line('integers[b] ' + Esc(o.AsJSON));
+    o.Integers['n'] := 8;
+    Line('integers[n] ' + Esc(o.AsJSON));
+    JsonDump(o);
+    defInt := -1;
+    defText := 'none';
+    Line('get b ' + IntToStr(o.Get('b', defInt)));
+    Line('get missing ' + IntToStr(o.Get('missing', defInt)));
+    Line('get a ' + Esc(o.Get('a', defText)));
+    Line('get missing ' + Esc(o.Get('missing', defText)));
+    Line('findpath p.b[1] ' + JsonDataText(o.FindPath('p.b[1]')));
+    Line('findpath p ' + JsonDataText(o.FindPath('p')));
+    Line('findpath p.b[3] ' + JsonDataText(o.FindPath('p.b[3]')));
+    Line('findpath p.x.y ' + JsonDataText(o.FindPath('p.x.y')));
+    o.Delete('c');
+    Line('delete(c) ' + IntToStr(o.Count) + ' ' + Esc(o.AsJSON));
+    o.Delete('missing');
+    Line('delete(missing) ' + IntToStr(o.Count));
+    o.Clear;
+    Line('clear ' + IntToStr(o.Count) + ' ' + Esc(o.AsJSON));
+    o.Add('e', 1);
+    JsonTree(o);
+  finally
+    o.Free;
+  end;
+end;
+
 procedure SectionJson;
 begin
   BeginSection('json');
@@ -409,4 +455,5 @@ begin
   { 12 }
   JsonBuiltObject;
   JsonBuiltArray;
+  JsonBuiltObjectMembers;
 end;

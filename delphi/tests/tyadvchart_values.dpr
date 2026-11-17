@@ -7,7 +7,10 @@ program tyadvchart_values;
 
 uses
   SysUtils,
+  Classes,
   fpjson,
+  jsonparser,
+  jsonscanner,
   tyControls.AdvanceChart.Catalog,
   tyControls.AdvanceChart.JsMath,
   tyControls.AdvanceChart.NativeStr,
@@ -159,10 +162,11 @@ begin
 end;
 
 { delphi/fcl's fpjson keeps member names of any length (FPC's own keeps 255 bytes of them; the FCL
-  transcript shows it only as informational lines). }
+  transcript shows it only as informational lines), for objects built with Add and read by the parser. }
 procedure CheckJsonLongKeys;
 var
   o: TJSONObject;
+  d: TJSONData;
   k300, ka, kb: string;
 begin
   k300 := StringOfChar('k', 300);
@@ -185,6 +189,72 @@ begin
     Check((o.Find(kb) <> nil) and (o.Find(kb).AsInteger = 2), 'JSON: the second of them has the value 2');
   finally
     o.Free;
+  end;
+  { The same, for objects read by the parser. }
+  d := GetJSON('{"' + k300 + '":1}');
+  try
+    Check(TJSONObject(d).Find(k300) <> nil, 'JSON, parsed: a key of 300 characters is found');
+    Check(Length(TJSONObject(d).Names[0]) = 300, 'JSON, parsed: Length(Names[0]) = 300');
+  finally
+    d.Free;
+  end;
+  d := GetJSON('{"' + ka + '":1,"' + kb + '":2}');
+  try
+    o := TJSONObject(d);
+    Check(o.Count = 2, 'JSON, parsed: two keys that differ at the 280th character are two members');
+    Check((o.Find(ka) <> nil) and (o.Find(ka).AsInteger = 1), 'JSON, parsed: the first of them has the value 1');
+    Check((o.Find(kb) <> nil) and (o.Find(kb).AsInteger = 2), 'JSON, parsed: the second of them has the value 2');
+  finally
+    d.Free;
+  end;
+end;
+
+{ delphi/fcl's JSON units keep strings as UTF-16: an escaped surrogate pair is the two code units, a
+  non-ASCII character needs no escape, and a stream of UTF-8 bytes reads as the same text. }
+procedure CheckJsonStrings;
+const
+  cText = '{"' + #$540D + '":"caf' + #$00E9 + ' ' + #$56FD + #$D83D#$DE00 + '","a":[' + '"\u00f1"]}';
+var
+  d, ds: TJSONData;
+  s: string;
+  st: TBytesStream;
+  p: TJSONParser;
+begin
+  d := GetJSON('"\ud83d\ude00"');
+  try
+    s := d.AsString;
+    Check(Length(s) = 2, 'JSON: "\ud83d\ude00" reads as a string of length 2');
+    Check((Ord(s[1]) = $D83D) and (Ord(s[2]) = $DE00), 'JSON: "\ud83d\ude00" reads as $D83D $DE00');
+  finally
+    d.Free;
+  end;
+  s := 'a' + #$56FD + 'b';
+  Check(StringToJSONString(s) = s, 'JSON: StringToJSONString(a + U+56FD + b) gives it back as it is');
+  d := GetJSON(cText);
+  try
+    st := TBytesStream.Create(TEncoding.UTF8.GetBytes(cText));
+    try
+      p := TJSONParser.Create(st, [joUTF8]);
+      try
+        ds := p.Parse;
+      finally
+        p.Free;
+      end;
+    finally
+      st.Free;
+    end;
+    try
+      Check(ds.AsJSON = d.AsJSON, 'JSON: read from a stream of UTF-8 bytes, the tree is the one read from the string');
+      Check(TJSONObject(ds).Names[0] = #$540D, 'JSON: read from a stream of UTF-8 bytes, the name is U+540D');
+      Check(TJSONObject(ds).Items[0].AsString = TJSONObject(d).Items[0].AsString,
+        'JSON: read from a stream of UTF-8 bytes, the string is the one read from the string');
+      Check(TJSONObject(ds).Items[0].AsString = 'caf' + #$00E9 + ' ' + #$56FD + #$D83D#$DE00,
+        'JSON: read from a stream of UTF-8 bytes, the string is caf + U+00E9 + blank + U+56FD + U+1F600');
+    finally
+      ds.Free;
+    end;
+  finally
+    d.Free;
   end;
 end;
 
@@ -223,6 +293,7 @@ begin
   CheckNativeStr;
   CheckByteEscapeRun;
   CheckJsonLongKeys;
+  CheckJsonStrings;
   CheckJsonStringLocaleFloat;
   Writeln('DELPHI VALUES OK');
 end.

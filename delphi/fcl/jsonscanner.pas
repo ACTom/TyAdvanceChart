@@ -16,8 +16,14 @@
   packages/fcl-json/src/jsonscanner.pp. Compiled by Delphi only: Lazarus builds with FPC's own unit.
   Changed, by kind:
   - the source is Delphi's UTF-16 string and the scanner walks it with PChar, not PAnsiChar (Move
-    counts SizeOf(Char)); a stream is read as UTF-8; the property Strict is written &Strict, and
-    Strict and UseUTF8 are not marked deprecated (Delphi has no hint directives on properties);
+    counts SizeOf(Char)); a stream is read as UTF-8 (a byte order mark is skipped under joBOMCheck,
+    as FPC's does, and is otherwise read as a character, which the scanner rejects as FPC's does
+    its first byte); where FPC's appends the UTF8Encode of the code units of escapes \uXXXX, this
+    one appends the code units themselves less the unpaired surrogates, which UTF8Encode drops (so
+    that it gives what FPC's gives, also where FPC's pairs a code unit with the next escape's
+    whatever they are), and joUTF8 and UseUTF8 change nothing; the property Strict is written
+    &Strict, and Strict and UseUTF8 are not marked deprecated (Delphi has no hint directives on
+    properties);
     the default values of parameters are not repeated in the implementation;
   - the switch to mode objfpc is gone (FPC's only).
   The original's licence applies, see the notice above (THIRD-PARTY-NOTICES.md says more). }
@@ -132,6 +138,30 @@ const
 
 
 implementation
+
+// What FPC's UTF8Encode keeps of W: W without its unpaired surrogates.
+function KeptByUTF8Encode(const W : String): String;
+var
+  i: integer;
+begin
+  Result:='';
+  i:=1;
+  while i<=Length(W) do
+  begin
+    if (W[i]>=#$D800) and (W[i]<=#$DBFF) and (i<Length(W))
+      and (W[i+1]>=#$DC00) and (W[i+1]<=#$DFFF) then
+      begin
+      Result:=Result+Copy(W,i,2);
+      Inc(i,2);
+      end
+    else
+      begin
+      if (W[i]<#$D800) or (W[i]>#$DFFF) then
+        Result:=Result+W[i];
+      Inc(i);
+      end;
+  end;
+end;
 
 constructor TJSONScanner.Create(Source : TStream; AUseUTF8 : Boolean);
 
@@ -277,10 +307,7 @@ var
   // if there is a leftover \u, append
   if (u1<>0) then
     begin
-    if (joUTF8 in Options) or (DefaultSystemCodePage=CP_UTF8) then
-      U:=WideChar(u1) // ToDo: use faster function
-    else
-      U:=String(WideChar(u1)); // WideChar converts the encoding. Should it warn on loss?
+    U:=KeptByUTF8Encode(WideChar(u1)); // whatever joUTF8 says
     FCurTokenString:=FCurTokenString+U;
     OldLength:=Length(FCurTokenString);
     u1:=0;
@@ -366,10 +393,7 @@ begin
                     // ToDo: 4-bytes UTF16
                     if u1<>0 then
                       begin
-                      if (joUTF8 in Options) or (DefaultSystemCodePage=CP_UTF8) then
-                        S:=WideChar(u1)+WideChar(u2) // ToDo: use faster function
-                      else
-                        S:=String(WideChar(u1)+WideChar(u2)); // WideChar converts the encoding. Should it warn on loss?
+                      S:=KeptByUTF8Encode(WideChar(u1)+WideChar(u2)); // whatever joUTF8 says
                       u1:=0;
                       end
                     else
