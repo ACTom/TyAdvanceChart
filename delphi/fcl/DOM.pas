@@ -8,7 +8,8 @@
     the reader in XMLRead through the TXMLDocument.Create* functions, TDOMNode.AppendChild and
     TDOMElement.SetAttribute;
   - node types, NodeName and NodeValue as FPC gives them: '#document', '#text', '#comment',
-    '#cdata-section'; a processing instruction is named by its target and its value is its data; the
+    '#cdata-section'; an entity reference (left by the reader only for an entity it cannot know) is
+    named by the entity and has an empty value and no children; a processing instruction is named by its target and its value is its data; the
     document type node is named by the root name and has an empty value; an element's value is empty;
   - TextContent as FPC computes it: an element's is the text of its text and CDATA descendants (comments
     and processing instructions left out), the document's is empty, any other node's is its value;
@@ -32,6 +33,7 @@ const
   ATTRIBUTE_NODE = 2;
   TEXT_NODE = 3;
   CDATA_SECTION_NODE = 4;
+  ENTITY_REFERENCE_NODE = 5;
   PROCESSING_INSTRUCTION_NODE = 7;
   COMMENT_NODE = 8;
   DOCUMENT_NODE = 9;
@@ -92,6 +94,9 @@ type
     function CreateComment(const AData: DOMString): TDOMNode;
     function CreateCDATASection(const AData: DOMString): TDOMNode;
     function CreateProcessingInstruction(const ATarget, AData: DOMString): TDOMNode;
+    { A reference to an entity the reader could not expand (declared in an external subset it does not
+      read): named by the entity, empty value, no children. }
+    function CreateEntityReference(const AName: DOMString): TDOMNode;
     { The document type node of a DOCTYPE declaration whose root name is AName. }
     function CreateDocumentTypeNode(const AName: DOMString): TDOMNode;
     { The first child that is an element; nil when there is none. }
@@ -267,6 +272,11 @@ end;
 function TXMLDocument.CreateProcessingInstruction(const ATarget, AData: DOMString): TDOMNode;
 begin
   Result := TDOMNode.Create(PROCESSING_INSTRUCTION_NODE, ATarget, AData);
+end;
+
+function TXMLDocument.CreateEntityReference(const AName: DOMString): TDOMNode;
+begin
+  Result := TDOMNode.Create(ENTITY_REFERENCE_NODE, AName, '');
 end;
 
 function TXMLDocument.CreateDocumentTypeNode(const AName: DOMString): TDOMNode;

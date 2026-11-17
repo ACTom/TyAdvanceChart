@@ -21,7 +21,8 @@
     a sequence cut short by the end of the bytes is dropped, and so is an odd last byte of UTF-16, as
     FPC's decoders do;
   - a character below U+0020 other than tab, line feed and carriage return, and U+FFFE and U+FFFF,
-    raise anywhere; CR LF and a lone CR become LF;
+    raise anywhere; CR LF and a lone CR in the document become LF; an unpaired surrogate (in UTF-16
+    input) is kept, as FPC keeps it;
   - the XML declaration (version 1.0; encoding; standalone yes or no); comments and processing
     instructions (target 'xml' in any case is refused) before, in and after the root element; one
     DOCTYPE before the root, with an optional external identifier, which is never read, and an optional
@@ -32,16 +33,26 @@
   - text, kept as it is, white space included (white space outside the root element makes no node); text
     next to a reference is one text node with it; ']]>' in text raises; CDATA sections, empty ones
     included, are CDATA nodes;
+  - ']]>' in text raises also when its brackets come from character references (&#93;&#93;>);
   - references: the five predefined entities, character references (&#N; and &#xH;, 'x' lower case,
     to a character XML allows), and the internal entities of the DOCTYPE, expanded (their replacement
-    text is read as content or attribute text in place; an entity that refers to itself raises; an
-    entity's elements must close inside it).
-  What it rejects with EXMLReadError although FPC may read it:
-  - an XML declaration with a version other than 1.0;
-  - in the internal subset: parameter entities and references to them, external entities, ELEMENT,
-    ATTLIST and NOTATION declarations (FPC would apply their defaults and types);
-  - a reference to an undeclared entity even in a document whose DOCTYPE has an external identifier
-    (FPC, which does not read the external subset either, then only reports it when validating).
+    text is read as content or attribute text in place, its characters as they are: a CR from &#13; in
+    an entity value stays a CR in text and is a blank in an attribute value; an entity that refers to
+    itself raises; an entity's elements must close inside it). There is no limit on how much text
+    entities expand to, as in FPC (whose MaxChars is unlimited by default);
+  - a reference to an undeclared entity: raises, unless the DOCTYPE has an external identifier and the
+    declaration does not say standalone="yes" (the entity may be declared in the external subset, which
+    is not read); then, as in FPC, in text it is an entity reference node (type ENTITY_REFERENCE_NODE,
+    named by the entity, empty value, no children, so it adds nothing to TextContent) between the text
+    before and after it, and in an attribute value it adds nothing.
+  Deliberate limits, differences from FPC, which accepts these: EXMLReadError is raised for
+  - an XML declaration with a version other than 1.0 (FPC reads 1.1);
+  - in the internal subset: a parameter entity declaration or reference, an external entity
+    declaration, an ELEMENT, ATTLIST or NOTATION declaration (FPC reads them and applies the defaults
+    and types of ATTLIST);
+  - elements nested deeper than 4096 levels (FPC has no such limit). The reader keeps open elements on
+    a stack of its own, but freeing the tree and TextContent recurse per level: the cap keeps a deep
+    file an EXMLReadError instead of a stack overflow.
   Names follow the XML 1.0 (fifth edition) name characters, with every UTF-16 surrogate allowed; FPC's
   tables may differ for some names outside ASCII. Error messages are this unit's own (and say where, as a
   character offset in the decoded text or in an entity's replacement text). }
@@ -106,6 +117,9 @@ type
   private
     FDoc: TXMLDocument;
     FEntities: array of TXmlEntity;
+    FStandalone: Boolean;   // the declaration says standalone="yes"
+    FUndeclaredOk: Boolean; // an undeclared entity is no error: the DOCTYPE has an external identifier
+    FDepth: Integer;        // elements open
     procedure Fail(const AMsg: string; const ASrc: TXmlSource);
     function AtEnd(const ASrc: TXmlSource): Boolean;
     function Peek(const ASrc: TXmlSource): WideChar;
@@ -125,14 +139,17 @@ type
     procedure ReadCData(var ASrc: TXmlSource; AParent: TDOMNode);
     procedure ReadEntityDecl(var ASrc: TXmlSource);
     procedure ReadDoctype(var ASrc: TXmlSource);
-    procedure ReadElement(var ASrc: TXmlSource; AParent: TDOMNode);
-    procedure ReadContent(var ASrc: TXmlSource; AParent: TDOMNode; const AEndName: UnicodeString;
-      AInEntity: Boolean; var APending: UnicodeString);
+    function ReadStartTag(var ASrc: TXmlSource; AParent: TDOMNode; out AEmpty: Boolean): TDOMElement;
+    procedure ReadContent(var ASrc: TXmlSource; ABase: TDOMNode; AInEntity: Boolean;
+      var APending: UnicodeString);
     function ReadXmlDecl(var ASrc: TXmlSource): UnicodeString;
     procedure ReadDocument(var ASrc: TXmlSource);
   public
     procedure Run(const ABytes: TBytes; ADoc: TXMLDocument);
   end;
+
+const
+  cMaxDepth = 4096;
 
 function MakeSource(const AText: UnicodeString): TXmlSource;
 begin
@@ -430,8 +447,8 @@ begin
     Result := '';
 end;
 
-{ The index of the declared entity AName, ready to be expanded; raises when there is none or when it
-  is being expanded already. }
+{ The index of the declared entity AName, ready to be expanded; raises when it is being expanded
+  already, and when there is none, unless an undeclared entity is allowed (FUndeclaredOk): then -1. }
 function TXmlReader.FindEntity(const AName: UnicodeString; const ASrc: TXmlSource): Integer;
 var
   i: Integer;
@@ -444,7 +461,8 @@ begin
       Result := i;
       Exit;
     end;
-  Fail('Reference to undefined entity ''' + AName + '''', ASrc);
+  if not FUndeclaredOk then
+    Fail('Reference to undefined entity ''' + AName + '''', ASrc);
   Result := -1;
 end;
 
@@ -514,10 +532,13 @@ begin
       else
       begin
         k := FindEntity(name, ASrc);
-        FEntities[k].Active := True;
-        sub := MakeSource(FEntities[k].Text);
-        ReadAttChars(sub, #0, AOut);
-        FEntities[k].Active := False;
+        if k >= 0 then // an undeclared entity adds nothing to an attribute value, as in FPC
+        begin
+          FEntities[k].Active := True;
+          sub := MakeSource(FEntities[k].Text);
+          ReadAttChars(sub, #0, AOut);
+          FEntities[k].Active := False;
+        end;
       end;
     end;
   until False;
@@ -612,14 +633,14 @@ begin
   Expect(ASrc, '<!ENTITY');
   NeedSpaces(ASrc);
   if Peek(ASrc) = '%' then
-    Fail('Parameter entities are not supported by this XMLRead', ASrc);
+    Fail('A parameter entity declaration is not supported by this XMLRead', ASrc);
   name := ReadName(ASrc);
   NeedSpaces(ASrc);
   q := Peek(ASrc);
   if (q <> '"') and (q <> '''') then
   begin
     if StartsWith(ASrc, 'SYSTEM') or StartsWith(ASrc, 'PUBLIC') then
-      Fail('External entities are not supported by this XMLRead', ASrc);
+      Fail('An external entity declaration is not supported by this XMLRead', ASrc);
     Fail('Expected an entity value', ASrc);
   end;
   Inc(ASrc.P);
@@ -648,8 +669,6 @@ begin
   until False;
   SkipSpaces(ASrc);
   Expect(ASrc, '>');
-  { a carriage return from a character reference is a line end when the text is read }
-  value := CheckAndNormalize(value);
   for i := 0 to High(FEntities) do
     if FEntities[i].Name = name then
       Exit;
@@ -664,7 +683,9 @@ procedure TXmlReader.ReadDoctype(var ASrc: TXmlSource);
 var
   name, pubid: UnicodeString;
   i: Integer;
+  hasExternal: Boolean;
 begin
+  hasExternal := False;
   Expect(ASrc, '<!DOCTYPE');
   NeedSpaces(ASrc);
   name := ReadName(ASrc);
@@ -672,6 +693,7 @@ begin
   begin
     if Accept(ASrc, 'PUBLIC') then
     begin
+      hasExternal := True;
       NeedSpaces(ASrc);
       pubid := ReadQuoted(ASrc);
       for i := 1 to Length(pubid) do
@@ -684,6 +706,7 @@ begin
     end
     else if Accept(ASrc, 'SYSTEM') then
     begin
+      hasExternal := True;
       NeedSpaces(ASrc);
       ReadQuoted(ASrc);
       SkipSpaces(ASrc);
@@ -704,10 +727,13 @@ begin
       else if StartsWith(ASrc, '<?') then
         ReadPI(ASrc, nil)
       else if Peek(ASrc) = '%' then
-        Fail('Parameter entity references are not supported by this XMLRead', ASrc)
-      else if StartsWith(ASrc, '<!ELEMENT') or StartsWith(ASrc, '<!ATTLIST')
-        or StartsWith(ASrc, '<!NOTATION') then
-        Fail('ELEMENT, ATTLIST and NOTATION declarations are not supported by this XMLRead', ASrc)
+        Fail('A parameter entity reference is not supported by this XMLRead', ASrc)
+      else if StartsWith(ASrc, '<!ELEMENT') then
+        Fail('An ELEMENT declaration is not supported by this XMLRead', ASrc)
+      else if StartsWith(ASrc, '<!ATTLIST') then
+        Fail('An ATTLIST declaration is not supported by this XMLRead', ASrc)
+      else if StartsWith(ASrc, '<!NOTATION') then
+        Fail('A NOTATION declaration is not supported by this XMLRead', ASrc)
       else
         Fail('Illegal character in internal subset', ASrc);
     until False;
@@ -715,50 +741,65 @@ begin
   end;
   Expect(ASrc, '>');
   FDoc.AppendChild(FDoc.CreateDocumentTypeNode(name));
+  { as FPC's EntityCheck: an undeclared entity is a fatal error unless the document is not standalone
+    and has an external subset, where the entity may be declared }
+  FUndeclaredOk := hasExternal and not FStandalone;
 end;
 
-{ After '<' and a name start: the element, its attributes and its content. }
-procedure TXmlReader.ReadElement(var ASrc: TXmlSource; AParent: TDOMNode);
+{ After '<' and a name start: the start tag and its attributes; the element is appended to AParent.
+  AEmpty is set for '/>'. Raises when the element would be nested deeper than cMaxDepth. }
+function TXmlReader.ReadStartTag(var ASrc: TXmlSource; AParent: TDOMNode; out AEmpty: Boolean): TDOMElement;
 var
-  el: TDOMElement;
-  name, aname, pending: UnicodeString;
+  aname: UnicodeString;
   sp: Boolean;
 begin
   Expect(ASrc, '<');
-  name := ReadName(ASrc);
-  el := FDoc.CreateElement(name);
-  AParent.AppendChild(el);
+  if FDepth >= cMaxDepth then
+    Fail('Elements nested deeper than ' + IntToStr(cMaxDepth) + ' levels are not supported by this XMLRead',
+      ASrc);
+  Result := FDoc.CreateElement(ReadName(ASrc));
+  AParent.AppendChild(Result);
+  AEmpty := False;
   repeat
     sp := SkipSpaces(ASrc);
     if Accept(ASrc, '/>') then
+    begin
+      AEmpty := True;
       Exit;
+    end;
     if Accept(ASrc, '>') then
-      Break;
+      Exit;
     if not sp then
       Fail('Expected white space, ''>'' or ''/>''', ASrc);
     aname := ReadName(ASrc);
-    if el.GetAttributeNode(aname) <> nil then
+    if Result.GetAttributeNode(aname) <> nil then
       Fail('Duplicate attribute ''' + aname + '''', ASrc);
     SkipSpaces(ASrc);
     Expect(ASrc, '=');
     SkipSpaces(ASrc);
-    el.SetAttribute(aname, ReadAttValue(ASrc));
+    Result.SetAttribute(aname, ReadAttValue(ASrc));
   until False;
-  pending := '';
-  ReadContent(ASrc, el, name, False, pending);
 end;
 
-{ Content under AParent up to the end tag of AEndName or, in an entity's text (AInEntity), to its end.
-  APending is the text not yet made a node: an entity's text joins the text around it. }
-procedure TXmlReader.ReadContent(var ASrc: TXmlSource; AParent: TDOMNode;
-  const AEndName: UnicodeString; AInEntity: Boolean; var APending: UnicodeString);
+{ Content under ABase: up to the end tag of ABase (an element open in this source), or, in an entity's
+  text (AInEntity), to the end of the text. The elements opened in between are kept on a stack of this
+  call (no recursion per level); an entity is read by a recursive call. APending is the text not yet made
+  a node under ABase: an entity's text joins the text around it. }
+procedure TXmlReader.ReadContent(var ASrc: TXmlSource; ABase: TDOMNode; AInEntity: Boolean;
+  var APending: UnicodeString);
+var
+  stackNode: array of TDOMNode;
+  stackPending: array of UnicodeString;
+  top: Integer;          // elements opened by this call and still open
+  cur: TDOMNode;         // where content goes
+  pending: UnicodeString; // the text not yet a node under cur
 
   procedure Flush;
   begin
-    if APending <> '' then
+    if pending <> '' then
     begin
-      AParent.AppendChild(FDoc.CreateTextNode(APending));
-      APending := '';
+      cur.AppendChild(FDoc.CreateTextNode(pending));
+      pending := '';
     end;
   end;
 
@@ -767,7 +808,12 @@ var
   c: WideChar;
   name, pre: UnicodeString;
   sub: TXmlSource;
+  el: TDOMElement;
+  empty: Boolean;
 begin
+  top := 0;
+  cur := ABase;
+  pending := APending;
   repeat
     start := ASrc.P;
     while (ASrc.P <= ASrc.Len) do
@@ -777,78 +823,110 @@ begin
         Break;
       Inc(ASrc.P);
     end;
-    APending := APending + Copy(ASrc.S, start, ASrc.P - start);
+    pending := pending + Copy(ASrc.S, start, ASrc.P - start);
     if AtEnd(ASrc) then
     begin
-      if not AInEntity then
-        Fail('End-tag is missing for ''' + AEndName + '''', ASrc);
+      if (top > 0) or not AInEntity then
+        Fail('End-tag is missing for ''' + cur.NodeName + '''', ASrc);
+      APending := pending;
       Exit;
     end;
     c := ASrc.S[ASrc.P];
     if c = '>' then
     begin
-      n := Length(APending);
-      if (n >= 2) and (APending[n - 1] = ']') and (APending[n] = ']') then
+      n := Length(pending);
+      if (n >= 2) and (pending[n - 1] = ']') and (pending[n] = ']') then
         Fail('Literal '']]>'' is not allowed in text', ASrc);
-      APending := APending + '>';
+      pending := pending + '>';
       Inc(ASrc.P);
     end
     else if c = '&' then
     begin
       Inc(ASrc.P);
       if Accept(ASrc, '#') then
-        APending := APending + ReadCharRef(ASrc)
+        pending := pending + ReadCharRef(ASrc)
       else
       begin
         name := ReadName(ASrc);
         Expect(ASrc, ';');
         pre := Predefined(name);
         if pre <> '' then
-          APending := APending + pre
+          pending := pending + pre
         else
         begin
           k := FindEntity(name, ASrc);
-          FEntities[k].Active := True;
-          sub := MakeSource(FEntities[k].Text);
-          ReadContent(sub, AParent, '', True, APending);
-          FEntities[k].Active := False;
+          if k < 0 then
+          begin
+            { undeclared, allowed: an entity reference node between the texts, as in FPC }
+            Flush;
+            cur.AppendChild(FDoc.CreateEntityReference(name));
+          end
+          else
+          begin
+            FEntities[k].Active := True;
+            sub := MakeSource(FEntities[k].Text);
+            ReadContent(sub, cur, True, pending);
+            FEntities[k].Active := False;
+          end;
         end;
       end;
     end
     else if StartsWith(ASrc, '</') then
     begin
-      if AInEntity then
+      if (top = 0) and AInEntity then
         Fail('End-tag inside an entity that did not start the element', ASrc);
       Flush;
       Inc(ASrc.P, 2);
       name := ReadName(ASrc);
-      if name <> AEndName then
-        Fail('End-tag ''' + name + ''' does not match ''' + AEndName + '''', ASrc);
+      if name <> cur.NodeName then
+        Fail('End-tag ''' + name + ''' does not match ''' + cur.NodeName + '''', ASrc);
       SkipSpaces(ASrc);
       Expect(ASrc, '>');
-      Exit;
+      Dec(FDepth);
+      if top = 0 then
+      begin
+        APending := '';
+        Exit;
+      end;
+      Dec(top);
+      cur := stackNode[top];
+      pending := stackPending[top];
     end
     else if StartsWith(ASrc, '<!--') then
     begin
       Flush;
-      ReadComment(ASrc, AParent);
+      ReadComment(ASrc, cur);
     end
     else if StartsWith(ASrc, '<![CDATA[') then
     begin
       Flush;
-      ReadCData(ASrc, AParent);
+      ReadCData(ASrc, cur);
     end
     else if StartsWith(ASrc, '<?') then
     begin
       Flush;
-      ReadPI(ASrc, AParent);
+      ReadPI(ASrc, cur);
     end
     else
     begin
       Flush;
       if StartsWith(ASrc, '<!') then
         Fail('Markup declaration not allowed here', ASrc);
-      ReadElement(ASrc, AParent);
+      el := ReadStartTag(ASrc, cur, empty);
+      if not empty then
+      begin
+        Inc(FDepth);
+        if top = Length(stackNode) then
+        begin
+          SetLength(stackNode, 2 * top + 16);
+          SetLength(stackPending, 2 * top + 16);
+        end;
+        stackNode[top] := cur;
+        stackPending[top] := pending;
+        Inc(top);
+        cur := el;
+        pending := '';
+      end;
     end;
   until False;
 end;
@@ -870,7 +948,7 @@ begin
   SkipSpaces(ASrc);
   v := ReadQuoted(ASrc);
   if v <> '1.0' then
-    Fail('XML version ''' + v + ''' is not supported by this XMLRead', ASrc);
+    Fail('XML version ''' + v + ''' is not supported by this XMLRead (only 1.0)', ASrc);
   sp := SkipSpaces(ASrc);
   if StartsWith(ASrc, 'encoding') then
   begin
@@ -903,6 +981,7 @@ begin
     Expect(ASrc, '=');
     SkipSpaces(ASrc);
     v := ReadQuoted(ASrc);
+    FStandalone := v = 'yes';
     if (v <> 'yes') and (v <> 'no') then
       Fail('Only "yes" or "no" are permitted as values of "standalone"', ASrc);
     SkipSpaces(ASrc);
@@ -913,7 +992,9 @@ end;
 { The prolog, the root element and what follows it. }
 procedure TXmlReader.ReadDocument(var ASrc: TXmlSource);
 var
-  hasRoot, hasDoctype: Boolean;
+  hasRoot, hasDoctype, empty: Boolean;
+  el: TDOMElement;
+  pending: UnicodeString;
 begin
   hasRoot := False;
   hasDoctype := False;
@@ -936,7 +1017,13 @@ begin
     begin
       if hasRoot then
         Fail('Only one top-level element allowed', ASrc);
-      ReadElement(ASrc, FDoc);
+      el := ReadStartTag(ASrc, FDoc, empty);
+      if not empty then
+      begin
+        Inc(FDepth);
+        pending := '';
+        ReadContent(ASrc, el, False, pending);
+      end;
       hasRoot := True;
     end
     else

@@ -2017,6 +2017,61 @@ raises EXMLReadError
 == xml 38
 raises EXMLReadError
 == xml 39
+0 9 #document
+1 10 svg
+1 1 svg
+text ab
+2 1 text
+text ab
+3 3 #text a
+3 5 nbsp
+3 3 #text b
+== xml 40
+0 9 #document
+1 10 svg
+1 1 svg
+@id=ab
+@name=
+text
+== xml 41
+0 9 #document
+1 10 svg
+1 1 svg
+text abc
+2 3 #text a
+2 5 x
+2 3 #text b
+2 5 y
+2 3 #text c
+2 1 g
+text
+2 5 x
+== xml 42
+raises EXMLReadError
+== xml 43
+raises EXMLReadError
+== xml 44
+0 9 #document
+1 10 s
+1 1 s
+@id=a b
+text a\u000Db
+2 3 #text a\u000Db
+== xml 45
+0 9 #document
+1 10 s
+1 1 s
+@id=a  b
+text a\u000D\u000Ab
+2 3 #text a\u000D\u000Ab
+== xml 46
+0 9 #document
+1 1 a
+text \uD800
+2 3 #text \uD800
+== xml 47
+raises EXMLReadError
+== xml 48
 file Beef_cuts_France.svg
 bytes 71195
 elements 200
@@ -2063,13 +2118,13 @@ text
 @transform=matrix(-0.2,0,0,-0.2,-1.2,0)
 @style=fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none
 text
-== xml 40
+== xml 49
 file Map_of_Iceland.svg
 bytes 733758
 elements 3063
 texts 3064
-lines 17233
-fnv 1942372F
+lines 19489
+fnv 60F333B9
 0 9 #document
 1 8 #comment \u0020Generator: Adobe Illustrator 13.0.0, SVG Export Plug-In \u0020
 1 10 svg
@@ -2090,27 +2145,27 @@ text \u000A
 @d=M1.5,1487.344V1.5h1831.289v1485.844H1.5z
 @fill=#80ADD1
 @stroke=#306799
+@stroke-width=3
 text
 2 3 #text \u000A
 2 1 path
 @d=M1625.139,1375.994v16.863
 @stroke=#000000
+@stroke-width=1.5
 text
 2 3 #text \u000A
 2 1 path
 @d=M1551.267,1392.24h-73.099v-7.457h73.099V1392.24z
 @fill=#FFFFFF
 @stroke=#000000
+@stroke-width=1.3307
 text
 2 3 #text \u000A
 2 1 path
 @d=M1625.317,1392.24h-73.913v-7.457h73.913V1392.24z
 @fill=#9A9999
 @stroke=#000000
-text
-2 3 #text \u000A
-2 1 path
-== xml 41
+== xml 50
 file Sicily_prehellenic_topographic_map.svg
 bytes 3734062
 elements 310

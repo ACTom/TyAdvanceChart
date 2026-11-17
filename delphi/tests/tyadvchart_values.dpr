@@ -445,6 +445,75 @@ begin
   end;
 end;
 
+{ The class of what parsing AText (UTF-8, GeoSvg's options) raises: '' when it parses. }
+function XmlRaises(const AText: string): string;
+var
+  parser: TDOMParser;
+  src: TXMLInputSource;
+  st: TStringStream;
+  doc: TXMLDocument;
+begin
+  Result := '';
+  doc := nil;
+  parser := TDOMParser.Create;
+  st := TStringStream.Create(AText, TEncoding.UTF8);
+  src := TXMLInputSource.Create(st);
+  try
+    parser.Options.PreserveWhitespace := True;
+    parser.Options.Namespaces := False;
+    parser.Options.ExpandEntities := True;
+    parser.Options.Validate := False;
+    try
+      parser.Parse(src, doc);
+    except
+      on E: Exception do
+        Result := E.ClassName;
+    end;
+  finally
+    doc.Free;
+    src.Free;
+    st.Free;
+    parser.Free;
+  end;
+end;
+
+function XmlNested(ADepth: Integer): string;
+var
+  i: Integer;
+  sb: TStringBuilder;
+begin
+  sb := TStringBuilder.Create;
+  try
+    for i := 1 to ADepth do
+      sb.Append('<g>');
+    for i := 1 to ADepth do
+      sb.Append('</g>');
+    Result := sb.ToString;
+  finally
+    sb.Free;
+  end;
+end;
+
+{ The XMLRead stand-in's deliberate limits (FPC accepts all of these): each raises EXMLReadError itself,
+  not another class; and nesting is capped at 4096 levels. }
+procedure CheckXmlLimits;
+begin
+  Check(XmlRaises('<!DOCTYPE s [<!ELEMENT s ANY>]><s/>') = 'EXMLReadError',
+    'XML limit: an ELEMENT declaration raises EXMLReadError');
+  Check(XmlRaises('<!DOCTYPE s [<!ATTLIST s a CDATA "x">]><s/>') = 'EXMLReadError',
+    'XML limit: an ATTLIST declaration raises EXMLReadError');
+  Check(XmlRaises('<!DOCTYPE s [<!ENTITY % p "x">]><s/>') = 'EXMLReadError',
+    'XML limit: a parameter entity declaration raises EXMLReadError');
+  Check(XmlRaises('<!DOCTYPE s [%p;]><s/>') = 'EXMLReadError',
+    'XML limit: a parameter entity reference raises EXMLReadError');
+  Check(XmlRaises('<?xml version="1.1"?><s/>') = 'EXMLReadError',
+    'XML limit: version="1.1" raises EXMLReadError');
+  Check(XmlRaises(XmlNested(1000)) = '', 'XML limit: 1000 nested elements parse');
+  Check(XmlRaises(XmlNested(4096)) = '', 'XML limit: 4096 nested elements parse');
+  Check(XmlRaises(XmlNested(4097)) = 'EXMLReadError', 'XML limit: 4097 nested elements raise EXMLReadError');
+  Check(XmlRaises(XmlNested(5000)) = 'EXMLReadError', 'XML limit: 5000 nested elements raise EXMLReadError');
+end;
+
 begin
   CheckSar32;
   CheckIntToDouble;
@@ -458,5 +527,6 @@ begin
   CheckJsonInvalidBytes;
   CheckJsonStringLocaleFloat;
   CheckSvgBytes;
+  CheckXmlLimits;
   Writeln('DELPHI VALUES OK');
 end.

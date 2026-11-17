@@ -36,14 +36,13 @@ var
   GCase: Integer;
   GInfo: Boolean;
 
-{ S as UTF-16 code units: $20..$7E except '\' as they are, any other unit as \uXXXX; a blank that is the
-  first or the last unit is written \u0020 as well, so that no line depends on blanks at its ends. }
-function Esc(const S: string): string;
+{ The code units of U: $20..$7E except '\' as they are, any other unit as \uXXXX; a blank that is the
+  first or the last unit is written \u0020 as well, so that no line depends on blanks at its ends. Takes
+  UTF-16 as it is (an unpaired surrogate too), with no conversion through FPC's UTF-8 strings. }
+function EscUnits(const U: UnicodeString): string;
 var
-  u: UnicodeString;
   i, c: Integer;
 begin
-  u := TyJsUnits(S);
   Result := '';
   for i := 1 to Length(u) do
   begin
@@ -54,6 +53,12 @@ begin
     else
       Result := Result + '\u' + IntToHex(c, 4);
   end;
+end;
+
+{ S as UTF-16 code units, written as EscUnits writes them. }
+function Esc(const S: string): string;
+begin
+  Result := EscUnits(TyJsUnits(S));
 end;
 
 { One result line; informational while GInfo is set. Blanks at its end are dropped: Esc writes none, so

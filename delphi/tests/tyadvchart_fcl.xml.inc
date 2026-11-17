@@ -1,9 +1,10 @@
 (* Section xml: DOM and XMLRead. Every input is a run of bytes in a TBytesStream, parsed with the options
   the chart's map reader sets (PreserveWhitespace True, Namespaces False, ExpandEntities True, Validate
   False). The tree is printed depth first from the document node, one line per node:
-  '<depth> <NodeType> <Esc(NodeName)> <Esc(NodeValue)>'; an element is followed by '@<name>=<Esc(value)>'
-  for every name of cXmlAttrNames that GetAttributeNode finds, then by 'text <Esc(TextContent)>'. A parse
-  that raises prints 'raises <class name>'. No line of this section is informational.
+  '<depth> <NodeType> <EscUnits(NodeName)> <EscUnits(NodeValue)>'; an element is followed by
+  '@<name>=<EscUnits(value)>' for every name of cXmlAttrNames that GetAttributeNode finds, then by
+  'text <EscUnits(TextContent)>' (EscUnits: the DOM's UTF-16 strings as they are, not through FPC's UTF-8
+  strings). A parse that raises prints 'raises <class name>'. No line of this section is informational.
 
   The inputs by group of the plan (numbers of '== xml N'):
     1  1       a small SVG
@@ -28,14 +29,27 @@
                attribute; a repeated attribute; attributes without white space between them; ']]>' in
                text; '--' in a comment; a processing instruction named XML; &#X41; (upper-case X); a
                reference to U+0001; a raw U+0001; a second DOCTYPE
-    13 39-41   the three SVG files of examples/advchart/maps (read relative to delphi/tests, the working
+    -  39-47   what FPC does with: an undeclared entity under the SVG 1.1 DOCTYPE (an external
+               identifier) in text, in an attribute value, two of them with text between; an undeclared
+               entity under a DOCTYPE with an internal subset only, and with no DOCTYPE; a CR from &#13; in
+               an entity value, used in an attribute and in text, and CR LF from &#13;&#10;; a lone
+               surrogate in UTF-16 LE input; ']]>' whose brackets are character references
+    13 48-50   the three SVG files of examples/advchart/maps (read relative to delphi/tests, the working
                directory the probe gives): the number of element and of text nodes, the FNV-1a (32 bits)
                of all the node lines (each followed by a line feed), and the first 40 node lines *)
 
 const
-  cXmlAttrNames: array[0..18] of string = (
+  { The names GeoSvg reads (its Attr, AttrOr and ParseFloatAttr calls, cInhAttr and cSelfAttr), and
+    class and xmlns. }
+  cXmlAttrNames: array[0..48] of string = (
     'id', 'name', 'd', 'points', 'transform', 'style', 'class', 'fill', 'stroke', 'x', 'y', 'width',
-    'height', 'viewBox', 'cx', 'cy', 'r', 'xlink:href', 'xmlns');
+    'height', 'viewBox', 'cx', 'cy', 'r', 'xlink:href', 'xmlns',
+    'stroke-width', 'opacity', 'fill-opacity', 'stroke-opacity', 'stroke-dasharray', 'stroke-dashoffset',
+    'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'font-family', 'font-size', 'font-style',
+    'font-weight', 'text-anchor', 'visibility', 'display', 'alignment-baseline', 'stop-color',
+    'stop-opacity', 'x1', 'y1', 'x2', 'y2', 'rx', 'ry', 'dx', 'dy', 'offset', 'gradientUnits', 'href');
+  cXmlSvg11 = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" '
+    + '"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
   cXmlMapFiles: array[0..2] of string = (
     'Beef_cuts_France.svg', 'Map_of_Iceland.svg', 'Sicily_prehellenic_topographic_map.svg');
   cXmlMapDir = '..' + PathDelim + '..' + PathDelim + 'examples' + PathDelim + 'advchart' + PathDelim
@@ -123,8 +137,8 @@ var
   i: Integer;
   a, c: TDOMNode;
 begin
-  AOut.Add(IntToStr(ADepth) + ' ' + IntToStr(ANode.NodeType) + ' ' + Esc(ANode.NodeName) + ' '
-    + Esc(ANode.NodeValue));
+  AOut.Add(IntToStr(ADepth) + ' ' + IntToStr(ANode.NodeType) + ' ' + EscUnits(ANode.NodeName) + ' '
+    + EscUnits(ANode.NodeValue));
   if ANode.NodeType = TEXT_NODE then
     Inc(ATexts);
   if ANode is TDOMElement then
@@ -134,9 +148,9 @@ begin
     begin
       a := TDOMElement(ANode).GetAttributeNode(TyJsUnits(cXmlAttrNames[i]));
       if a <> nil then
-        AOut.Add('@' + cXmlAttrNames[i] + '=' + Esc(a.NodeValue));
+        AOut.Add('@' + cXmlAttrNames[i] + '=' + EscUnits(a.NodeValue));
     end;
-    AOut.Add('text ' + Esc(ANode.TextContent));
+    AOut.Add('text ' + EscUnits(ANode.TextContent));
   end;
   c := ANode.FirstChild;
   while c <> nil do
@@ -310,6 +324,15 @@ begin
   XmlTextCase('<svg>&#1;</svg>');
   XmlTextCase('<svg>'#1'</svg>');
   XmlTextCase('<!DOCTYPE a><!DOCTYPE b><svg/>');
+  XmlTextCase(cXmlSvg11 + '<svg><text>a&nbsp;b</text></svg>');
+  XmlTextCase(cXmlSvg11 + '<svg id="a&nbsp;b" name="&nbsp;"/>');
+  XmlTextCase(cXmlSvg11 + '<svg>a&x;b&y;c<g/>&x;</svg>');
+  XmlTextCase('<!DOCTYPE svg [<!ENTITY e "E">]><svg>a&nbsp;b</svg>');
+  XmlTextCase('<svg>a&nbsp;b</svg>');
+  XmlTextCase('<!DOCTYPE s [<!ENTITY e "a&#13;b">]><s id="&e;">&e;</s>');
+  XmlTextCase('<!DOCTYPE s [<!ENTITY e "a&#13;&#10;b">]><s id="&e;">&e;</s>');
+  XmlCase(JsonStrHexBytes('FFFE3C0061003E0000D83C002F0061003E00'));
+  XmlTextCase('<svg>a&#93;&#93;>b</svg>');
   { group 13 }
   for i := 0 to High(cXmlMapFiles) do
     XmlFileCase(cXmlMapFiles[i]);
