@@ -110,7 +110,8 @@ function TyHtmlSetCells(const AHtml: string;
 implementation
 
 uses
-  tyControls.AdvanceChart.Color, tyControls.AdvanceChart.Scale, tyControls.FontUnits;
+  tyControls.AdvanceChart.Color, tyControls.AdvanceChart.Scale, tyControls.FontUnits,
+  tyControls.AdvanceChart.NativeStr;
 
 const
   { tyControls.Types' TyFontItalic: the italic flag above a font weight. Not
@@ -152,16 +153,7 @@ function Utf8Of(ACode: Cardinal): string;
 begin
   if (ACode = 0) or (ACode > $10FFFF) or ((ACode >= $D800) and (ACode <= $DFFF)) then
     ACode := $FFFD;
-  if ACode < $80 then
-    Result := Chr(ACode)
-  else if ACode < $800 then
-    Result := Chr($C0 or (ACode shr 6)) + Chr($80 or (ACode and $3F))
-  else if ACode < $10000 then
-    Result := Chr($E0 or (ACode shr 12)) + Chr($80 or ((ACode shr 6) and $3F))
-      + Chr($80 or (ACode and $3F))
-  else
-    Result := Chr($F0 or (ACode shr 18)) + Chr($80 or ((ACode shr 12) and $3F))
-      + Chr($80 or ((ACode shr 6) and $3F)) + Chr($80 or (ACode and $3F));
+  Result := TyCodePointStr(ACode);
 end;
 
 type

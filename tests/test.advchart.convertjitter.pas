@@ -80,6 +80,7 @@ type
     procedure TestAConversionFollowsANewOptionBeforeAPaint;
     procedure TestTheJsonFormsPrintAsJsonPrints;
     procedure TestCustomLabelsLeaveACategoryAxisTicksAlone;
+    procedure TestAStringIsIndexedInUtf16Units;
   end;
 
 implementation
@@ -969,6 +970,61 @@ begin
     AssertEquals('category ' + IntToStr(i) + ' on the final rect',
       FChart.Build.Axis('xAxis', 0).DataToLocal(spec^.CatTickValues[i]),
       spec^.CatLocalCoords[i], 0);
+end;
+
+{ A STRING IS INDEXED AS JAVASCRIPT INDEXES IT, by UTF-16 unit: an element
+  of it is one unit (half a pair alone), and customValues written as a
+  string are its units, the digits among them values }
+procedure TAdvChartConvertJitterTest.TestAStringIsIndexedInUtf16Units;
+const
+  cText = '1'#$E5#$9B#$BD#$F0#$9F#$98#$80'3';
+var
+  s: TJSONString;
+  el, own: TJSONData;
+  i, k: Integer;
+  t, got, b: string;
+  spec: PTyAxisLayoutSpec;
+begin
+  { through a string variable: the constant itself would pick the
+    UnicodeString constructor }
+  t := cText;
+  s := TJSONString.Create(t);
+  try
+    got := '';
+    for i := 0 to 5 do
+    begin
+      el := TyJsonElement(s, i, own);
+      try
+        if el = nil then got := got + '|nil'
+        else
+        begin
+          { as bytes: half a pair is no character to print }
+          b := el.AsString;
+          got := got + '|';
+          for k := 1 to Length(b) do got := got + IntToHex(Ord(b[k]), 2);
+        end;
+      finally
+        own.Free;
+      end;
+    end;
+  finally
+    s.Free;
+  end;
+  AssertEquals('one unit each (FPC writes half a pair as nothing)', '|31|E59BBD|||33|nil', got);
+  FChart.Free;
+  FChart := TCjProbe.Create(FForm);
+  FChart.Parent := FForm;
+  FChart.Controller := FCtl;
+  FChart.SetBounds(0, 0, cW, cH);
+  FChart.Option := '{"animation":false,"xAxis":{"type":"value","min":0,"max":10,'
+    + '"axisTick":{"customValues":"' + cText + '"}},"yAxis":{"type":"value"},'
+    + '"series":[{"type":"line","data":[[0,0],[10,1]]}]}';
+  Frame;
+  spec := FChart.Build.Grid(0).SpecFor(FChart.Build.Axis('xAxis', 0));
+  got := '';
+  for i := 0 to High(spec^.TickMarks) do
+    got := got + '|' + FloatToStr(spec^.TickMarks[i].Value);
+  AssertEquals('the ticks', '|1|3', got);
 end;
 
 initialization

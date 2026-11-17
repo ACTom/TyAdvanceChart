@@ -761,7 +761,7 @@ uses
   tyControls.AdvanceChart.JsMath, tyControls.AdvanceChart.Marker,
   tyControls.AdvanceChart.Labels, tyControls.AdvanceChart.RichText,
   tyControls.AdvanceChart.Convert, tyControls.AdvanceChart.AxisBreak,
-  tyControls.AdvanceChart.Jitter;
+  tyControls.AdvanceChart.Jitter, tyControls.AdvanceChart.NativeStr;
 
 const
   { GridModel's defaultOption. Percentages are of the FULL container extent, not
@@ -1964,7 +1964,7 @@ begin
       AInks[0].Ok := True;
       AInks[0].Colour := cTyCanvasColourLeft;
     end;
-    ACount := Length(UTF8Decode(d.AsString));
+    ACount := Length(TyJsUnits(d.AsString));
   end
   else if d is TJSONArray then
   begin
@@ -3918,7 +3918,7 @@ begin
     jtArray, jtObject:
       for i := 0 to d.Count - 1 do Take(d.Items[i]);
     jtString:
-      for i := 0 to Length(UTF8Decode(d.AsString)) - 1 do
+      for i := 0 to Length(TyJsUnits(d.AsString)) - 1 do
       begin
         item := TyJsonElement(d, i, own);
         try

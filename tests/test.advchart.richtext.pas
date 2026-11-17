@@ -36,6 +36,7 @@ type
   published
     procedure TestTheBlockAsUpstream;
     procedure TestTheHostsTrapsAreLeftAlone;
+    procedure TestABreakCountsUtf16Units;
   end;
 
 implementation
@@ -638,6 +639,33 @@ begin
     on E: Exception do what := E.ClassName;
   end;
   AssertEquals('a division by zero', 'EZeroDivide', what);
+end;
+
+{ overflow 'break' walks the text in UTF-16 units, as zrender does: a
+  three-byte character is one, an astral one two (each measured as a wide
+  character); the pieces' texts, as drawn }
+procedure TAdvChartRichTextEngineOracleTest.TestABreakCountsUtf16Units;
+var
+  st: TTyRtStyle;
+  j: TJSONData;
+  res: TTyRtResult;
+  k: Integer;
+  got: string;
+begin
+  st := TyRtStyleDefault;
+  j := TJSONIntegerNumber.Create(30);
+  try
+    TyRtTakeWidth(j, st);
+  finally
+    j.Free;
+  end;
+  st.Overflow := rtoBreak;
+  res := TyRtLayout('ab'#$E5#$9B#$BD#$F0#$9F#$98#$80'cd'#$E5#$9B#$BD'ef', st, nil, False,
+    Default(TTyRtDefault), 0, 0, FMeasurer);
+  got := '';
+  for k := 0 to High(res.Pieces) do
+    if res.Pieces[k].Kind = rpkText then got := got + '|' + res.Pieces[k].Text;
+  AssertEquals('ab'#$E5#$9B#$BD'|'#$F0#$9F#$98#$80'|cd'#$E5#$9B#$BD'|ef', Copy(got, 2, MaxInt));
 end;
 
 initialization

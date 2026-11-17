@@ -234,7 +234,7 @@ implementation
 
 uses
   tyControls.AdvanceChart.JsMath, tyControls.AdvanceChart.Data, tyControls.AdvanceChart.Scale,
-  tyControls.AdvanceChart.Color;
+  tyControls.AdvanceChart.Color, tyControls.AdvanceChart.NativeStr;
 
 const
   cTransEps = 5e-5;
@@ -360,7 +360,7 @@ end;
 
 function DomStr(const S: DOMString): string;
 begin
-  Result := UTF8Encode(UnicodeString(S));
+  Result := TyFromJsUnits(UnicodeString(S));
 end;
 
 { getAttribute: AHas False for an absent attribute (null) }
@@ -370,7 +370,7 @@ begin
   AValue := '';
   Result := False;
   if not (AEl is TDOMElement) then Exit;
-  a := TDOMElement(AEl).GetAttributeNode(DOMString(UTF8Decode(AName)));
+  a := TDOMElement(AEl).GetAttributeNode(DOMString(TyJsUnits(AName)));
   if a = nil then Exit;
   AValue := DomStr(a.NodeValue);
   Result := True;
@@ -663,7 +663,7 @@ begin
     end;
   end;
   if JsFalsy(size) then size := 12;
-  u := UTF8Decode(AText);
+  u := TyJsUnits(AText);
   w := 0;
   if Pos('mono', font) > 0 then
     Exit(size * Length(u));

@@ -771,10 +771,13 @@ begin
   CountNames('FPC-only names outside {$IFDEF FPC} lines (for TStringArray write TTyStringArray; ' +
     'for TArray<T> a named "array of T" type; for TFPList TTyList; for GetTickCount64 ' +
     'TThread.GetTickCount64; for TryStrToQWord TryStrToUInt64; for TryStrToDWord TryStrToUInt; ' +
-    'for Floor64 and Ceil64 TyFloor64 and TyCeil64; for GetLocalTimeOffset TyLocalTimeOffsetMinutes)',
+    'for Floor64 and Ceil64 TyFloor64 and TyCeil64; for GetLocalTimeOffset TyLocalTimeOffsetMinutes; ' +
+    'for UTF8Decode TyJsUnits; for UTF8Encode TyFromJsUnits; for UnicodeToUTF8 TyCodePointStr; ' +
+    'for IndexByte over a string Pos; no LazUTF8 in uses: tyControls.AdvanceChart.NativeStr)',
     ['DefaultFormatSettings', 'LineEnding', 'SarLongint', 'StrToQWord', 'TStringArray', 'TArray',
     'TFPList', 'GetTickCount64', 'TryStrToQWord', 'TryStrToDWord', 'Floor64', 'Ceil64',
-    'GetLocalTimeOffset'], True, ExpFpcOnlyNames, 'GetTickCount64');
+    'GetLocalTimeOffset', 'UTF8Decode', 'UTF8Encode', 'UnicodeToUTF8', 'IndexByte', 'LazUTF8'],
+    True, ExpFpcOnlyNames, 'GetTickCount64');
 end;
 
 { True when S, trimmed, is a float literal: an optional sign, digits, then a '.' and digits

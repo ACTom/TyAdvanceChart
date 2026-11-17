@@ -66,6 +66,7 @@ type
     procedure TestBlockMarginsCollapse;
     procedure TestABordersRuleSitsInTheGap;
     procedure TestEntitiesAreDecoded;
+    procedure TestANumericEntityIsItsCharacter;
     procedure TestUnknownTagsAreTheirText;
     procedure TestHiddenContentDrawsNothing;
     procedure TestALessThanThatIsNoTagIsText;
@@ -405,6 +406,20 @@ begin
   AssertEquals('named, numeric; an unknown or unterminated one as written',
     'a<b>&"''AB''&foo;&amp x', LineText(l[0]));
   AssertEquals('an encoded tag is text, not a tag', '<b>x</b>', LineText(Read('&lt;b&gt;x&lt;/b&gt;')[0]));
+end;
+
+{ a numeric entity beyond ASCII is its character (UTF-8 here); nought, a
+  surrogate and a code past U+10FFFF are U+FFFD }
+procedure TAdvChartTipHtmlTest.TestANumericEntityIsItsCharacter;
+begin
+  AssertEquals('U+56FD, decimal', 'a'#$E5#$9B#$BD'b', TyTooltipDecodeEntities('a&#22269;b'));
+  AssertEquals('U+1F600, hex', #$F0#$9F#$98#$80, TyTooltipDecodeEntities('&#x1F600;'));
+  AssertEquals('U+00E9', #$C3#$A9, TyTooltipDecodeEntities('&#xe9;'));
+  AssertEquals('U+10FFFF', #$F4#$8F#$BF#$BF, TyTooltipDecodeEntities('&#x10FFFF;'));
+  AssertEquals('a surrogate', #$EF#$BF#$BD, TyTooltipDecodeEntities('&#xD800;'));
+  AssertEquals('nought', #$EF#$BF#$BD, TyTooltipDecodeEntities('&#0;'));
+  AssertEquals('past U+10FFFF', #$EF#$BF#$BD, TyTooltipDecodeEntities('&#x110000;'));
+  AssertEquals('not a number: as written', '&#xZ;', TyTooltipDecodeEntities('&#xZ;'));
 end;
 
 procedure TAdvChartTipHtmlTest.TestUnknownTagsAreTheirText;

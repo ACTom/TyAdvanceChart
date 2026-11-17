@@ -355,11 +355,10 @@ implementation
 
 uses
   { Only for the diagnostic resourcestrings; kept out of the interface uses so
-    the dependency stays one-way and invisible to hosts. LazUTF8 is here for
-    UnicodeToUTF8, used by the escape decoder below. }
-  tyControls.AdvanceChart.StrConsts, LazUTF8, Math, tyControls.FontUnits,
+    the dependency stays one-way and invisible to hosts. }
+  tyControls.AdvanceChart.StrConsts, Math, tyControls.FontUnits,
   tyControls.AdvanceChart.Scale, tyControls.AdvanceChart.Data,
-  tyControls.AdvanceChart.BackwardCompat;
+  tyControls.AdvanceChart.BackwardCompat, tyControls.AdvanceChart.NativeStr;
 
 function TyGetShallowRoot(ANode: TJSONData; ARoot: TJSONData;
   const AKey: string): TJSONData;
@@ -1031,7 +1030,7 @@ begin
           if (code = Ord(quote)) or (code = Ord('\')) then
             Result := Result + '\' + Chr(code)
           else
-            Result := Result + UnicodeToUTF8(Cardinal(code));
+            Result := Result + TyCodePointStr(Cardinal(code));
           Continue;
         end;
       end;
@@ -1155,7 +1154,7 @@ var
       while not (p^ in ['"', '\']) and (p^ >= #32) do Inc(p);
       n := Length(sb);
       SetLength(sb, n + (p - start));
-      if p > start then Move(start^, sb[n + 1], p - start);
+      if p > start then Move(start^, sb[n + 1], (p - start) * SizeOf(Char));
     end;
     AStr := sb;
     Inc(p);
@@ -1447,8 +1446,8 @@ var
 begin
   Result := False;
   AData := nil;
-  if (AText = '') or (DefaultSystemCodePage <> CP_UTF8) then Exit;
-  if IndexByte(AText[1], Length(AText), 0) >= 0 then Exit;
+  if (AText = '') {$IFDEF FPC}or (DefaultSystemCodePage <> CP_UTF8){$ENDIF} then Exit;
+  if Pos(#0, AText) > 0 then Exit;
   if Pos('\u', AText) > 0 then Exit;
   base := PChar(AText);
   p := base;

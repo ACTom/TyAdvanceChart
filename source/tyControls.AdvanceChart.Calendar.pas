@@ -239,7 +239,7 @@ function TyBuildCalendar(ACal: TTyCalendar; const AInk: TTyCalendarInk;
 implementation
 
 uses tyControls.AdvanceChart.Scale, tyControls.StrConsts, tyControls.AdvanceChart.Handlers, tyControls.FontUnits,
-     tyControls.AdvanceChart.RichStyle;
+     tyControls.AdvanceChart.RichStyle, tyControls.AdvanceChart.NativeStr;
 
 { what a named month or year label handler is given: nameMap as Name, the
   kind in Extra, and (yyyy, M) for a month, (start, end) for a year }
@@ -1370,21 +1370,13 @@ end;
 function LocaleDayLetter(AIndex: Integer): string;
 var
   s: string;
-  n: Integer;
 begin
   s := TyDateTimeNames.ShortDayNames[AIndex + 1];
   Result := '';
   if s = '' then Exit;
-  if (Copy(s, 1, 3) = '周') or (Copy(s, 1, 6) = '星期') then
-  begin
-    n := Length(s);
-    while (n > 1) and ((Ord(s[n]) and $C0) = $80) do Dec(n);
-    Exit(Copy(s, n, Length(s)));
-  end;
-  n := 1;
-  if Ord(s[1]) >= $C0 then
-    while (n < Length(s)) and ((Ord(s[n + 1]) and $C0) = $80) do Inc(n);
-  Result := Copy(s, 1, n);
+  if (Pos('周', s) = 1) or (Pos('星期', s) = 1) then
+    Exit(Copy(s, TyLastCharStart(s), Length(s)));
+  Result := Copy(s, 1, TyFirstCharLen(s));
 end;
 
 function DayName(const ASpec: TTyCalendarSpec; AIndex: Integer): string;

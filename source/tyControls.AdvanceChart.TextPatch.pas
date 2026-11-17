@@ -184,7 +184,7 @@ function TyOptQuoteString(const S: string; AQuote: Char): string;
 
 implementation
 
-uses tyControls.AdvanceChart.Scale;
+uses tyControls.AdvanceChart.Scale, tyControls.AdvanceChart.NativeStr;
 
 const
   cWidth = 80;
@@ -567,16 +567,7 @@ var
 
   procedure AddCode(ACode: Cardinal);
   begin
-    if ACode < $80 then Result := Result + Chr(ACode)
-    else if ACode < $800 then
-      Result := Result + Chr($C0 or (ACode shr 6)) + Chr($80 or (ACode and $3F))
-    else if ACode < $10000 then
-      Result := Result + Chr($E0 or (ACode shr 12))
-        + Chr($80 or ((ACode shr 6) and $3F)) + Chr($80 or (ACode and $3F))
-    else
-      Result := Result + Chr($F0 or (ACode shr 18))
-        + Chr($80 or ((ACode shr 12) and $3F))
-        + Chr($80 or ((ACode shr 6) and $3F)) + Chr($80 or (ACode and $3F));
+    Result := Result + TyCodePointStr(ACode);
   end;
 
 begin

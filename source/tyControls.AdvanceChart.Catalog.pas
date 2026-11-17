@@ -59,7 +59,7 @@ const
   { SHA-1 over tools/advchart/gen-catalog.js with CRLF normalised to LF, so a
     checkout with a different core.autocrlf does not turn the guard red for
     no reason. }
-  TyOptGeneratorDigest = '7F5167CCA54170FD7EDAF2F2A40797F7A6F161D8';
+  TyOptGeneratorDigest = '64FC12AF640FDA0BCCED0CE7D81D39FCC227C8B4';
   { SHA-1 over everything below the DATA marker further down.
     The two digests above pin the INPUT and the TRANSFORMATION, which is what
     tyControls.Icons.Lucide does -- but neither can see a hand-edit of the
@@ -67,7 +67,7 @@ const
     value leaves them untouched. Measured by mutation: changing one DefaultStr
     index left every test green. This third digest closes that, and it is why
     the data sits below a marker instead of interleaved with the header. }
-  TyOptDataDigest = '9489867E0DC2EC066671161E5A87259D9EFC0E76';
+  TyOptDataDigest = '7802123D051FC254A42424D6674445C42047545F';
   TyOptRoot = 2454;
   TyOptNodeCount = 2455;
   TyOptEdgeCount = 10077;
@@ -468,7 +468,7 @@ const
     'center',
     'middle',
     '80%',
-    '''' + #$E2 + #$96 + #$B6 + '''',
+    ''''#$E2#$96#$B6'''',
     '''zoomToNode''',
     '0.32*0.32',
     '''index''',

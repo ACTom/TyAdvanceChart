@@ -50,6 +50,7 @@ type
     function SpecOf(const AText: string): TTyLabelSpec;
   published
     procedure TestTheFourOutsidePositions;
+    procedure TestATruncatedLineIsCutInUtf16Units;
     procedure TestTheNineInsidePositions;
     procedure TestDistanceDoesNothingInTheDefaultPosition;
     procedure TestAnUnknownNameIsNotTheDefault;
@@ -659,6 +660,22 @@ begin
   TyExpandLabels(FList, specs, FM, 192);
   AssertEquals('doubled at twice the density', plain.Left + 14,
     FList.Element(1).Shape.Bounds.Left, Eps);
+end;
+
+{ parseText's cut counts characters as JavaScript does, in UTF-16 units: a
+  three-byte character is one, an astral one two -- and a cut can fall
+  between the two halves of a pair. The measurer counts bytes. }
+procedure TAdvChartLabelsTest.TestATruncatedLineIsCutInUtf16Units;
+const
+  cText = 'ab'#$E5#$9B#$BD#$F0#$9F#$98#$80'cdefgh';
+var r: TTyStringArray;
+begin
+  r := TyZrPlainTextLines(cText, 12 * CharW + 1, 1000 * CharH, 0, '.', FM, 'x', 12, 400, False);
+  AssertEquals(1, Length(r));
+  AssertEquals('past the pair', 'ab'#$E5#$9B#$BD#$F0#$9F#$98#$80'.', r[0]);
+  r := TyZrPlainTextLines(cText, 8 * CharW + 1, 1000 * CharH, 0, '.', FM, 'x', 12, 400, False);
+  AssertEquals(1, Length(r));
+  AssertEquals('inside the pair', 'ab'#$E5#$9B#$BD'.', r[0]);
 end;
 
 initialization

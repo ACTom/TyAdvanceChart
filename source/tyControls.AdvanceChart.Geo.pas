@@ -901,7 +901,7 @@ uses
   tyControls.AdvanceChart.Calendar,
   tyControls.AdvanceChart.Labels, tyControls.AdvanceChart.OptionMerge,
   tyControls.AdvanceChart.RichStyle, jsonparser,
-  tyControls.AdvanceChart.Scale;
+  tyControls.AdvanceChart.Scale, tyControls.AdvanceChart.NativeStr;
 
 const
   { Math.PI as a Double: every use is one Double operation upstream makes }
@@ -1619,7 +1619,7 @@ var
   x, y, prevX, prevY, cy: Double;
 begin
   Result := nil;
-  u := UTF8Decode(AText);
+  u := TyJsUnits(AText);
   n := Length(u);
   SetLength(Result, (n + 1) div 2);
   prevX := AOffX;
@@ -1816,7 +1816,7 @@ begin
       begin
         if IsNullish(coords) then raise EGeoParse.Create('a geometry has no coordinates');
         if coords is TJSONArray then len := TJSONArray(coords).Count
-        else if coords is TJSONString then len := Length(UTF8Decode(coords.AsString))
+        else if coords is TJSONString then len := Length(TyJsUnits(coords.AsString))
         else len := 0;
       end;
       if len <= 0 then
@@ -2157,10 +2157,11 @@ end;
 
 { the markup itself: '<' first past white space and a byte-order mark }
 function LooksLikeMarkup(const AText: string): Boolean;
+const cUtf8Bom = #$EF#$BB#$BF;
 var i: Integer;
 begin
   i := 1;
-  if Copy(AText, 1, 3) = #$EF#$BB#$BF then i := 4;
+  if Copy(AText, 1, Length(cUtf8Bom)) = cUtf8Bom then i := Length(cUtf8Bom) + 1;
   while (i <= Length(AText)) and (AText[i] in [#9, #10, #13, ' ']) do Inc(i);
   Result := (i <= Length(AText)) and (AText[i] = '<');
 end;

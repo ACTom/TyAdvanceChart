@@ -133,6 +133,8 @@ function TyAxisCoordJs(AAxis: TTyAxis; AValue: Double): Double;
 
 implementation
 
+uses tyControls.AdvanceChart.NativeStr;
+
 { ==================== JavaScript values ==================== }
 
 function TyJsonNullish(AData: TJSONData): Boolean;
@@ -202,10 +204,10 @@ begin
     jtString:
       begin
         { a UTF-16 code unit, as JavaScript indexes a string }
-        u := UTF8Decode(AData.AsString);
+        u := TyJsUnits(AData.AsString);
         if (AIndex >= 0) and (AIndex < Length(u)) then
         begin
-          AOwned := TJSONString.Create(UTF8Encode(u[AIndex + 1]));
+          AOwned := TJSONString.Create(TyFromJsUnits(u[AIndex + 1]));
           Result := AOwned;
         end;
       end;

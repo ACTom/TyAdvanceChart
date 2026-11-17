@@ -190,7 +190,8 @@ implementation
 
 uses
   tyControls.AdvanceChart.Data, tyControls.AdvanceChart.Scale, tyControls.AdvanceChart.Jitter,
-  tyControls.AdvanceChart.StrConsts, tyControls.AdvanceChart.JsRegExp;
+  tyControls.AdvanceChart.StrConsts, tyControls.AdvanceChart.JsRegExp,
+  tyControls.AdvanceChart.NativeStr;
 
 { ==================== JavaScript values ==================== }
 
@@ -343,8 +344,8 @@ var
   i, n: Integer;
 begin
   if A = B then Exit(0);
-  ua := UTF8Decode(A);
-  ub := UTF8Decode(B);
+  ua := TyJsUnits(A);
+  ub := TyJsUnits(B);
   n := Min(Length(ua), Length(ub));
   for i := 1 to n do
     if ua[i] <> ub[i] then
@@ -1481,7 +1482,7 @@ begin
         Result := TyJsRegExpTest(C.Re, JsText(V));
       except
         on E: ETyJsRegExpError do
-          raise ETyTransformError.CreateFmt(rsTyDsCondRegSlow, [UTF8Encode(C.Re.Source)]);
+          raise ETyTransformError.CreateFmt(rsTyDsCondRegSlow, [TyFromJsUnits(C.Re.Source)]);
       end;
     roEq, roNe:
       begin

@@ -414,7 +414,7 @@ implementation
 uses
   tyControls.AdvanceChart.Data, tyControls.AdvanceChart.Scale,
   tyControls.AdvanceChart.AnimView, tyControls.AdvanceChart.Color,
-  tyControls.AdvanceChart.ZrPath;
+  tyControls.AdvanceChart.ZrPath, tyControls.AdvanceChart.NativeStr;
 
 { ==================== JSON ==================== }
 
@@ -552,12 +552,12 @@ begin
       vtUnicodeString:
         begin
           Result[i].Kind := cckText;
-          Result[i].Text := UTF8Encode(UnicodeString(AData[i].VUnicodeString));
+          Result[i].Text := TyFromJsUnits(UnicodeString(AData[i].VUnicodeString));
         end;
       vtWideString:
         begin
           Result[i].Kind := cckText;
-          Result[i].Text := UTF8Encode(WideString(AData[i].VWideString));
+          Result[i].Text := TyFromJsUnits(WideString(AData[i].VWideString));
         end;
       vtChar:
         begin

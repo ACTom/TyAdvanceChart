@@ -6428,7 +6428,7 @@ uses
   { ecStat's three transforms, registered by its initialization [Batch 134] }
   tyControls.AdvanceChart.StatTransform,
   { `image://` pictures and their image lists [F6a] }
-  tyControls.AdvanceChart.Images;
+  tyControls.AdvanceChart.Images, tyControls.AdvanceChart.NativeStr;
 
 var
   GStPatchOff: Boolean = False;

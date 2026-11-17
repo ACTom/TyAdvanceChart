@@ -540,7 +540,8 @@ implementation
 uses fpjson, jsonparser, tyControls.AdvanceChart.Style, tyControls.AdvanceChart.RichStyle,
   tyControls.AdvanceChart.RichText, tyControls.AdvanceChart.PolarBar,
   tyControls.AdvanceChart.LabelLayout, tyControls.AdvanceChart.Color,
-  tyControls.AdvanceChart.JsMath, tyControls.AdvanceChart.Option;
+  tyControls.AdvanceChart.JsMath, tyControls.AdvanceChart.Option,
+  tyControls.AdvanceChart.NativeStr;
 
 { [R5-B] THE HOVERED BLOCK when emphasis.label writes `rich`: the chain
   resolved again with the emphasis label first (its rich styles cascade over
@@ -1454,7 +1455,7 @@ begin
         lines[k] := lines[k] + ell;
         Break;
       end;
-      u := UTF8Decode(lines[k]);
+      u := TyJsUnits(lines[k]);
       n := Length(u);
       if j = 0 then
       begin
@@ -1472,7 +1473,7 @@ begin
         sub := Floor(n * contentWidth / lw)
       else
         sub := 0;
-      lines[k] := UTF8Encode(Copy(u, 1, sub));
+      lines[k] := TyFromJsUnits(Copy(u, 1, sub));
       lw := M(lines[k]);
       Inc(j);
     end;

@@ -162,7 +162,7 @@ implementation
 uses tyControls.FontUnits, tyControls.AdvanceChart.Labels, tyControls.AdvanceChart.Symbol,
   tyControls.AdvanceChart.Data, tyControls.AdvanceChart.Scale,
   { [R7-AI] Math.cos of a rounded path's arcs }
-  tyControls.AdvanceChart.JsMath;
+  tyControls.AdvanceChart.JsMath, tyControls.AdvanceChart.NativeStr;
 
 const
   cGuo = #$E5#$9B#$BD;   // U+56FD: zrender's measure of a font's height
@@ -267,7 +267,7 @@ end;
   NaN -- the caller has the traps masked) }
 function JGreater(const A, B: TTyRtJs): Boolean;
 begin
-  if A.IsStr and B.IsStr then Result := UnicodeString(UTF8Decode(A.S)) > UnicodeString(UTF8Decode(B.S))
+  if A.IsStr and B.IsStr then Result := UnicodeString(TyJsUnits(A.S)) > UnicodeString(TyJsUnits(B.S))
   else Result := A.N > B.N;
 end;
 
@@ -423,7 +423,7 @@ var
   procedure Push(const S: UnicodeString; AW: Double);
   begin
     SetLength(Result.Lines, Length(Result.Lines) + 1);
-    Result.Lines[High(Result.Lines)] := UTF8Encode(S);
+    Result.Lines[High(Result.Lines)] := TyFromJsUnits(S);
     SetLength(Result.Widths, Length(Result.Widths) + 1);
     Result.Widths[High(Result.Widths)] := AW;
   end;
@@ -431,7 +431,7 @@ var
   function CharW(ACode: Integer; const S: UnicodeString): Double;
   begin
     if (ACode >= 0) and (ACode <= 127) then
-      Result := MeasureW(AMeasurer, UTF8Encode(S), AFamily, APx, AWeight)
+      Result := MeasureW(AMeasurer, TyFromJsUnits(S), AFamily, APx, AWeight)
     else
       Result := MeasureW(AMeasurer, cGuo, AFamily, APx, AWeight);
     { a control character is one whole size, as zrender's table has it }
@@ -441,7 +441,7 @@ var
 begin
   Result := Default(TWrapResult);
   ALineWidth := ALineWidthV.N;
-  u := UTF8Decode(AText);
+  u := TyJsUnits(AText);
   line := '';
   currentWord := '';
   currentWordWidth := 0;

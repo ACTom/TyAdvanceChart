@@ -121,6 +121,8 @@ function TyJsRegExpTest(ARe: TTyJsRegExp; const AText: string): Boolean;
 
 implementation
 
+uses tyControls.AdvanceChart.NativeStr;
+
 type
   TNodeKind = (nkEmpty, nkChar, nkAny, nkClass, nkSeq, nkAlt, nkGroup,
     nkNonCap, nkLook, nkBol, nkEol, nkWordB, nkNotWordB, nkBackref,
@@ -1322,12 +1324,12 @@ end;
 
 function TyJsRegExpCreate(const APattern: string): TTyJsRegExp;
 begin
-  Result := TTyJsRegExp.Create(UTF8Decode(APattern));
+  Result := TTyJsRegExp.Create(TyJsUnits(APattern));
 end;
 
 function TyJsRegExpTest(ARe: TTyJsRegExp; const AText: string): Boolean;
 begin
-  Result := ARe.Test(UTF8Decode(AText));
+  Result := ARe.Test(TyJsUnits(AText));
 end;
 
 end.

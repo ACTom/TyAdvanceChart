@@ -96,7 +96,9 @@ const edgeRows = cat.edges.map(function (e) {
 
 /* A Pascal string literal that is pure ASCII in the FILE whatever the value is.
    Printable ASCII goes inside quotes; anything else becomes #$xx byte escapes of
-   its UTF-8 encoding, concatenated. An all-non-ASCII value must still emit a
+   its UTF-8 encoding, written next to each other and to the quoted parts with no
+   '+' between them: Delphi reads such a run as one UTF-8 sequence, but a single
+   escape between '+' as a character of its own. An all-non-ASCII value must still emit a
    quoted part, or the result would be a bare escape run that reads oddly and an
    empty value would emit nothing at all. */
 function pasQuote(s) {
@@ -114,7 +116,7 @@ function pasQuote(s) {
     }
   }
   if (run !== '' || parts.length === 0) parts.push("'" + run + "'");
-  return parts.join(' + ');
+  return parts.join('');
 }
 
 function q(s) { return pasQuote(s); }

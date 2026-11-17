@@ -37,6 +37,7 @@ type
     procedure TestTheStyleIsReadOffTheDocument;
     procedure TestATextThatCannotBeMappedIsWrittenWhole;
     procedure TestSameMeansWhatTheOptionMeans;
+    procedure TestAnEscapedKeyIsTheMemberItNames;
     procedure TestRandomEditsOfTheGalleryReadBackAsEdited;
   end;
 
@@ -353,6 +354,40 @@ begin
     p.Free;
     work.Free;
     wrong.Free;
+  end;
+end;
+
+{ a key written with \u escapes maps onto the member the reader made of
+  it: a BMP character, a surrogate pair, one beside ASCII. A lone high
+  surrogate is decoded differently by the two (the reader makes U+FFFD of
+  it), so that text is not mapped. }
+procedure TAdvChartTextPatchTest.TestAnEscapedKeyIsTheMemberItNames;
+const
+  cText = '{ "\u56fd": 1, "\ud83d\ude00": 2, "\u00e9x": 3 }';
+var
+  orig, work: TJSONData;
+  p: TTyOptTextPatcher;
+begin
+  orig := Reparse(cText);
+  work := orig.Clone;
+  p := TTyOptTextPatcher.Create(cText, orig);
+  try
+    AssertTrue('mapped', p.Mapped);
+    TJSONObject(work).Elements[#$F0#$9F#$98#$80] := TJSONIntegerNumber.Create(5);
+    AssertEquals('only that value rewritten',
+      '{ "\u56fd": 1, "\ud83d\ude00": 5, "\u00e9x": 3 }', p.Patch(work));
+  finally
+    p.Free;
+    work.Free;
+    orig.Free;
+  end;
+  orig := Reparse('{ "\ud83dz": 1 }');
+  p := TTyOptTextPatcher.Create('{ "\ud83dz": 1 }', orig);
+  try
+    AssertFalse('a lone high surrogate: not mapped', p.Mapped);
+  finally
+    p.Free;
+    orig.Free;
   end;
 end;
 

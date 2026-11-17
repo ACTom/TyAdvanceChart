@@ -247,7 +247,7 @@ uses tyControls.FontUnits, tyControls.AdvanceChart.Option,
      tyControls.AdvanceChart.Color, tyControls.AdvanceChart.RichText,
      tyControls.AdvanceChart.Data,
      { [R7-AF] JavaScript's String of a number }
-     tyControls.AdvanceChart.Scale;
+     tyControls.AdvanceChart.Scale, tyControls.AdvanceChart.NativeStr;
 
 function TyRtJoinedNum(A: Double; const AText: string): Double;
 begin
@@ -579,7 +579,7 @@ begin
   for k := 0 to 3 do src[k] := k;
   if AData.JSONType = jtString then
   begin
-    u := UTF8Decode(AData.AsString);
+    u := TyJsUnits(AData.AsString);
     n := Length(u);
   end
   else if AData.JSONType = jtArray then
@@ -600,7 +600,7 @@ begin
         jtString:
           if src[k] < n then
           begin
-            ch[k] := TJSONString.Create(UTF8Encode(Copy(u, src[k] + 1, 1)));
+            ch[k] := TJSONString.Create(TyFromJsUnits(Copy(u, src[k] + 1, 1)));
             PadSide(S, k, ch[k]);
           end
           else

@@ -2216,7 +2216,7 @@ begin
     string branch is never reached from a lines series) }
   if AX.Kind = lvkName then
   begin
-    u := UTF8Decode(AX.Str);
+    u := TyJsUnits(AX.Str);
     cx := Default(TTyLinesValue);
     cy := Default(TTyLinesValue);
     cx.Kind := lvkOther;
@@ -2226,12 +2226,12 @@ begin
     if Length(u) >= 1 then
     begin
       cx.Kind := lvkString;
-      cx.Str := UTF8Encode(Copy(u, 1, 1));
+      cx.Str := TyFromJsUnits(Copy(u, 1, 1));
     end;
     if Length(u) >= 2 then
     begin
       cy.Kind := lvkString;
-      cy.Str := UTF8Encode(Copy(u, 2, 1));
+      cy.Str := TyFromJsUnits(Copy(u, 2, 1));
     end;
     Exit(LinesProject(cx, cy, AClamp));
   end;

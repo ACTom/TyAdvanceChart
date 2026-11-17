@@ -51,6 +51,7 @@ type
     procedure TestTheGalleryCalendarsAsUpstream;
     procedure TestAHeatmapCellSitsBetweenTheDayAndTheSplitLine;
     procedure TestAFractionOfAMillisecondCarriesIntoTheNextDay;
+    procedure TestALocaleDayNameGivesOneCharacter;
   end;
 
   TCalProbe = class(TTyAdvanceChart)
@@ -715,6 +716,52 @@ begin
   finally
     cal.Free;
   end;
+end;
+
+{ THE LOCALE'S DAY LETTER is one character of its abbreviation, not one
+  byte: the first, or for a Chinese name starting with zhou or xingqi the
+  last (the one upstream's own ZH table holds). Non-ASCII names written as
+  their UTF-8 bytes. }
+procedure TAdvChartCalendarOracleTest.TestALocaleDayNameGivesOneCharacter;
+const
+  { zhou ri, xingqi yi, E-acute 'tr', a grinning face then 'x', zhou alone,
+    xing alone (no xingqi), zhou cut short by its last byte }
+  cNames: array[1..7] of string = (
+    #$E5#$91#$A8#$E6#$97#$A5, #$E6#$98#$9F#$E6#$9C#$9F#$E4#$B8#$80, #$C3#$89'tr',
+    #$F0#$9F#$98#$80'x', #$E5#$91#$A8, #$E6#$98#$9F, #$E5#$91);
+var
+  saved: TFormatSettings;
+  cal: TTyCalendar;
+  list: TTyPaintList;
+  i: Integer;
+  got: string;
+begin
+  saved := DefaultFormatSettings;
+  try
+    for i := 1 to 7 do DefaultFormatSettings.ShortDayNames[i] := cNames[i];
+    DefaultFormatSettings.ShortMonthNames[2] := 'Feb';
+    TyDateTimeNameSource := dnLocale;
+    FOpt.SetOptionText('{"calendar": {"range": "2017-02"}}');
+    cal := TTyCalendar.Create(TyCalendarSpecOf(FOpt, 0));
+    list := TTyPaintList.Create;
+    try
+      cal.UTC := True;
+      cal.Resize(TyRectF(0, 0, 800, 600), 96);
+      TyBuildCalendar(cal, TestInk, TFixedMeasurer.Create, 96, list);
+      got := '';
+      for i := 0 to list.Count - 1 do
+        if list.Element(i).Caption.Text <> '' then
+          got := got + '|' + list.Element(i).Caption.Text;
+    finally
+      list.Free;
+      cal.Free;
+    end;
+  finally
+    DefaultFormatSettings := saved;
+  end;
+  AssertEquals('the year, the month, then a character of each day''s name',
+    '|2017|Feb|' + #$E6#$97#$A5 + '|' + #$E4#$B8#$80 + '|' + #$C3#$89 + '|'
+    + #$F0#$9F#$98#$80 + '|' + #$E5#$91#$A8 + '|' + #$E6#$98#$9F + '|' + #$E5#$91, got);
 end;
 
 initialization
