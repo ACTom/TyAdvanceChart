@@ -68,6 +68,10 @@ begin
   AssertEquals('one BMP character', Length(cGuo), TyFirstCharLen(cGuo));
   AssertEquals('one astral character', Length(cGrin), TyFirstCharLen(cGrin));
   AssertEquals('ASCII then BMP', 1, TyFirstCharLen('a' + cGuo));
+  { Malformed input: a continuation byte is no lead, so it is one byte long,
+    whatever follows it. }
+  AssertEquals('two continuation bytes', 1, TyFirstCharLen(#$80#$80));
+  AssertEquals('ASCII then a continuation byte', 1, TyFirstCharLen('a'#$80));
 end;
 
 procedure TAdvChartNativeStrTest.TestLastCharStart;
@@ -83,6 +87,15 @@ begin
 end;
 
 procedure TAdvChartNativeStrTest.TestCodePointAt;
+const
+  { Malformed input: these pin what the routine returns today (the old
+    decoder verbatim), not what would be right. A two-byte lead takes the
+    next byte whatever it is: $C3 'a' gives ($03 shl 6) or ($61 and $3F). }
+  cLeadThenAscii = $E1;
+  cLeadThenAsciiLen = 2;
+  { $FF starts no sequence: it is itself, one byte long. }
+  cFF = $FF;
+  cFFLen = 1;
 var n: Integer;
 begin
   AssertEquals('A', $41, TyCodePointAt('A', 1, n)); AssertEquals('A len', 1, n);
@@ -103,6 +116,10 @@ begin
   AssertEquals('a lone lead byte len', 1, n);
   AssertEquals('a lone continuation byte', $80, TyCodePointAt(#$80, 1, n));
   AssertEquals('a lone continuation byte len', 1, n);
+  AssertEquals('a lead byte, then ASCII', cLeadThenAscii, TyCodePointAt(#$C3'a', 1, n));
+  AssertEquals('a lead byte, then ASCII len', cLeadThenAsciiLen, n);
+  AssertEquals('$FF', cFF, TyCodePointAt(#$FF, 1, n));
+  AssertEquals('$FF len', cFFLen, n);
 end;
 
 procedure TAdvChartNativeStrTest.TestCharStartAt;

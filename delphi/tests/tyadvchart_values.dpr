@@ -7,6 +7,7 @@ program tyadvchart_values;
 
 uses
   SysUtils,
+  tyControls.AdvanceChart.Catalog,
   tyControls.AdvanceChart.JsMath,
   tyControls.AdvanceChart.NativeStr,
   tyControls.AdvanceChart.Types;
@@ -134,6 +135,26 @@ begin
   Check(TyCharStartAt(cGrin, 2, 2) = 2, 'TyCharStartAt(U+1F600, 2, 2) = 2 (the floor holds)');
   Check(TyCharStartAt(#$DE00, 1, 0) = 1, 'TyCharStartAt(lone low surrogate, 1, 0) = 1');
   Check(TyCharStartAt('a' + #$DE00, 2, 1) = 2, 'TyCharStartAt(a + lone low surrogate, 2, 1) = 2');
+
+  { Unpaired surrogates: Delphi's branches keep them as they are. }
+  Check(TyLastCharStart('a' + #$DE00) = 2, 'TyLastCharStart(a + lone low surrogate) = 2');
+  Check(TyFirstCharLen(#$D83D + 'a') = 1, 'TyFirstCharLen(lone high surrogate + a) = 1');
+  Check(TyCodePointStr($D800) = #$D800, 'TyCodePointStr($D800) = $D800');
+  { FPC's TyFromJsUnits drops an unpaired surrogate (UTF8Encode's behaviour); Delphi's keeps it. }
+  u := 'a' + #$D83D + 'b';
+  Check(TyFromJsUnits(u) = 'a' + #$D83D + 'b', 'TyFromJsUnits(a + lone high surrogate + b) keeps it');
+end;
+
+{ With --codepage:65001 a contiguous run of byte escapes in a chart unit is one UTF-8 sequence, one
+  character under Delphi: Catalog's TyOptStr[387] is written ''''#$E2#$96#$B6'''', a quoted U+25B6.
+  The index moves when the catalog is generated again; find the entry by that literal. }
+procedure CheckByteEscapeRun;
+const
+  cAt = 387;
+begin
+  Check(Length(TyOptStr[cAt]) = 3, 'Length(TyOptStr[387]) = 3 (quote, U+25B6, quote)');
+  Check((TyOptStr[cAt][1] = '''') and (TyOptStr[cAt][3] = ''''), 'TyOptStr[387] is quoted');
+  Check(Ord(TyOptStr[cAt][2]) = $25B6, 'TyOptStr[387][2] = $25B6');
 end;
 
 begin
@@ -142,5 +163,6 @@ begin
   CheckFloorCeil64;
   CheckBoolText;
   CheckNativeStr;
+  CheckByteEscapeRun;
   Writeln('DELPHI VALUES OK');
 end.

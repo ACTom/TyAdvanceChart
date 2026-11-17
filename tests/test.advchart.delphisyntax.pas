@@ -22,8 +22,10 @@ const
   ExpFpcOnlyNames = 0;
   ExpFloatCastsOfNonLiterals = 0;
   ExpFinalizationWithoutInitialization = 0;
-  // Load fails when it finds fewer units than this under source/ (114 when the census was written).
-  MinSourceUnits = 114;
+  ExpLoneHighByteEscapes = 0;
+  // Load fails when it finds fewer units than this under source/ (114 when the census was written,
+  // 115 since tyControls.AdvanceChart.NativeStr was added).
+  MinSourceUnits = 115;
 
 type
   TPascalScanTest = class(TTestCase)
@@ -50,6 +52,7 @@ type
     procedure TestFloatCastOperands;
     procedure TestFinalizationHasInitialization;
     procedure TestOptionLinksLazUtf8;
+    procedure TestHighByteEscapesComeInRuns;
   end;
 
 implementation
@@ -366,8 +369,9 @@ type
   TNameCounter = class(TWordWalker)
     Wanted: array of string;
     SkipFpcLines: Boolean;
-    // a name (lower case) not counted where a '.' directly precedes it, '' for none
-    SkipAfterDot: string;
+    // a qualified name (lower case, 'qualifier.name') whose name is not counted where it is
+    // written so, the qualifier directly before the '.'; '' for none
+    SkipQualified: string;
     constructor Create(const AWanted: array of string; ASkipFpcLines: Boolean);
     procedure OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer); override;
   end;
@@ -428,13 +432,19 @@ end;
 
 procedure TNameCounter.OnWord(AFile: TSourceFile; const AWord: string; AStart, AEnd: Integer);
 var
-  i, ln: Integer;
+  i, ln, q: Integer;
 begin
   for i := 0 to High(Wanted) do
     if Wanted[i] = AWord then
     begin
-      if (AWord = SkipAfterDot) and (AStart > 1) and (AFile.Code[AStart - 1] = '.') then
-        Exit;
+      if (SkipQualified <> '') and (AStart > 1) and (AFile.Code[AStart - 1] = '.') then
+      begin
+        q := AStart - 1;
+        while (q > 1) and IsIdentChar(AFile.Code[q - 1]) do
+          Dec(q);
+        if Lower(Copy(AFile.Code, q, AEnd - q)) = SkipQualified then
+          Exit;
+      end;
       ln := LineOf(AFile, AStart);
       if not (SkipFpcLines and LineHasIfdefFpc(AFile, ln)) then
         Finds.Add(AFile, ln);
@@ -461,13 +471,13 @@ begin
 end;
 
 procedure CountNames(const AWhat: string; const AWanted: array of string; ASkipFpcLines: Boolean;
-  AExpected: Integer; const ASkipAfterDot: string = '');
+  AExpected: Integer; const ASkipQualified: string = '');
 var
   w: TNameCounter;
 begin
   w := TNameCounter.Create(AWanted, ASkipFpcLines);
   try
-    w.SkipAfterDot := Lower(ASkipAfterDot);
+    w.SkipQualified := Lower(ASkipQualified);
     w.Walk;
     w.Finds.Check(AWhat, AExpected);
   finally
@@ -768,7 +778,8 @@ end;
 
 procedure TAdvChartDelphiSyntaxTest.TestFpcOnlyNames;
 begin
-  // GetTickCount64 right after a '.' is TThread.GetTickCount64, which both compilers have
+  // TThread.GetTickCount64 both compilers have; any other GetTickCount64 (SysUtils.GetTickCount64
+  // too) counts
   CountNames('FPC-only names outside {$IFDEF FPC} lines (for TStringArray write TTyStringArray; ' +
     'for TArray<T> a named "array of T" type; for TFPList TTyList; for GetTickCount64 ' +
     'TThread.GetTickCount64; for TryStrToQWord TryStrToUInt64; for TryStrToDWord TryStrToUInt; ' +
@@ -779,7 +790,7 @@ begin
     ['DefaultFormatSettings', 'LineEnding', 'SarLongint', 'StrToQWord', 'TStringArray', 'TArray',
     'TFPList', 'GetTickCount64', 'TryStrToQWord', 'TryStrToDWord', 'Floor64', 'Ceil64',
     'GetLocalTimeOffset', 'UTF8Decode', 'UTF8Encode', 'UnicodeToUTF8', 'IndexByte', 'LazUTF8'],
-    True, ExpFpcOnlyNames, 'GetTickCount64');
+    True, ExpFpcOnlyNames, 'TThread.GetTickCount64');
 end;
 
 { True when S, trimmed, is a float literal: an optional sign, digits, then a '.' and digits
@@ -979,6 +990,86 @@ begin
   AssertEquals('LazUTF8 in the code of tyControls.AdvanceChart.Option.pas. ' + Why, 1, found);
   AssertTrue('LazUTF8 on line ' + IntToStr(ln) + ' of tyControls.AdvanceChart.Option.pas, a line ' +
     'without {$IFDEF FPC} (Delphi has no LazUTF8). ' + Why, LineHasIfdefFpc(f, ln));
+end;
+
+{ The character escape (#n or #$n) that starts at APos of ACode, a '#': False when no digit
+  follows; else its value, held at 256 for anything larger, and the position after it. }
+function ReadEscape(const ACode: string; APos: Integer; out AValue, AEnd: Integer): Boolean;
+var
+  first, d, n: Integer;
+  hex: Boolean;
+begin
+  AValue := 0;
+  n := Length(ACode);
+  first := APos + 1;
+  hex := (first <= n) and (ACode[first] = '$');
+  if hex then
+    Inc(first);
+  AEnd := first;
+  while AEnd <= n do
+  begin
+    if ACode[AEnd] in ['0'..'9'] then
+      d := Ord(ACode[AEnd]) - Ord('0')
+    else if hex and (ACode[AEnd] in ['a'..'f']) then
+      d := Ord(ACode[AEnd]) - Ord('a') + 10
+    else if hex and (ACode[AEnd] in ['A'..'F']) then
+      d := Ord(ACode[AEnd]) - Ord('A') + 10
+    else
+      Break;
+    if AValue < 256 then
+    begin
+      if hex then
+        AValue := AValue * 16 + d
+      else
+        AValue := AValue * 10 + d;
+      if AValue > 256 then
+        AValue := 256;
+    end;
+    Inc(AEnd);
+  end;
+  Result := AEnd > first;
+end;
+
+{ A character escape of 128..255 (#$80..#$FF, #128..#255, any leading zeros) with no other escape
+  directly before or after it. With --codepage:65001 Delphi decodes a contiguous run of byte
+  escapes as one UTF-8 sequence, but a byte alone -- by itself, or joined to the next by + --
+  becomes U+FFFD; FPC takes the bytes as they are, so nothing on Lazarus notices. }
+procedure TAdvChartDelphiSyntaxTest.TestHighByteEscapesComeInRuns;
+var
+  finds: TFinds;
+  i, p, v, e, v2, e2, prevEnd: Integer;
+  f: TSourceFile;
+  c: string;
+  before, after: Boolean;
+begin
+  Load;
+  finds := TFinds.Create;
+  try
+    for i := 0 to Files.Count - 1 do
+    begin
+      f := FileAt(i);
+      c := f.Code;
+      prevEnd := 0;
+      p := 1;
+      while p <= Length(c) do
+        if (c[p] = '#') and ReadEscape(c, p, v, e) then
+        begin
+          before := prevEnd = p;
+          after := (e <= Length(c)) and (c[e] = '#') and ReadEscape(c, e, v2, e2);
+          if (v >= 128) and (v <= 255) and not before and not after then
+            finds.Add(f, LineOf(f, p));
+          prevEnd := e;
+          p := e;
+        end
+        else
+          Inc(p);
+    end;
+    finds.Check('character escapes #$80..#$FF not in a run of escapes (Delphi reads a lone byte as ' +
+      'an invalid character, U+FFFD; write the character itself, or its UTF-8 bytes as one contiguous ' +
+      'run like #$E5#$9B#$BD, never joined by +)', ExpLoneHighByteEscapes);
+  finally
+    finds.Free;
+  end;
 end;
 
 initialization

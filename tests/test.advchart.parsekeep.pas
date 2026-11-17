@@ -677,22 +677,6 @@ end;
   a capitalised literal, a control character in a string, something after
   the value, an escape the scanner does not know, more than
   TyOptionMaxNesting levels }
-{ a string with an escape is read piece by piece: the non-ASCII runs
-  between the escapes come through whole; a NUL anywhere in the text sends
-  it the long way }
-procedure TAdvChartFastJsonTest.TestTextAfterAnEscapeKeepsEveryByte;
-var d: TJSONData;
-begin
-  AssertTrue('plain', TyJsonFastParse('{"s":"\n'#$E5#$9B#$BD'a'#$F0#$9F#$98#$80'\t'#$C3#$A9'"}', d));
-  try
-    AssertEquals(#10#$E5#$9B#$BD'a'#$F0#$9F#$98#$80#9#$C3#$A9, TJSONObject(d).Strings['s']);
-  finally
-    d.Free;
-  end;
-  AssertFalse('a NUL after the value', TyJsonFastParse('[1]'#0'x', d));
-  AssertTrue('nothing made', d = nil);
-end;
-
 procedure TAdvChartFastJsonTest.TestTheFastReaderTakesPlainJsonOnly;
 const
   cLeft: array[0..12] of string = ('// c'#10'1', '''x''', '"\u0041"', '{a:1}', '[1,]',
@@ -718,6 +702,22 @@ begin
   finally
     d.Free;
   end;
+end;
+
+{ a string with an escape is read piece by piece: the non-ASCII runs
+  between the escapes come through whole; a NUL anywhere in the text sends
+  it the long way }
+procedure TAdvChartFastJsonTest.TestTextAfterAnEscapeKeepsEveryByte;
+var d: TJSONData;
+begin
+  AssertTrue('plain', TyJsonFastParse('{"s":"\n'#$E5#$9B#$BD'a'#$F0#$9F#$98#$80'\t'#$C3#$A9'"}', d));
+  try
+    AssertEquals(#10#$E5#$9B#$BD'a'#$F0#$9F#$98#$80#9#$C3#$A9, TJSONObject(d).Strings['s']);
+  finally
+    d.Free;
+  end;
+  AssertFalse('a NUL after the value', TyJsonFastParse('[1]'#0'x', d));
+  AssertTrue('nothing made', d = nil);
 end;
 
 { ---------------------------------------------------------- the order }
