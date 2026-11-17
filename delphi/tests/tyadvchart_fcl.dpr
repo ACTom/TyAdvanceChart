@@ -27,6 +27,8 @@ uses
   fpjson,
   jsonparser,
   jsonscanner,
+  DOM,
+  XMLRead,
   tyControls.AdvanceChart.NativeStr;
 
 var
@@ -90,6 +92,7 @@ end;
 {$I tyadvchart_fcl.json.inc}
 {$I tyadvchart_fcl.jsonstr.inc}
 {$I tyadvchart_fcl.jsonnum.inc}
+{$I tyadvchart_fcl.xml.inc}
 
 begin
   {$IFDEF FPC}
@@ -99,5 +102,6 @@ begin
   SectionJson;
   SectionJsonStr;
   SectionJsonNum;
+  SectionXml;
   Writeln('FCL TRANSCRIPT END');
 end.

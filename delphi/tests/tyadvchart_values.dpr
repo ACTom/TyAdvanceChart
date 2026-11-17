@@ -11,6 +11,8 @@ uses
   fpjson,
   jsonparser,
   jsonscanner,
+  DOM,
+  XMLRead,
   tyControls.AdvanceChart.Catalog,
   tyControls.AdvanceChart.JsMath,
   tyControls.AdvanceChart.NativeStr,
@@ -385,6 +387,64 @@ begin
   end;
 end;
 
+{ The byte stream of GeoSvg's TyGsParseDocument under Delphi: TStringStream.Create(s, TEncoding.UTF8)
+  writes the UTF-8 bytes without a byte order mark, and the XMLRead stand-in, with the options GeoSvg
+  sets, gives back an attribute value with U+56FD as that one code unit. Any other option set raises
+  EXMLReadError. }
+procedure CheckSvgBytes;
+var
+  parser: TDOMParser;
+  src: TXMLInputSource;
+  st: TStringStream;
+  doc: TXMLDocument;
+  el: TDOMElement;
+  a: TDOMNode;
+  first: Byte;
+  raised: Boolean;
+begin
+  doc := nil;
+  parser := TDOMParser.Create;
+  st := TStringStream.Create('<svg><g id="a' + #$56FD + 'b"/></svg>', TEncoding.UTF8);
+  src := nil;
+  try
+    Check(st.Size = Length('<svg><g id="ab"/></svg>') + 3, 'SVG bytes: three bytes for U+56FD, no byte order mark');
+    st.Position := 0;
+    st.ReadBuffer(first, 1);
+    Check(first = Ord('<'), 'SVG bytes: the stream starts with <');
+    st.Position := 0;
+    parser.Options.PreserveWhitespace := True;
+    parser.Options.Namespaces := False;
+    parser.Options.ExpandEntities := True;
+    parser.Options.Validate := False;
+    src := TXMLInputSource.Create(st);
+    parser.Parse(src, doc);
+    el := doc.DocumentElement;
+    Check((el <> nil) and (el.NodeName = 'svg'), 'SVG bytes: the root is svg');
+    Check(el.FirstChild is TDOMElement, 'SVG bytes: its first child is an element');
+    a := TDOMElement(el.FirstChild).GetAttributeNode('id');
+    Check(a <> nil, 'SVG bytes: the g has an id');
+    Check(Length(a.NodeValue) = 3, 'SVG bytes: the id has three code units');
+    Check(Ord(a.NodeValue[2]) = $56FD, 'SVG bytes: the id''s second code unit is $56FD');
+    Check(a.NodeValue = 'a' + #$56FD + 'b', 'SVG bytes: the id is a U+56FD b');
+    FreeAndNil(doc);
+    parser.Options.Namespaces := True;
+    st.Position := 0;
+    raised := False;
+    try
+      parser.Parse(src, doc);
+    except
+      on E: EXMLReadError do
+        raised := True;
+    end;
+    Check(raised, 'SVG bytes: Namespaces = True raises EXMLReadError (not implemented)');
+  finally
+    doc.Free;
+    src.Free;
+    st.Free;
+    parser.Free;
+  end;
+end;
+
 begin
   CheckSar32;
   CheckIntToDouble;
@@ -397,5 +457,6 @@ begin
   CheckJsonEscapes;
   CheckJsonInvalidBytes;
   CheckJsonStringLocaleFloat;
+  CheckSvgBytes;
   Writeln('DELPHI VALUES OK');
 end.

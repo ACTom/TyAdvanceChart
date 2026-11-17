@@ -26,7 +26,8 @@ are printed too.
 --fcl            builds delphi/tests/tyadvchart_fcl.dpr with FPC (FPC's own FCL units; unit path source/ only)
                  and with dcc32 and dcc64 (the ports in delphi/fcl), runs each, and compares its output line
                  by line with delphi/tests/expected/fcl.txt (trailing carriage returns dropped first).
-                 FPC must give every line. dcc must give as many lines, and every line that does not
+                 The program runs with delphi/tests as its working directory (it reads files by paths
+                 relative to it). FPC must give every line. dcc must give as many lines, and every line that does not
                  start with '~ '; a '~ ' line (informational) that differs is only counted. Prints one
                  line per compiler, and the first 10 differences of a compiler that fails; compiles no
                  chart unit on its own and prints no unit summary.
@@ -171,7 +172,7 @@ def fcl_transcript(compiler, exe, tmp):
         errs = [l.strip() for l in out if MSG_RE.search(l) and MSG_RE.search(l).group(1) in 'EF']
     if rc != 0:
         return None, ['transcript program does not compile: ' + (errs[0] if errs else ' | '.join(out[-3:]))]
-    rc, lines = run_program(os.path.join(tmp, 'tyadvchart_fcl.exe'), tmp)
+    rc, lines = run_program(os.path.join(tmp, 'tyadvchart_fcl.exe'), os.path.dirname(FCL_DPR))
     if rc is None:
         return None, ['transcript program: ' + lines[0]]
     if rc != 0 or not lines or lines[-1] != FCL_END:

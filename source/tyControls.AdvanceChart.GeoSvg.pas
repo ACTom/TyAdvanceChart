@@ -1456,7 +1456,7 @@ begin
   ADoc := nil;
   ASvg := nil;
   parser := TDOMParser.Create;
-  st := TStringStream.Create(AText);
+  {$IFDEF FPC}st := TStringStream.Create(AText);{$ELSE}st := TStringStream.Create(AText, TEncoding.UTF8);{$ENDIF}
   src := nil;
   try
     parser.Options.PreserveWhitespace := True;
