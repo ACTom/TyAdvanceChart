@@ -1170,7 +1170,6 @@ formatjson
 | "A\u56FD\u00E9"
 tojson A\u56FD\u00E9
 tojson strict A\u56FD\u00E9
-fromjson AA\u56FD\u00E9
 == jsonstr 3
 input "\u005Cud83d\u005Cude00"
 string \uD83D\uDE00
@@ -1292,6 +1291,38 @@ fromjson a\u000Ab
 ~ tojson strict x
 ~ fromjson x
 == jsonstr 17
+~ input "\u005Cu00f1\u005Cud83d\u005Cude00"
+~ parsed
+~ value \u00F1
+~ asjson "\u00F1"
+~ tojson \u00F1
+~ tojson strict \u00F1
+~ fromjson \u00F1\u00F1
+== jsonstr 18
+~ input "\u005Cu4e2d\u005Cud83d\u005Cude00"
+~ parsed
+~ value \u4E2D
+~ asjson "\u4E2D"
+~ tojson \u4E2D
+~ tojson strict \u4E2D
+~ fromjson \u4E2D\u4E2D
+== jsonstr 19
+~ input "\u005Cu4e2d\u005Cu6587\u005Cud83d\u005Cude00"
+~ parsed
+~ value \u4E2D?\uD83D\uDE00
+~ asjson "\u4E2D?\uD83D\uDE00"
+~ tojson \u4E2D?\uD83D\uDE00
+~ tojson strict \u4E2D?\uD83D\uDE00
+~ fromjson \u4E2D\u4E2D\u6587\uD83D\uDE00
+== jsonstr 20
+~ input "\u005Cu0041\u005Cu56fd\u005Cu00e9"
+~ parsed
+~ value A\u56FD\u00E9
+~ asjson "A\u56FD\u00E9"
+~ tojson A\u56FD\u00E9
+~ tojson strict A\u56FD\u00E9
+~ fromjson AA\u56FD\u00E9
+== jsonstr 21
 input TJSONParser(TStream, [joUTF8]) "\u4E2D\u6587 caf\u00E9 \u00F1"
 bytes 17
 string \u4E2D\u6587 caf\u00E9 \u00F1
@@ -1300,7 +1331,7 @@ formatjson
 | "\u4E2D\u6587 caf\u00E9 \u00F1"
 tojson \u4E2D\u6587 caf\u00E9 \u00F1
 tojson strict \u4E2D\u6587 caf\u00E9 \u00F1
-== jsonstr 18
+== jsonstr 22
 input TJSONParser(TStream, []) "\u4E2D\u6587 caf\u00E9 \u00F1"
 bytes 17
 string \u4E2D\u6587 caf\u00E9 \u00F1
@@ -1309,11 +1340,11 @@ formatjson
 | "\u4E2D\u6587 caf\u00E9 \u00F1"
 tojson \u4E2D\u6587 caf\u00E9 \u00F1
 tojson strict \u4E2D\u6587 caf\u00E9 \u00F1
-== jsonstr 19
+== jsonstr 23
 input TJSONParser(TStream, [joUTF8]) after a BOM "\u4E2D\u6587 caf\u00E9 \u00F1"
 bytes 20
 raises EScannerError
-== jsonstr 20
+== jsonstr 24
 input TJSONParser(TStream, [joUTF8, joBOMCheck]) after a BOM "\u4E2D\u6587 caf\u00E9 \u00F1"
 bytes 20
 string \u4E2D\u6587 caf\u00E9 \u00F1
@@ -1322,7 +1353,7 @@ formatjson
 | "\u4E2D\u6587 caf\u00E9 \u00F1"
 tojson \u4E2D\u6587 caf\u00E9 \u00F1
 tojson strict \u4E2D\u6587 caf\u00E9 \u00F1
-== jsonstr 21
+== jsonstr 25
 input GetJSON(TStream) "\u4E2D\u6587 caf\u00E9 \u00F1"
 string \u4E2D\u6587 caf\u00E9 \u00F1
 asjson "\u4E2D\u6587 caf\u00E9 \u00F1"
@@ -1331,11 +1362,11 @@ formatjson
 tojson \u4E2D\u6587 caf\u00E9 \u00F1
 tojson strict \u4E2D\u6587 caf\u00E9 \u00F1
 position 17
-== jsonstr 22
+== jsonstr 26
 input GetJSON(TStream), no stream parser handler "\u4E2D\u6587 caf\u00E9 \u00F1"
 nil
 position 17
-== jsonstr 23
+== jsonstr 27
 input GetJSON(text, False) "\u4E2D\u6587 caf\u00E9 \u00F1"
 string \u4E2D\u6587 caf\u00E9 \u00F1
 asjson "\u4E2D\u6587 caf\u00E9 \u00F1"
@@ -1343,10 +1374,10 @@ formatjson
 | "\u4E2D\u6587 caf\u00E9 \u00F1"
 tojson \u4E2D\u6587 caf\u00E9 \u00F1
 tojson strict \u4E2D\u6587 caf\u00E9 \u00F1
-== jsonstr 24
-input DumpJSON {"\u540D":["caf\u00E9",1,"\u005Cu00f1\u005Cud83d\u005Cude00"],"a\u005C"b":{"\u2028":null}}
-bytes 44
-hex 7B22E5908D223A5B22636166C3A9222C312C22C3B1225D2C22615C2262223A7B22E280A8223A6E756C6C7D7D
+== jsonstr 28
+input DumpJSON {"\u540D":["caf\u00E9",1,"\u005Cu00f1x\u005Cud83d\u005Cude00"],"a\u005C"b":{"\u2028":null}}
+bytes 49
+hex 7B22E5908D223A5B22636166C3A9222C312C22C3B178F09F9880225D2C22615C2262223A7B22E280A8223A6E756C6C7D7D
 == jsonnum 1
 input 0.5
 type float

@@ -228,6 +228,28 @@ begin
   finally
     d.Free;
   end;
+  { Each \u escape is one code unit, where FPC 3.2.2 pairs a pending escape with the next one. }
+  d := GetJSON('"\u00f1\ud83d\ude00"');
+  try
+    s := d.AsString;
+    Check((Length(s) = 3) and (Ord(s[1]) = $00F1) and (Ord(s[2]) = $D83D) and (Ord(s[3]) = $DE00),
+      'JSON: "\u00f1\ud83d\ude00" reads as $00F1 $D83D $DE00');
+  finally
+    d.Free;
+  end;
+  d := GetJSON('"\ud83d"');
+  try
+    s := d.AsString;
+    Check((Length(s) = 1) and (Ord(s[1]) = $D83D), 'JSON: "\ud83d" reads as $D83D (an unpaired surrogate is kept)');
+  finally
+    d.Free;
+  end;
+  s := JSONStringToString('\u0041\u56fd\u00e9');
+  Check((Length(s) = 3) and (s[1] = 'A') and (Ord(s[2]) = $56FD) and (Ord(s[3]) = $00E9),
+    'JSON: JSONStringToString(\u0041\u56fd\u00e9) = A $56FD $00E9');
+  s := JSONStringToString('\u4e2d\u6587\ud83d\ude00');
+  Check((Length(s) = 4) and (Ord(s[1]) = $4E2D) and (Ord(s[2]) = $6587) and (Ord(s[3]) = $D83D)
+    and (Ord(s[4]) = $DE00), 'JSON: JSONStringToString(\u4e2d\u6587\ud83d\ude00) = $4E2D $6587 $D83D $DE00');
   s := 'a' + #$56FD + 'b';
   Check(StringToJSONString(s) = s, 'JSON: StringToJSONString(a + U+56FD + b) gives it back as it is');
   d := GetJSON(cText);

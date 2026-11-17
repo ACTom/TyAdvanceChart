@@ -27,10 +27,11 @@
     StrToQWord is StrToUInt64, and a UInt64 is printed with UIntToStr (Delphi's IntToStr takes
     it for an Int64); array of const takes Delphi's kinds of string and character as well;
     AsUnicodeString converts nothing;
-  - JSONStringToString walks the string with PChar, not PAnsiChar; where FPC's appends the
-    UTF8Encode of the code units of escapes \uXXXX, this one appends the code units themselves
-    less the unpaired surrogates, which UTF8Encode drops (so that it gives what FPC's gives,
-    including the code unit FPC's appends twice before a pair of escapes); GetJSON(TStream)
+  - JSONStringToString walks the string with PChar, not PAnsiChar; \u escapes: each escape is
+    one code unit, appended as it is (an unpaired surrogate is kept, \u0000 is a #0); FPC 3.2.2
+    keeps an escape pending, encodes it to UTF-8 together with the next escape, and appends the
+    pending one a second time, so it damages valid text and drops unpaired surrogates (a
+    deliberate difference: the port does not copy that defect); GetJSON(TStream)
     without a stream parser handler reads the stream as UTF-8 (and returns nil, as FPC's does);
     DumpJSON writes UTF-8, as FPC's does, not the bytes of the UTF-16 string;
   - floating-point numbers and text are converted by tyfclnum (TyFclTextToFloat for Val,
@@ -799,30 +800,6 @@ function JSONStringToString(const S: TJSONStringType): TJSONStringType;
       end;
     end;
 
-    // What FPC's UTF8Encode keeps of W: W without its unpaired surrogates.
-    function KeptByUTF8Encode(const W : String): String;
-    var
-      i: integer;
-    begin
-      Result:='';
-      i:=1;
-      while i<=Length(W) do
-      begin
-        if (W[i]>=#$D800) and (W[i]<=#$DBFF) and (i<Length(W))
-          and (W[i+1]>=#$DC00) and (W[i+1]<=#$DFFF) then
-          begin
-          Result:=Result+Copy(W,i,2);
-          Inc(i,2);
-          end
-        else
-          begin
-          if (W[i]<#$D800) or (W[i]>#$DFFF) then
-            Result:=Result+W[i];
-          Inc(i);
-          end;
-      end;
-    end;
-
 Var
 
   I,J,L,U1,U2 : Integer;
@@ -836,7 +813,7 @@ Var
   begin
     if (U1<>0) then
       begin
-      U:=KeptByUTF8Encode(widechar(U1));
+      U:=widechar(U1);
       Result:=Result+U;
       U1:=0;
       end;
@@ -870,13 +847,9 @@ begin
                 if U2=-1 then
                    Raise EJSON.Create('Invalid unicode hex code: '+Copy(S,I+1,4));
                 Inc(I,4);
-                if (U1<>0) then
-                  begin
-                  App:=KeptByUTF8Encode(WideChar(U1)+WideChar(U2));
-                  U2:=0;
-                  end
-                else
-                  U1:=U2;
+                // Each escape is one code unit (U1 stays 0): FPC's pairs a pending escape
+                // with the next one and appends the pending one twice.
+                App:=WideChar(U2);
                 end;
         end;
         if App<>'' then

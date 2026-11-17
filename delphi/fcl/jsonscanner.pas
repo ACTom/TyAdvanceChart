@@ -18,10 +18,11 @@
   - the source is Delphi's UTF-16 string and the scanner walks it with PChar, not PAnsiChar (Move
     counts SizeOf(Char)); a stream is read as UTF-8 (a byte order mark is skipped under joBOMCheck,
     as FPC's does, and is otherwise read as a character, which the scanner rejects as FPC's does
-    its first byte); where FPC's appends the UTF8Encode of the code units of escapes \uXXXX, this
-    one appends the code units themselves less the unpaired surrogates, which UTF8Encode drops (so
-    that it gives what FPC's gives, also where FPC's pairs a code unit with the next escape's
-    whatever they are), and joUTF8 and UseUTF8 change nothing; the property Strict is written
+    its first byte); \u escapes: each escape is one code unit, appended as it is (a valid pair
+    stays a pair, an unpaired surrogate is kept, \u0000 is a #0), and joUTF8 and UseUTF8 change
+    nothing; FPC 3.2.2 pairs a pending escape with the next one and encodes the two to UTF-8, so
+    it damages a valid pair that follows an odd number of escapes and drops unpaired surrogates
+    (a deliberate difference: the port does not copy that defect); the property Strict is written
     &Strict, and Strict and UseUTF8 are not marked deprecated (Delphi has no hint directives on
     properties);
     the default values of parameters are not repeated in the implementation;
@@ -138,30 +139,6 @@ const
 
 
 implementation
-
-// What FPC's UTF8Encode keeps of W: W without its unpaired surrogates.
-function KeptByUTF8Encode(const W : String): String;
-var
-  i: integer;
-begin
-  Result:='';
-  i:=1;
-  while i<=Length(W) do
-  begin
-    if (W[i]>=#$D800) and (W[i]<=#$DBFF) and (i<Length(W))
-      and (W[i+1]>=#$DC00) and (W[i+1]<=#$DFFF) then
-      begin
-      Result:=Result+Copy(W,i,2);
-      Inc(i,2);
-      end
-    else
-      begin
-      if (W[i]<#$D800) or (W[i]>#$DFFF) then
-        Result:=Result+W[i];
-      Inc(i);
-      end;
-  end;
-end;
 
 constructor TJSONScanner.Create(Source : TStream; AUseUTF8 : Boolean);
 
@@ -307,7 +284,7 @@ var
   // if there is a leftover \u, append
   if (u1<>0) then
     begin
-    U:=KeptByUTF8Encode(WideChar(u1)); // whatever joUTF8 says
+    U:=WideChar(u1); // whatever joUTF8 says
     FCurTokenString:=FCurTokenString+U;
     OldLength:=Length(FCurTokenString);
     u1:=0;
@@ -390,17 +367,9 @@ begin
                         Error(SErrInvalidCharacter, [CurRow,CurColumn,FTokenStr[0]]);
                       end;
                       end;
-                    // ToDo: 4-bytes UTF16
-                    if u1<>0 then
-                      begin
-                      S:=KeptByUTF8Encode(WideChar(u1)+WideChar(u2)); // whatever joUTF8 says
-                      u1:=0;
-                      end
-                    else
-                      begin
-                      S:='';
-                      u1:=u2;
-                      end
+                    // Each escape is one code unit (u1 stays 0), whatever joUTF8 says: FPC's
+                    // pairs a pending escape with the next one, whatever they are.
+                    S:=WideChar(u2);
                     end;
               #0  : Error(SErrOpenString,[FCurRow]);
             else

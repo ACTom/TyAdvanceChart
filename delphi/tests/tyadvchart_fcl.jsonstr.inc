@@ -5,18 +5,28 @@
 
   The inputs by group of the plan (numbers of '== jsonstr N'):
     1  1       the escapes \" \\ \/ \b \f \n \r \t
-    2  2-4     \u escapes; a surrogate pair written \u..\u..; a four-byte character written directly
+    2  2-4     \u escapes (case 2 without 'fromjson': FPC's JSONStringToString damages it, see
+               group 7b); a surrogate pair written \u..\u..; a four-byte character written directly
     3  5       Chinese and accented letters written directly
     4  6       U+0001, U+001F, U+007F, U+0080, U+2028 through StringToJSONString
     5  7-9     the empty string, a string of one quote, a string of 5000 units
     6  10-13   invalid: \x, \u with two digits, no closing quote, a line break in the string
-    7  14-16   unpaired surrogates (informational: FPC's strings are UTF-8, which cannot hold them; always
-               the same seven lines)
-    8  17-22   read from a stream of UTF-8 bytes: TJSONParser.Create(TStream, ...) with and without joUTF8,
+    7  14-16   unpaired surrogates (informational: FPC's strings are UTF-8, which cannot hold them, and
+               its UTF8Encode drops them; the port keeps them; always the same seven lines)
+    7b 17-20   valid text that FPC 3.2.2 damages (informational, the same seven lines): FPC's scanner
+               keeps a \u escape pending and encodes it together with the NEXT escape, whatever that
+               is, so a valid pair that follows an odd number of escapes is split and its halves
+               dropped (\u00f1 + pair, \u4e2d + pair: the emoji is lost); after an even number
+               (\u4e2d\u6587 + pair) the pair survives, but FPC 3.2.2 turns the U+6587 into '?'.
+               FPC's JSONStringToString also appends a pending escape a second time (\u00f1 + pair
+               gives U+00F1 twice and no emoji; \u4e2d\u6587 + pair gives U+4E2D twice;
+               \u0041\u56fd\u00e9 gives AA..). This is FPC's defect; the port appends every escape
+               as its one code unit.
+    8  21-26   read from a stream of UTF-8 bytes: TJSONParser.Create(TStream, ...) with and without joUTF8,
                with a byte order mark (with and without joBOMCheck), GetJSON(TStream), and GetJSON(TStream)
                with no stream parser handler (FPC's reads the stream and returns nil)
-    9  23      GetJSON(text, False)
-    -  24      the bytes TJSONData.DumpJSON writes for a tree with non-ASCII names and strings *)
+    9  27      GetJSON(text, False)
+    -  28      the bytes TJSONData.DumpJSON writes for a tree with non-ASCII names and strings *)
 
 const
   { group 3: "<U+4E2D U+6587> caf<U+00E9> <U+00F1>" }
@@ -86,7 +96,7 @@ begin
     JsonStrToJson(D.AsString);
 end;
 
-procedure JsonStrCase(const AText: string);
+procedure JsonStrCaseEx(const AText: string; AFromJson: Boolean);
 var
   d: TJSONData;
 begin
@@ -102,7 +112,13 @@ begin
   except
     on E: Exception do Raised(E);
   end;
-  JsonStrFromJson(AText);
+  if AFromJson then
+    JsonStrFromJson(AText);
+end;
+
+procedure JsonStrCase(const AText: string);
+begin
+  JsonStrCaseEx(AText, True);
 end;
 
 { Group 4: the characters one by one, then all of them, through StringToJSONString and back. }
@@ -185,7 +201,7 @@ begin
     Line('fromjson differs');
 end;
 
-{ Group 7: informational, and always the same seven lines. }
+{ Groups 7 and 7b: informational, and always the same seven lines. }
 procedure JsonStrInfoCase(const AText: string);
 var
   d: TJSONData;
@@ -341,7 +357,7 @@ begin
   { 1 }
   JsonStrCase('"\" \\ \/ \b \f \n \r \t"');
   { 2 }
-  JsonStrCase('"\u0041\u56fd\u00e9"');
+  JsonStrCaseEx('"\u0041\u56fd\u00e9"', False);
   JsonStrCase('"\ud83d\ude00"');
   JsonStrCase('"'#$F0#$9F#$98#$80'"');
   { 3 }
@@ -361,6 +377,11 @@ begin
   JsonStrInfoCase('"\ud83d"');
   JsonStrInfoCase('"\ude00"');
   JsonStrInfoCase('"\ud83dx"');
+  { 7b: informational, FPC's defect }
+  JsonStrInfoCase('"\u00f1\ud83d\ude00"');
+  JsonStrInfoCase('"\u4e2d\ud83d\ude00"');
+  JsonStrInfoCase('"\u4e2d\u6587\ud83d\ude00"');
+  JsonStrInfoCase('"\u0041\u56fd\u00e9"');
   { 8 }
   JsonStrStreamCase('TJSONParser(TStream, [joUTF8])', '', cJsonStrText3, [joUTF8]);
   JsonStrStreamCase('TJSONParser(TStream, [])', '', cJsonStrText3, []);
@@ -372,5 +393,5 @@ begin
   { 9 }
   JsonStrNoUtf8Case(cJsonStrText3);
   { DumpJSON }
-  JsonStrDumpCase('{"'#$E5#$90#$8D'":["caf'#$C3#$A9'",1,"\u00f1\ud83d\ude00"],"a\"b":{"'#$E2#$80#$A8'":null}}');
+  JsonStrDumpCase('{"'#$E5#$90#$8D'":["caf'#$C3#$A9'",1,"\u00f1x\ud83d\ude00"],"a\"b":{"'#$E2#$80#$A8'":null}}');
 end;
