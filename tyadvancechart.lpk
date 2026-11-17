@@ -526,6 +526,14 @@ Homepage: https://github.com/ACTom/TyAdvanceChart"/>
         <Type Value="Include"/>
       </Item>
       <Item>
+        <Filename Value="source/tyControls.AdvanceChart.ChecksOff.inc"/>
+        <Type Value="Include"/>
+      </Item>
+      <Item>
+        <Filename Value="source/tyControls.AdvanceChart.ChecksBack.inc"/>
+        <Type Value="Include"/>
+      </Item>
+      <Item>
         <Filename Value="source/tyControls.AdvanceChart.Control.Paint.inc"/>
         <Type Value="Include"/>
       </Item>

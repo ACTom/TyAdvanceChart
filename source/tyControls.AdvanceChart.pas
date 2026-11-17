@@ -6729,7 +6729,7 @@ end;
 procedure GeoUnmaskFpu(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
-  {$IFDEF CPUX86_64}
+  {$IFDEF CPUX64}
   SetMXCSR(GetMXCSR and not LongWord($3F));
   {$ENDIF}
   SetExceptionMask(AMask);
@@ -6964,7 +6964,7 @@ end;
 procedure ConvertUnmask(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
-  {$IFDEF CPUX86_64}
+  {$IFDEF CPUX64}
   { the SSE flags too, which ClearExceptions leaves standing on this CPU }
   SetMXCSR(GetMXCSR and not LongWord($3F));
   {$ENDIF}

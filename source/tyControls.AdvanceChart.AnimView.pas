@@ -1342,10 +1342,10 @@ var
       tagged with its length and an FNV-1a hash of the whole }
     if Length(S) <= 200 then Exit('_ec_' + S);
     h := 2166136261;
-    {$PUSH}{$Q-}{$R-}
+    {$I tyControls.AdvanceChart.ChecksOff.inc}
     for c := 1 to Length(S) do
       h := (h xor Ord(S[c])) * 16777619;
-    {$POP}
+    {$I tyControls.AdvanceChart.ChecksBack.inc}
     Result := '_ec_' + Copy(S, 1, 180) + '#' + IntToHex(Length(S), 8)
       + IntToHex(h, 8);
   end;

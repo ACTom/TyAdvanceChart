@@ -5689,7 +5689,7 @@ begin
     end;
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(m);

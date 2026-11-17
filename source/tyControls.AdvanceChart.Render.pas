@@ -1646,7 +1646,7 @@ begin
     hk := 0;
     if keep then
     begin
-      {$push}{$R-}{$Q-}
+      {$I tyControls.AdvanceChart.ChecksOff.inc}
       hk := QWord($CBF29CE484222325);
       hk := (hk xor QWord(LongWord(x0))) * QWord($100000001B3);
       hk := (hk xor QWord(LongWord(y0))) * QWord($100000001B3);
@@ -1659,7 +1659,7 @@ begin
         hk := (hk xor ab^) * QWord($100000001B3);
         Inc(ab);
       end;
-      {$pop}
+      {$I tyControls.AdvanceChart.ChecksBack.inc}
       if GTraceKeptCollide then hk := 0;
       if (GTraceKept <> nil) and GTraceKept.TryGetValue(hk, kFirst) then
       begin

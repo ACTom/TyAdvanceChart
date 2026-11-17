@@ -549,7 +549,7 @@ end;
 procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
-  {$IFDEF CPUX86_64}
+  {$IFDEF CPUX64}
   { the SSE flags too: ClearExceptions clears the x87 status word only, and
     a sticky invalid-operation flag would be reported by the next trap }
   SetMXCSR(GetMXCSR and not LongWord($3F));

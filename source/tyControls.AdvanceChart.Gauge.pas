@@ -587,7 +587,7 @@ end;
 procedure UnmaskTraps(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
-  {$IFDEF CPUX86_64}
+  {$IFDEF CPUX64}
   { and the SSE flags, which ClearExceptions leaves on this CPU (Graph.pas
     UnmaskFP) }
   SetMXCSR(GetMXCSR and not LongWord($3F));

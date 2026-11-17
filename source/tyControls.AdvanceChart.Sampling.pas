@@ -134,7 +134,7 @@ end;
 procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
-  {$IFDEF CPUX86_64}
+  {$IFDEF CPUX64}
   { the SSE flags too: ClearExceptions clears only the x87 status word here,
     and a sticky invalid-operation flag would make the host's next division
     by zero report as an invalid operation }

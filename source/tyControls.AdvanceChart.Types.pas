@@ -86,9 +86,9 @@ type
   TTyNonRefCountedObject = class(TObject, IUnknown)
   protected
     function QueryInterface({$IFDEF FPC_HAS_CONSTREF}constref{$ELSE}const{$ENDIF} IID: TGUID; out Obj): HResult;
-      {$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
-    function _AddRef: Integer; {$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
-    function _Release: Integer; {$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+      {$IFNDEF MSWINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+    function _AddRef: Integer; {$IFNDEF MSWINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+    function _Release: Integer; {$IFNDEF MSWINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
   end;
 
   { Where a text box sits on the anchor it is placed at. Deliberately NOT LCL's
@@ -217,7 +217,7 @@ implementation
 
 function TTyNonRefCountedObject.QueryInterface(
   {$IFDEF FPC_HAS_CONSTREF}constref{$ELSE}const{$ENDIF} IID: TGUID; out Obj): HResult;
-  {$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+  {$IFNDEF MSWINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
 begin
   if GetInterface(IID, Obj) then
     Result := S_OK
@@ -225,12 +225,12 @@ begin
     Result := HResult($80004002);   // E_NOINTERFACE
 end;
 
-function TTyNonRefCountedObject._AddRef: Integer; {$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+function TTyNonRefCountedObject._AddRef: Integer; {$IFNDEF MSWINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
 begin
   Result := -1;
 end;
 
-function TTyNonRefCountedObject._Release: Integer; {$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+function TTyNonRefCountedObject._Release: Integer; {$IFNDEF MSWINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
 begin
   Result := -1;
 end;

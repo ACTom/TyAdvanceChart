@@ -4012,7 +4012,7 @@ begin
 end;
 
 initialization
-  {$IFDEF WINDOWS}
+  {$IFDEF MSWINDOWS}
   GTextDefaults := TJSONObject(GetJSON('{"fontSize":12,"fontStyle":"normal",'
     + '"fontWeight":"normal","fontFamily":"Microsoft YaHei"}'));
   {$ELSE}

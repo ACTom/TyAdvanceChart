@@ -17,8 +17,8 @@ const
   ExpStringCaseLabels = 22;
   ExpCompoundAssignments = 0;
   ExpFpcOnlyKeywords = 5;
-  ExpBarePushPop = 24;
-  ExpConditionalSymbols = 53;
+  ExpBarePushPop = 0;
+  ExpConditionalSymbols = 0;
   ExpFpcOnlyNames = 417;
 
 type

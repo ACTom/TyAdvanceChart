@@ -149,7 +149,7 @@ end;
 procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
-  {$IFDEF CPUX86_64}
+  {$IFDEF CPUX64}
   { the SSE sticky flags too: ClearExceptions only clears the x87 word here }
   SetMXCSR(GetMXCSR and not LongWord($3F));
   {$ENDIF}

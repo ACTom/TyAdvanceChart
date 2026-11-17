@@ -633,7 +633,7 @@ begin
   if GBusy = 0 then
   begin
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
   end;

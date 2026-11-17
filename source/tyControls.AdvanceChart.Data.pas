@@ -1196,7 +1196,7 @@ end;
 
 {$IFDEF MSWINDOWS}
 type
-  {$PUSH}{$PACKRECORDS C}
+  {$IFDEF FPC}{$PUSH}{$PACKRECORDS C}{$ENDIF}
   TTyWinSysTime = record
     wYear, wMonth, wDayOfWeek, wDay, wHour, wMinute, wSecond,
       wMilliseconds: Word;
@@ -1217,7 +1217,7 @@ type
     TimeZoneKeyName: array[0..127] of WideChar;
     DynamicDaylightTimeDisabled: ByteBool;
   end;
-  {$POP}
+  {$IFDEF FPC}{$POP}{$ENDIF}
   TTyGetDynTzi = function(var ADtzi: TTyWinDynTzi): LongWord; stdcall;
   TTyGetTzi = function(var ATzi: TTyWinTzi): LongWord; stdcall;
   TTyGetTziForYear = function(AYear: Word; ADtzi: Pointer;
@@ -1354,7 +1354,7 @@ end;
 {$ELSE}
 {$IFDEF UNIX}
 type
-  {$PUSH}{$PACKRECORDS C}
+  {$IFDEF FPC}{$PUSH}{$PACKRECORDS C}{$ENDIF}
   { struct tm with the BSD / glibc tm_gmtoff }
   TTyCTm = record
     tm_sec, tm_min, tm_hour, tm_mday, tm_mon, tm_year, tm_wday, tm_yday,
@@ -1362,7 +1362,7 @@ type
     tm_gmtoff: clong;
     tm_zone: PAnsiChar;
   end;
-  {$POP}
+  {$IFDEF FPC}{$POP}{$ENDIF}
   PTyCTm = ^TTyCTm;
 
 function ty_localtime_r(ATimer: Ptime_t; AResult: PTyCTm): PTyCTm; cdecl;
@@ -1625,10 +1625,10 @@ function OrdinalHash(const AText: string): LongWord;
 var i: Integer;
 begin
   Result := 2166136261;
-  {$push}{$R-}{$Q-}
+  {$I tyControls.AdvanceChart.ChecksOff.inc}
   for i := 1 to Length(AText) do
     Result := (Result xor Ord(AText[i])) * 16777619;
-  {$pop}
+  {$I tyControls.AdvanceChart.ChecksBack.inc}
 end;
 
 function TTyOrdinalMeta.MapFind(const ACategory: string; AHash: LongWord): Integer;

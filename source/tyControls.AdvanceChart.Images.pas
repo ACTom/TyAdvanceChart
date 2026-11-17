@@ -436,7 +436,7 @@ begin
   Result.InvalidateBitmap;
 end;
 
-{$PUSH}{$Q-}{$R-}
+{$I tyControls.AdvanceChart.ChecksOff.inc}
 function TyChartImageListCachedCount(AList: TCustomImageList): Integer;
 var
   i: Integer;
@@ -484,7 +484,7 @@ begin
     end;
   end;
 end;
-{$POP}
+{$I tyControls.AdvanceChart.ChecksBack.inc}
 
 function ListImage(AList: TCustomImageList; AIndex: Integer;
   ADevicePx: Double): TBGRABitmap;

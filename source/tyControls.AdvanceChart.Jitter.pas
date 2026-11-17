@@ -107,7 +107,7 @@ end;
 procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
-  {$IFDEF CPUX86_64}
+  {$IFDEF CPUX64}
   { the SSE flags too: ClearExceptions clears the x87 status word only, and
     a sticky invalid-operation flag would be reported by the next trap }
   SetMXCSR(GetMXCSR and not LongWord($3F));
@@ -129,12 +129,12 @@ end;
 function TyJitterRandom(var AState: LongWord): Double;
 var x: LongWord;
 begin
-  {$push}{$R-}{$Q-}
+  {$I tyControls.AdvanceChart.ChecksOff.inc}
   x := AState;
   x := x xor LongWord(x shl 13);
   x := x xor (x shr 17);
   x := x xor LongWord(x shl 5);
-  {$pop}
+  {$I tyControls.AdvanceChart.ChecksBack.inc}
   AState := x;
   Result := x / cTwo32;
 end;

@@ -3761,7 +3761,7 @@ end;
 procedure UnmaskFP(const AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
-  {$IFDEF CPUX86_64}
+  {$IFDEF CPUX64}
   { AND THE SSE FLAGS, which ClearExceptions does not touch on this CPU -- it
     clears the x87 status word and nothing else, and a Double here is SSE. Left
     standing, the invalid-operation flag the masked arithmetic raised stays
@@ -3839,9 +3839,9 @@ end;
 
 function TyGraphForceSeed(ASeriesIndex: Integer): LongWord;
 begin
-  {$push}{$R-}{$Q-}
+  {$I tyControls.AdvanceChart.ChecksOff.inc}
   Result := LongWord(2463534242 + LongWord(ASeriesIndex) * 2654435769);
-  {$pop}
+  {$I tyControls.AdvanceChart.ChecksBack.inc}
   { xorshift has one state it can never leave. }
   if Result = 0 then Result := 2463534242;
 end;
@@ -3852,12 +3852,12 @@ const
 function TyGraphRandom(var AState: LongWord): Double;
 var x: LongWord;
 begin
-  {$push}{$R-}{$Q-}
+  {$I tyControls.AdvanceChart.ChecksOff.inc}
   x := AState;
   x := x xor LongWord(x shl 13);
   x := x xor (x shr 17);
   x := x xor LongWord(x shl 5);
-  {$pop}
+  {$I tyControls.AdvanceChart.ChecksBack.inc}
   AState := x;
   { A TYPED CONSTANT, so the division is a Double one. An untyped real constant
     here is a Single, and so is the arithmetic it takes part in. }
@@ -3938,8 +3938,8 @@ end;
   under half the time. A 64-bit register holds a Double exactly as memory
   does, so the arithmetic and its rounding are the same; on x86-64 only, where
   Doubles are SSE values (an x87 register would hold more bits than memory). }
-{$push}
-{$IFDEF CPUX86_64}{$OPTIMIZATION REGVAR}{$ENDIF}
+{$IFDEF FPC}{$push}{$ENDIF}
+{$IFDEF FPC}{$IFDEF CPUX64}{$OPTIMIZATION REGVAR}{$ENDIF}{$ENDIF}
 procedure ForceStep(var St: TTyGraphForceState; AFriction: Double);
 var
   n, ne, i, j, k, a, b: Integer;
@@ -4087,7 +4087,7 @@ begin
       St.InstLY[i] := St.InstPY[i];
     end;
 end;
-{$pop}
+{$IFDEF FPC}{$pop}{$ENDIF}
 
 { What the pass hands back: every node where its layout is -- a free one where
   the solver left it, a fixed one where its layout says -- and the preserved

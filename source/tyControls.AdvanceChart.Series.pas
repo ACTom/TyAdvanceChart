@@ -2009,7 +2009,7 @@ begin
     end;
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     { And the SSE flags, which ClearExceptions leaves standing on this CPU. }
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}

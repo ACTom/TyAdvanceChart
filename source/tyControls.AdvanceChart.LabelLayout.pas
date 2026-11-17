@@ -430,7 +430,7 @@ end;
 procedure UnmaskJs(AMask: TFPUExceptionMask);
 begin
   ClearExceptions(False);
-  {$IFDEF CPUX86_64}
+  {$IFDEF CPUX64}
   { and the SSE flags ClearExceptions leaves on this CPU }
   SetMXCSR(GetMXCSR and not LongWord($3F));
   {$ENDIF}

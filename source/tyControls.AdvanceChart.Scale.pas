@@ -1069,7 +1069,7 @@ begin
         ABreaks[i].GapReal := ABreaks[i].GapVal;
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);
@@ -1450,7 +1450,7 @@ begin
     end;
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);
@@ -3258,7 +3258,7 @@ begin
     Result.NiceHi := maxNice;
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);
@@ -3340,7 +3340,7 @@ begin
     NiceifyJs(ASplitNumber, AUserInterval);
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     { And the SSE flags, which ClearExceptions leaves standing on this CPU. }
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
@@ -3605,7 +3605,7 @@ begin
     end;
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);

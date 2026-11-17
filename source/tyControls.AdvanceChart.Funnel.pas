@@ -482,7 +482,7 @@ begin
     Result := FunnelLayoutOfImpl(ASpec, AViewport, AStore, ADim, False, Default(TTyXYWH));
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);
@@ -500,7 +500,7 @@ begin
       AView.Y + AView.H), AStore, ADim, True, AView);
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);
@@ -915,7 +915,7 @@ begin
     Result := FunnelPercentsImpl(ALayout);
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);

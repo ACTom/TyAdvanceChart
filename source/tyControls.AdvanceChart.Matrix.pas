@@ -923,13 +923,13 @@ end;
 
 { ==================== TTyMatrixBodyCorner ==================== }
 
-{$push}{$Q-}{$R-}
+{$I tyControls.AdvanceChart.ChecksOff.inc}
 function BCHash(AX, AY: Integer): Cardinal;
 begin
   Result := (Cardinal(AX) * Cardinal($9E3779B1)) xor (Cardinal(AY) * Cardinal($85EBCA77));
   Result := Result xor (Result shr 15);
 end;
-{$pop}
+{$I tyControls.AdvanceChart.ChecksBack.inc}
 
 destructor TTyMatrixBodyCorner.Destroy;
 begin

@@ -139,7 +139,7 @@ function TyProgNowMs: Double;
 
 implementation
 
-{$IFDEF WINDOWS}
+{$IFDEF MSWINDOWS}
 uses Windows;
 {$ELSE}
 { BaseUnix has TTimeVal; fpgettimeofday is declared in Unix }
@@ -147,7 +147,7 @@ uses BaseUnix, Unix;
 {$ENDIF}
 
 function TyProgNowMs: Double;
-{$IFDEF WINDOWS}
+{$IFDEF MSWINDOWS}
 var c, fq: Int64;
 begin
   c := 0;

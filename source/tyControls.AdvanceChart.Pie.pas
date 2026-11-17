@@ -690,7 +690,7 @@ begin
     Result := SeatsJs(AValues, APrecision);
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);
@@ -762,7 +762,7 @@ begin
     Result := PieLayoutOfImpl(ASpec, vr, TyXYWHOfRect(vr), AStore, ADim);
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);
@@ -779,7 +779,7 @@ begin
     Result := PieLayoutOfImpl(ASpec, TyRectOfXYWH(AView), AView, AStore, ADim);
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);

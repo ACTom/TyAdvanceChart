@@ -664,7 +664,7 @@ end;
   else is a non-negative word and shr is the same. Integer arithmetic wraps
   as C's does, with range and overflow checks off. }
 
-{$PUSH}{$R-}{$Q-}
+{$I tyControls.AdvanceChart.ChecksOff.inc}
 
 function WithHigh(AX: Double; AHigh: LongInt): Double;
 begin
@@ -688,7 +688,7 @@ begin
     if ADivide then Result := A / B else Result := A * B;
   finally
     ClearExceptions(False);
-    {$IFDEF CPUX86_64}
+    {$IFDEF CPUX64}
     SetMXCSR(GetMXCSR and not LongWord($3F));
     {$ENDIF}
     SetExceptionMask(mask);
@@ -1055,7 +1055,7 @@ begin
   Result := s * z;
 end;
 
-{$POP}
+{$I tyControls.AdvanceChart.ChecksBack.inc}
 
 initialization
   invpio2 := FromBits(QWord($3FE45F306DC9C883));
